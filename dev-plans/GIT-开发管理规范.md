@@ -10,8 +10,7 @@ litellm-cn/
 ├── docs/zh-CN/              # 中文文档
 │   ├── README.md
 │   └── <翻译文件>
-├── dev-plans/               # 开发需求拆解
-├── FORK-AND-LOCALIZATION-PLAN.md  # 总览方案
+├── dev-plans/               # 开发需求拆解（含 00-总体方案.md 总览）
 └── [功能分支代码]           # 各种 feat/* 分支的开发代码
 ```
 
@@ -277,6 +276,6 @@ git push origin <分支名>
 
 如有问题，查阅以下文件：
 
-- [`dev-plans/README.md`](../dev-plans/README.md) - 需求总览
-- [`FORK-AND-LOCALIZATION-PLAN.md`](../FORK-AND-LOCALIZATION-PLAN.md) - 总体方案
+- [`dev-plans/README.md`](./README.md) - 需求总览
+- [`00-总体方案.md`](./00-总体方案.md) - 总体方案
 - 上游仓库 [`CLAUDE.md`](https://github.com/BerriAI/litellm/blob/main/CLAUDE.md)

@@ -7,8 +7,8 @@
 ```
 docs/zh-CN/
 ├── README.md              # 本文件：索引 + 版本对应关系
-├── GIT-开发管理规范.md     # 开发管理规范（自有内容，非译文）
 ├── QUICK-START.md         # 二开快速开始（自有内容，非译文）
+├── private-llm-deployment-plan.md  # 私有化大模型部署实施方案（自有内容，非译文）
 ├── getting-started/       # 快速开始 / 部署 / 配置（待创建）
 ├── proxy/                 # 虚拟密钥、预算与限流、团队与用户（待创建）
 ├── providers/             # 模型接入（含国内提供商，见 dev-plans/08）（待创建）

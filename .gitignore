@@ -153,3 +153,6 @@ coverage-rust.xml
 
 # [CN-FORK] Local uv cache dir, used when %LOCALAPPDATA%\uv is not writable.
 .uv-cache/
+
+# [CN-FORK] Work buddy scratch dir (transient agent working files, never tracked).
+.workbuddy/
