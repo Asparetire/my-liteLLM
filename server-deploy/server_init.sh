@@ -47,18 +47,29 @@ else
   echo "    已存在，跳过"
 fi
 
+echo "==> 本地忽略规则（写进 .git/info/exclude，不改仓库的 .gitignore，避免与上游冲突）"
+if [ -d "$BASE/.git" ]; then
+  EXC="$BASE/.git/info/exclude"
+  for pat in "/data/" "/.env" "/.venv/" "/rust_bridge/" "/node_modules/" "/ui_cn/"; do
+    grep -qxF "$pat" "$EXC" 2>/dev/null || echo "$pat" >> "$EXC"
+  done
+  echo "    已写入 $EXC"
+else
+  echo "    不是 git 仓库，跳过（建议用 git clone 方式放置代码，见 README-VSCode远程开发.md）"
+fi
+
 cat <<EOF
 
-初始化完成。接下来：
+初始化完成。接下来（远程开发模式）：
 
-  1) 在本机上传源码：
-       \$env:LITELLM_SERVER_PWD = "<密码>"
-       python server-deploy/sync_fork.py --host <服务器IP> --user $USER
-
-  2) 确认 .env 里的 PG_PASSWORD 已改：
+  1) 在 VS Code 里 Remote-SSH 连接本服务器，打开 $BASE
+  2) 修改 .env 里的 PG_PASSWORD：
        vi $BASE/.env
-
-  3) 启动：
+  3) 启动二开版：
        cd $BASE && docker compose -f docker-compose.cn.yml -p litellm-cn up -d
        docker compose -p litellm-cn logs -f litellm-cn
+  4) 验证：
+       bash server-deploy/verify.sh 4001
+
+若代码还没放到服务器上，见 README-VSCode远程开发.md 第 2 节（git 方式搬运，保留提交历史）。
 EOF
