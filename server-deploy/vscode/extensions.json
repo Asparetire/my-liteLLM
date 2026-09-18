@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "ms-vscode-remote.remote-ssh",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "charliermarsh.ruff",
+    "ms-vscode-remote.remote-ssh-edit",
+    "redhat.vscode-yaml",
+    "esbenp.prettier-vscode",
+    "eamodio.gitlens",
+    "ms-azuretools.vscode-docker",
+    "tamasfe.even-better-toml"
+  ],
+  "unwantedRecommendations": []
+}
