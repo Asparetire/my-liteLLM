@@ -99,19 +99,18 @@ describe("dataUtils", () => {
       expect(getSpendString(Number.NaN)).toBe("-");
     });
 
-    it("should format spend with dollar sign", () => {
-      expect(getSpendString(1234.5, 2)).toBe("$1,234.50");
-      expect(getSpendString(-2500, 0)).toBe("$-2,500");
+    it("should format spend as a token count", () => {
+      expect(getSpendString(1234567)).toBe("1,234,567 tokens");
+      expect(getSpendString(42)).toBe("42 tokens");
     });
 
-    it("should return threshold string for very small values", () => {
-      expect(getSpendString(0.0000004, 6)).toBe("< $0.000001");
-      expect(getSpendString(-0.0000004, 6)).toBe("< $0.000001");
+    it("should return the sub-threshold string for values below one token", () => {
+      expect(getSpendString(0.4)).toBe("< 1 token");
     });
 
-    it("should respect custom decimals", () => {
-      expect(getSpendString(0.01234, 3)).toBe("$0.012");
-      expect(getSpendString(999.9999, 1)).toBe("$1,000.0");
+    it("should round fractional token counts to integers", () => {
+      expect(getSpendString(1234.5678)).toBe("1,235 tokens");
+      expect(getSpendString(0.9)).toBe("1 token");
     });
   });
 
