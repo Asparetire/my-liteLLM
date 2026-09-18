@@ -1,7 +1,17 @@
-# LiteLLM 二开版部署方案（服务器 192.168.100.123）
+﻿# LiteLLM 二开版部署方案（服务器 192.168.100.123）
 
 > 本方案基于对目标服务器的**实测探查**编写，所有结论均有证据，不是通用模板。
 > 探查时间：2026-09-18
+
+## 0. 先选模式：代码放哪
+
+| 模式 | 代码真身 | 适用 | 文档 |
+|---|---|---|---|
+| **远程开发模式**（推荐） | 服务器 `~/litellm-src`，VS Code Remote-SSH 直连改 | 长期开发，改完重启即生效 | **[README-VSCode远程开发.md](./README-VSCode远程开发.md)** |
+| 上传模式 | Windows 本地，用 `sync_fork.py` 上传 | 临时验证、不方便在服务器上开发 | 本文件 |
+
+两种模式跑的是**同一套编排**（`docker-compose.cn.yml`），区别只有代码从哪来。
+选远程开发模式就按那份文档走，本文件第 4 节里的「上传」步骤可跳过。
 
 ---
 
@@ -102,7 +112,7 @@
 bash server-deploy/server_init.sh
 ```
 
-做三件事：建 `~/litellm-cn/{litellm,litellm_cn,rust_bridge,data}`；从运行中的 `litellm` 容器 `docker cp` 出 `_native.abi3.so`；生成 `.env` 模板。
+做三件事：建 `~/litellm-src/{litellm,litellm_cn,rust_bridge,data}`；从运行中的 `litellm` 容器 `docker cp` 出 `_native.abi3.so`；生成 `.env` 模板。
 
 **第 2 步：本机上传 fork 源码**
 
@@ -116,7 +126,7 @@ python server-deploy/sync_fork.py --host 192.168.100.123 --user hifen37
 **第 3 步：填 `.env`**
 
 ```bash
-cd ~/litellm-cn
+cd ~/litellm-src
 # 沿用原版 master key，客户端不用改 key
 grep LITELLM_MASTER_KEY /home/hifen37/ollama-litellm/.env >> .env
 # 新库的密码，随便起一个
@@ -126,7 +136,7 @@ echo 'PG_PASSWORD=<新密码>' >> .env
 **第 4 步：启动**
 
 ```bash
-cd ~/litellm-cn
+cd ~/litellm-src
 docker compose -f docker-compose.cn.yml -p litellm-cn up -d
 docker compose -p litellm-cn logs -f litellm-cn
 ```
@@ -144,21 +154,56 @@ bash server-deploy/verify.sh
 | 宿主机路径 | 容器路径 | 作用 |
 |---|---|---|
 | `./litellm_config.cn.yaml` | `/app/config.yaml` | 配置（ro） |
-| `./litellm` | `/app/.venv/lib/python3.13/site-packages/litellm` | **fork 源码覆盖**（ro） |
+| `./litellm` | `/app/.venv/lib/python3.13/site-packages/litellm` | **fork 源码覆盖**（**必须可读写**，见坑 4） |
 | `./litellm_cn` | `/app/litellm_cn` | 中文错误中间件包（ro） |
 | `./rust_bridge/_native.abi3.so` | `.../litellm/rust_bridge/_native.abi3.so` | 补回被覆盖的 Rust 扩展 |
+| `./litellm-proxy-extras/litellm_proxy_extras` | `.../litellm_proxy_extras` | **补版本漂移**（坑 3），少了它启动直接 ImportError |
 | `/home/hifen37/ollama-litellm/patches` | `/app/patches` | 沿用原版的 Ollama 缓存计数补丁 |
 
 `litellm_cn` 之所以能被 import，靠的是 `proxy_cli.py:50` 的 `sys.path.append(os.getcwd())`，容器 WORKDIR 是 `/app`，所以 `/app/litellm_cn` 自动进 path，无需改 PYTHONPATH。
 
 ### 4.4 配置文件改了什么
 
-`litellm_config.cn.yaml` 完全沿用现有 `litellm_config.yaml`（num_ctx / keep_alive / reasoning_effort 等全部保留），只改两处：
+`litellm_config.cn.yaml` 完全沿用现有 `litellm_config.yaml`（num_ctx / keep_alive / reasoning_effort 等全部保留），只改三处：
 
 1. **token 计费**：5 个模型的 `input_cost_per_token` / `output_cost_per_token` 从 `0` 改为 `1.0`
    → 这是二开需求 05 的第一阶段，改完 `spend` 数值就等于 token 数，`max_budget` 立刻生效
    → 想先验证原版一致性，把这两项改回 `0` 即可
-2. **`database_url`** 指向新的独立库（通过 `DATABASE_URL` 环境变量，与配置解耦）
+2. **补 `cache_creation_input_token_cost` / `cache_read_input_token_cost` = 1.0**（坑 5）
+   → 不补的话输入 token 全部免费，`spend` 只统计输出 token
+3. **`database_url`** 指向新的独立库（通过 `DATABASE_URL` 环境变量，与配置解耦）
+
+### 4.5 实测排障记录（2026-09-18 首次部署逐条踩过）
+
+按发生顺序，都是挂载方案特有的，构建自有镜像后 1/2/3 自然消失。
+
+**① `set: pipefail: 无效的选项名`**
+脚本经 SFTP 上传后带上了 CRLF 换行，`set -euo pipefail\r` 被当成无效选项。
+修：`sed -i 's/\r$//' server-deploy/*.sh *.yml *.yaml`。
+
+**② `error mounting ... _native.abi3.so: read-only file system`**
+`./litellm` 以 `:ro` 挂载时，Docker 无法在其中为嵌套的 `.so` 创建挂载点文件。
+修：把 `./litellm` 那一行改成可读写（去掉 `:ro`）。代价是容器内可能往源码树写 `__pycache__`，已被 `.gitignore` 覆盖。
+
+**③ `ImportError: cannot import name 'prisma_cli_available' from 'litellm_proxy_extras.prisma_toolchain'`**
+fork 的 `proxy_cli.py`（1.102.0）比镜像内置的 `litellm_proxy_extras`（0.4.94，**167 个迁移**）新；fork 侧是 0.4.97、**175 个迁移**。
+修：额外挂载 `./litellm-proxy-extras/litellm_proxy_extras`。只补单个文件也能启动，但迁移数与 `schema.prisma` 会对不上，**必须整包挂**。
+
+**④ `verify.sh` 全部「拿不到 LITELLM_MASTER_KEY」**
+非交互执行（`ssh host "cmd"`）时 `$HOME` 可能未设，`$HOME/litellm-src` 展开成 `/litellm-src`。
+修：脚本已加回退 `[ -f "$BASE/.env" ] || BASE="$(cd "$(dirname "$0")/.." && pwd)"`；也可以显式 `BASE=~/litellm-src bash server-deploy/verify.sh`。
+
+**⑤ token 计费只算输出 token（最隐蔽的一个）**
+开了 `LITELLM_OLLAMA_CACHE_CREATION=1` 后，prompt token 会被整段记为 cache-write，而 `cache_creation_input_token_cost` 默认 **0**。
+实测 16 进 / 2 出的请求 `spend` 只有 **2.0**。启动时日志也有 WARNING 提示（`... will default to 0 for this model`）。
+修：每个模型补 `cache_creation_input_token_cost: 1.0` 与 `cache_read_input_token_cost: 1.0`，之后实测 `spend = 18.0 = total_tokens`。
+
+**⑥ 用 master key 查 `/key/info` 返回 404 `Key not found in database`**
+master key 不在虚拟密钥表里。要验 spend 必须**先建一把虚拟密钥再查它**，`verify.sh` 第 9 项已自动完成这一步。
+
+**⑦ 已注册但看不出版本**
+`litellm.__version__` 读的是镜像安装元数据（恒为 1.101.0），源码被挂载覆盖后不会变。
+判断 fork 是否生效要用专属标记：`grep -c 'CN-FORK' .../litellm/proxy/proxy_server.py`（当前 2 处）。
 
 ---
 
@@ -201,7 +246,15 @@ curl -s http://192.168.100.123:4001/v1/chat/completions \
   -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
   -d '{"model":"qwen38-27b-fast","messages":[{"role":"user","content":"你好"}]}'
 # 查用量：spend 应等于 token 数（token 计费验收点）
-curl -s http://192.168.100.123:4001/key/info -H "Authorization: Bearer $KEY"
+# 注意：master key 不在虚拟密钥表里，用它查 /key/info 只会 404，必须先建一把虚拟密钥
+VK=$(curl -s http://192.168.100.123:4001/key/generate -H "Authorization: Bearer $KEY" \
+      -H "Content-Type: application/json" -d '{"models":["qwen38-iq3s"]}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["key"])')
+curl -s http://192.168.100.123:4001/v1/chat/completions -H "Authorization: Bearer $VK" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"qwen38-iq3s","messages":[{"role":"user","content":"你好"}],"max_tokens":32}'
+sleep 12   # spend 经 Redis 异步落库
+curl -s http://192.168.100.123:4001/key/info -H "Authorization: Bearer $VK"
+# 期望 spend 等于该密钥累计的「输入+输出」token 数，例如 18 个 token → "spend": 18.0
 ```
 
 ### 6.3 中文错误中间件专项（验证二开真正生效）
@@ -209,10 +262,19 @@ curl -s http://192.168.100.123:4001/key/info -H "Authorization: Bearer $KEY"
 ```bash
 # 用错误 key 触发 401，期望返回中文而非英文
 curl -s http://192.168.100.123:4001/v1/models -H "Authorization: Bearer sk-wrong"
-# 期望：认证失败：代理服务器令牌无效。
+# 期望：认证失败：代理服务器令牌无效。收到的 API Key = sk-...ong，令牌哈希 = ...。
 # 若仍是英文 "Authentication Error, Invalid proxy server token passed." → 说明 litellm_cn 没被 import，检查挂载
 
-docker exec litellm-cn python -c "import litellm_cn; print('litellm_cn OK')"
+docker exec litellm-cn /app/.venv/bin/python -c "import litellm_cn; print('litellm_cn OK')"
+```
+
+中间件是否真的挂到 app 上（光能 import 不算）：
+
+```bash
+docker exec litellm-cn /app/.venv/bin/python -c "
+import litellm.proxy.proxy_server as p
+print([m.cls.__name__ for m in p.app.user_middleware])"
+# 期望列表末尾出现 'ErrorHandlerMiddleware'
 ```
 
 ### 6.4 控制台
@@ -232,7 +294,7 @@ docker exec litellm-cn python -c "import litellm_cn; print('litellm_cn OK')"
 # 1. 停原版（保留容器与数据，随时可起）
 docker stop litellm
 # 2. 把二开版改挂 4000
-sed -i 's/4001:4000/4000:4000/' ~/litellm-cn/docker-compose.cn.yml
+sed -i 's/4001:4000/4000:4000/' ~/litellm-src/docker-compose.cn.yml
 docker compose -p litellm-cn up -d
 ```
 
@@ -242,7 +304,7 @@ docker compose -p litellm-cn up -d
 
 UI 源码在 `ui/litellm-dashboard`，需要 Node ≥ 24.14.1。服务器无 node，两种做法：
 
-- **推荐**：本机（Windows，`D:\tool\node.exe` 是 24.21.0）`npm ci && npm run build`，把 `out/` 上传到 `~/litellm-cn/ui_cn/`，compose 里加 `LITELLM_UI_PATH=/app/ui_cn` 与对应挂载 —— 不进镜像，改一次传一次
+- **推荐**：本机（Windows，`D:\tool\node.exe` 是 24.21.0）`npm ci && npm run build`，把 `out/` 上传到 `~/litellm-src/ui_cn/`，compose 里加 `LITELLM_UI_PATH=/app/ui_cn` 与对应挂载 —— 不进镜像，改一次传一次
 - 或在服务器装 Node（`nodejs.org` 可达）后自行构建
 
 ---
@@ -251,11 +313,14 @@ UI 源码在 `ui/litellm-dashboard`，需要 Node ≥ 24.14.1。服务器无 nod
 
 | 文件 | 作用 |
 |---|---|
-| `README-部署方案.md` | 本文档 |
+| `README-部署方案.md` | 本文档（上传模式） |
+| `README-VSCode远程开发.md` | **远程开发模式**：SSH 免密、代码搬运、VS Code 配置、开发循环 |
+| `vscode/settings.json` / `extensions.json` | 复制到仓库 `.vscode/`（大仓库必须调优，否则卡） |
 | `docker-compose.cn.yml` | 二开版编排（4001 + 独立库/缓存） |
 | `litellm_config.cn.yaml` | 配置（沿用原版调优 + token 计费） |
-| `sync_fork.py` | 本机 → 服务器增量上传 fork 源码 |
+| `sync_fork.py` | 上传模式专用：本机 → 服务器增量上传源码（远程开发模式用不到） |
 | `server_init.sh` | 服务器端初始化（建目录、取 .so、生成 .env） |
+| `setup-remote.ps1` | **一键**：Windows 侧把仓库同步到服务器并搭好远程开发环境 |
 | `verify.sh` | 一键验证（健康/模型/中文错误/调用/用量） |
 | `build-image.sh` | 阶段二：生成改造后的 Dockerfile 并构建自有镜像 |
 

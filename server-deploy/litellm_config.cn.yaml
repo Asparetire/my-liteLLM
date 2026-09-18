@@ -19,6 +19,11 @@ model_list:
       reasoning_effort: none
       input_cost_per_token: 1.0
       output_cost_per_token: 1.0
+      # 必填：开了 LITELLM_OLLAMA_CACHE_CREATION 后，prompt token 会被记成 cache-write，
+      # 而 cache_creation_input_token_cost 默认 0 —— 不写这两行，输入 token 全部免费，
+      # spend 只统计输出 token（实测 16 进 / 2 出的请求只记了 2.0）
+      cache_creation_input_token_cost: 1.0
+      cache_read_input_token_cost: 1.0
 
   # ===== qwen3.5:9b =====
   # num_ctx=204800（200K）仅对 qwen3.5 成立，不要照搬：
@@ -34,6 +39,11 @@ model_list:
       reasoning_effort: none
       input_cost_per_token: 1.0
       output_cost_per_token: 1.0
+      # 必填：开了 LITELLM_OLLAMA_CACHE_CREATION 后，prompt token 会被记成 cache-write，
+      # 而 cache_creation_input_token_cost 默认 0 —— 不写这两行，输入 token 全部免费，
+      # spend 只统计输出 token（实测 16 进 / 2 出的请求只记了 2.0）
+      cache_creation_input_token_cost: 1.0
+      cache_read_input_token_cost: 1.0
 
   # ===== qwen3.8-27B IQ3_S（ollama 名 qwen38-iq3s，13GB）=====
   # 架构：64 层混合（48 层线性注意力 + 16 层带 KV），只有 16 层 KV 随上下文增长，约 66 KiB/token。
@@ -49,6 +59,11 @@ model_list:
       reasoning_effort: none
       input_cost_per_token: 1.0
       output_cost_per_token: 1.0
+      # 必填：开了 LITELLM_OLLAMA_CACHE_CREATION 后，prompt token 会被记成 cache-write，
+      # 而 cache_creation_input_token_cost 默认 0 —— 不写这两行，输入 token 全部免费，
+      # spend 只统计输出 token（实测 16 进 / 2 出的请求只记了 2.0）
+      cache_creation_input_token_cost: 1.0
+      cache_read_input_token_cost: 1.0
 
   # 同一模型的快速档（32K），日常对话 / Agent 场景用，比上面快约 3.9 倍
   - model_name: qwen38-27b-fast
@@ -60,6 +75,11 @@ model_list:
       reasoning_effort: none
       input_cost_per_token: 1.0
       output_cost_per_token: 1.0
+      # 必填：开了 LITELLM_OLLAMA_CACHE_CREATION 后，prompt token 会被记成 cache-write，
+      # 而 cache_creation_input_token_cost 默认 0 —— 不写这两行，输入 token 全部免费，
+      # spend 只统计输出 token（实测 16 进 / 2 出的请求只记了 2.0）
+      cache_creation_input_token_cost: 1.0
+      cache_read_input_token_cost: 1.0
 
   # 需要推理链的场景（数学、复杂逻辑），走思考模式
   # 思考内容在 reasoning_content 字段，正文仍可能较短，max_tokens 要给足
@@ -72,6 +92,11 @@ model_list:
       reasoning_effort: medium
       input_cost_per_token: 1.0
       output_cost_per_token: 1.0
+      # 必填：开了 LITELLM_OLLAMA_CACHE_CREATION 后，prompt token 会被记成 cache-write，
+      # 而 cache_creation_input_token_cost 默认 0 —— 不写这两行，输入 token 全部免费，
+      # spend 只统计输出 token（实测 16 进 / 2 出的请求只记了 2.0）
+      cache_creation_input_token_cost: 1.0
+      cache_read_input_token_cost: 1.0
 
   # ===== 可选扩展（启用前必须先 ollama pull，否则启动会反复重试注册导致卡住 2 分钟以上）=====
   # - model_name: qwen2.5-coder
@@ -102,7 +127,7 @@ litellm_settings:
   request_timeout: 600
 
 # ============================================================
-# 相对原版的改动（仅此两处）
+# 相对原版的改动
 # ============================================================
 # 1. token 计费（二开需求 05 第一阶段）
 #    原版所有模型都是 input_cost_per_token: 0 / output_cost_per_token: 0，
@@ -110,5 +135,10 @@ litellm_settings:
 #    spend 的数值就等于 token 数，配额立刻生效。
 #    想先验证与原版的一致性，把全部 1.0 改回 0 即可。
 #
-# 2. database_url 改为环境变量注入（原版也是），实际指向新的独立库，
+# 2. 每个模型额外补了 cache_creation_input_token_cost / cache_read_input_token_cost。
+#    因为服务器开了 LITELLM_OLLAMA_CACHE_CREATION=1，prompt token 会被整段记为
+#    cache-write，这两项默认 0 会让输入 token 完全不计费（实测 16 进 / 2 出只记 2.0）。
+#    补成 1.0 之后 spend 才等于「输入 + 输出」的真实 token 数。
+#
+# 3. database_url 改为环境变量注入（原版也是），实际指向新的独立库，
 #    由 docker-compose.cn.yml 的 DATABASE_URL 决定，配置本身不含连接串。

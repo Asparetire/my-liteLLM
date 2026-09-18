@@ -59,7 +59,7 @@
 ```
 /home/hifen37/litellm-src/          ← git clone 出来的完整仓库
   .git/
-  litellm/                          ← bind mount 进容器（ro）
+  litellm/                          ← bind mount 进容器（可读写，嵌套挂 .so 必须用）
   litellm_cn/                       ← bind mount 进容器（ro）
   ui/litellm-dashboard/             ← 前端源码
   docker-compose.cn.yml             ← 部署编排
@@ -169,37 +169,56 @@ git remote add origin git@github.com:<你>/litellm-src.git
 
 ### 3.2 配 SSH 免密（强烈建议，否则每次重连都要输密码）
 
-服务器 `~/.ssh/authorized_keys` 目前是**空文件**，权限已正确（`.ssh` 700、`authorized_keys` 600），直接追加即可。
+**当前状态（2026-09-18 已配好，可直接跳到 3.3）**：服务器 `~/.ssh/authorized_keys` 里已有 3 条公钥，其中
+`ssh-rsa ... administrator@WIN-VFLHEGUOM6I` 对应本机的 `C:\Users\Administrator\.ssh\id_rsa`，实测 `ssh litellm-server` 免密直连成功。
 
-Windows PowerShell：
+> ⚠️ 一个踩过的坑：本机 OpenSSH for Windows 9.5 用 **ed25519** 时会在签名阶段失败
+> （服务器接受了 key，客户端报 `sign_and_send_pubkey` 错误）。改用 **RSA 4096** 后正常。
+> 所以配置里统一用 `id_rsa`，不要用 `id_ed25519`。
+
+如果换机器 / 重装系统，重配一次：
 
 ```powershell
-# 没有密钥就先生成一路回车
-ssh-keygen -t ed25519 -C "litellm-dev"
+# 1) 生成 RSA 4096（一路回车）
+ssh-keygen -t rsa -b 4096 -C "administrator@WIN"
 
-# 追加公钥到服务器（会提示输入服务器密码）
-Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub | ssh hifen37@192.168.100.123 "cat >> ~/.ssh/authorized_keys"
+# 2) 追加公钥到服务器（会提示输入服务器密码）
+Get-Content $env:USERPROFILE\.ssh\id_rsa.pub | ssh hifen37@192.168.100.123 "cat >> ~/.ssh/authorized_keys"
 
-# 验证：这次应该不再要密码
-ssh hifen37@192.168.100.123 "echo 免密OK"
+# 3) 验证：这次应该不再要密码
+ssh litellm-server "echo 免密OK"
 ```
 
 ### 3.3 配置 `C:\Users\<你>\.ssh\config`
+
+已写好（Windows OpenSSH 读的就是这个文件）：
 
 ```
 Host litellm-server
   HostName 192.168.100.123
   User hifen37
-  IdentityFile ~/.ssh/id_ed25519
+  IdentityFile C:/Users/Administrator/.ssh/id_rsa
+  IdentitiesOnly yes
   ServerAliveInterval 30
   ServerAliveCountMax 3
 ```
+
+要点：
+- `IdentityFile` 写**正斜杠**的完整路径，`~` 在 Windows 版 OpenSSH 里不一定展开
+- 加 `IdentitiesOnly yes`，避免 ssh-agent 里别的 key 抢先失败
+- `ServerAliveInterval` 防长时间不动被掐断（VS Code 远程最常遇到的断连就是这个）
 
 ### 3.4 连接
 
 `F1` → **Remote-SSH: Connect to Host** → 选 `litellm-server` → 打开文件夹 `/home/hifen37/litellm-src`。
 
 首次连接会在服务器 `~/.vscode-server` 装服务端，约 1-2 分钟。
+
+命令行一步直达（跳过选 host 和选目录）：
+
+```powershell
+code --folder-uri "vscode-remote://ssh-remote+litellm-server/home/hifen37/litellm-src"
+```
 
 ### 3.5 端口转发（浏览器直接访问网关）
 
@@ -280,7 +299,11 @@ node -v      # v24.21.0
 
 ## 6. 日常操作
 
-### 6.1 首次启动二开版
+### 6.1 启动二开版
+
+> 2026-09-18 已完成首次部署并跑通：`litellm-cn` 在 4001 healthy，
+> `bash server-deploy/verify.sh 4001` **10/10 通过**（中文错误、真实调用、token 计费均已验证）。
+> 原版 4000 全程未受影响。排障细节见 `README-部署方案.md` 第 4.5 节。
 
 > **注意**：compose 里的 `./litellm`、`./data` 等相对路径是按 **compose 文件所在目录**解析的，
 > 所以必须把编排文件放在仓库根，不能直接 `-f server-deploy/docker-compose.cn.yml`。
@@ -347,7 +370,8 @@ git push -u server feat/xxx
 | 现象 | 原因 | 处理 |
 |---|---|---|
 | VS Code 连上后很卡 / 文件改动不生效 | 大仓库文件监听打满 | 配置第 4 节的 `files.watcherExclude` |
-| 在容器里改文件被拒 | 源码挂载是 `:ro` | 正常。在 VS Code 里改宿主机文件 |
+| 在容器里改 `litellm_cn/` 被拒 | 该目录挂载是 `:ro` | 正常。在 VS Code 里改宿主机文件 |
+| 在容器里改 `litellm/` 居然成功了 | fork 源码挂的是可读写（嵌套挂 Rust `.so` 的需要） | 尽量别在容器里改，还是在 VS Code 里改宿主机那份 |
 | `uv venv --python 3.13` 卡住或失败 | uv 去 GitHub 下托管 Python，而 github.com 不通 | 用 apt 装的 `/usr/bin/python3.13` |
 | `python3 -m pip` 报 No module named pip | 系统没装 pip | `sudo apt install -y python3-pip` |
 | `git commit` 报身份未配置 | 服务器 git 未设 user | 第 2.4 节 |

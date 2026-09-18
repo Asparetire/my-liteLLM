@@ -3,7 +3,7 @@
 # 用法：bash server_init.sh
 set -euo pipefail
 
-BASE="${BASE:-$HOME/litellm-cn}"
+BASE="${BASE:-$HOME/litellm-src}"
 SRC_STACK="${SRC_STACK:-$HOME/ollama-litellm}"
 IMAGE="${IMAGE:-ghcr.io/berriai/litellm:main-stable}"
 SP="/app/.venv/lib/python3.13/site-packages/litellm"

@@ -1,7 +1,7 @@
 # LiteLLM 二开版编排 —— 与现有原版（4000）完全隔离
 #
 # 用法：
-#   cd ~/litellm-cn
+#   cd ~/litellm-src
 #   docker compose -f docker-compose.cn.yml -p litellm-cn up -d
 #
 # 隔离策略：
@@ -30,11 +30,16 @@ services:
     volumes:
       - ./litellm_config.cn.yaml:/app/config.yaml:ro
       # fork 源码覆盖镜像内置的 litellm 包
-      - ./litellm:/app/.venv/lib/python3.13/site-packages/litellm:ro
+      # 注意：这里必须是可读写。因为下面要把编译好的 _native.abi3.so 挂进这个目录，
+      # 而 Docker 在只读挂载点里无法创建挂载点文件（会报 read-only file system）
+      - ./litellm:/app/.venv/lib/python3.13/site-packages/litellm
       # 中文错误中间件外挂包；靠 proxy_cli.py 的 sys.path.append(os.getcwd()) 被 import
       - ./litellm_cn:/app/litellm_cn:ro
       # 上一步挂载会盖掉镜像里编译好的 Rust 扩展，这里补回来
       - ./rust_bridge/_native.abi3.so:/app/.venv/lib/python3.13/site-packages/litellm/rust_bridge/_native.abi3.so:ro
+      # fork 的 proxy_cli.py 比镜像内置的 litellm_proxy_extras 新（175 vs 167 个迁移，
+      # prisma_toolchain 多了 prisma_cli_available），必须整包一起挂，否则启动时 ImportError
+      - ./litellm-proxy-extras/litellm_proxy_extras:/app/.venv/lib/python3.13/site-packages/litellm_proxy_extras:ro
       # 沿用原版的 Ollama prompt cache 计数补丁
       - /home/hifen37/ollama-litellm/patches:/app/patches:ro
       # 汉化 UI 构建好之后启用下面两行（见方案文档 7.2）

@@ -86,8 +86,8 @@ def main() -> int:
     parser.add_argument("--user", default="hifen37")
     parser.add_argument("--password", default=None)
     parser.add_argument("--port", type=int, default=22)
-    parser.add_argument("--remote-dir", default="~/litellm-cn",
-                        help="服务器目标目录，默认 ~/litellm-cn")
+    parser.add_argument("--remote-dir", default="~/litellm-src",
+                        help="服务器目标目录，默认 ~/litellm-src")
     parser.add_argument("--full", action="store_true",
                         help="忽略 mtime 比对，全量重传")
     parser.add_argument("--full-repo", action="store_true",
@@ -102,9 +102,6 @@ def main() -> int:
         password = getpass.getpass(f"{args.user}@{args.host} 密码：")
 
     files = iter_local_files(REPO_ROOT, full_repo=args.full_repo)
-    if args.full_repo:
-        # 整仓模式上传到独立目录，避免和阶段一的运行目录混在一起
-        args.remote_dir = args.remote_dir.rstrip("/") + "-src"
     total_bytes = sum(p.stat().st_size for p, _ in files)
     print(f"待比对 {len(files)} 个文件，共 {total_bytes / 1024 / 1024:.1f} MB")
 

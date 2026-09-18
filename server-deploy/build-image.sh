@@ -7,10 +7,10 @@
 #   3. node 基础镜像走 Docker Hub 镜像站 —— 服务器直连 registry-1.docker.io 不通
 #
 # 用法（在服务器上的源码目录里执行）：
-#   cd ~/litellm-cn-src && bash server-deploy/build-image.sh
+#   cd ~/litellm-src && bash server-deploy/build-image.sh
 set -euo pipefail
 
-SRC="${SRC:-$HOME/litellm-cn-src}"
+SRC="${SRC:-$HOME/litellm-src}"
 TAG="${TAG:-litellm-cn:1.102.0}"
 PYPI_INDEX="${PYPI_INDEX:-https://pypi.tuna.tsinghua.edu.cn/simple}"
 
@@ -86,7 +86,7 @@ docker images "$TAG"
 cat <<EOF
 
 下一步：
-  1) 编辑 ~/litellm-cn/docker-compose.cn.yml
+  1) 编辑 ~/litellm-src/docker-compose.cn.yml
        image: $TAG
      并删除三个源码挂载（litellm / litellm_cn / rust_bridge 的 .so）
   2) docker compose -p litellm-cn up -d

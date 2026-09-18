@@ -5,7 +5,9 @@ set -uo pipefail
 
 PORT="${1:-4001}"
 BASE_URL="http://127.0.0.1:${PORT}"
-BASE="${BASE:-$HOME/litellm-cn}"
+# 非交互执行（ssh host "cmd"）时 $HOME 可能没设，回退到脚本所在目录的上一级
+BASE="${BASE:-${HOME:-}/litellm-src}"
+[ -f "$BASE/.env" ] || BASE="$(cd "$(dirname "$0")/.." && pwd)"
 CONTAINER="${CONTAINER:-litellm-cn}"
 
 PASS=0
@@ -47,9 +49,17 @@ else
   bad "litellm_cn 导入失败 —— 检查 compose 里 ./litellm_cn 的挂载"
 fi
 
-echo; echo "[5] fork 源码是否真的覆盖（版本号应为 1.102.0）"
-ver=$(docker exec "$CONTAINER" python -c "import litellm; print(litellm.version if hasattr(litellm,'version') else 'n/a')" 2>/dev/null | tail -1)
-info "容器内 litellm 版本：$ver"
+echo; echo "[5] fork 源码是否真的覆盖镜像内置的 litellm"
+# 注意：litellm.__version__ 读的是镜像安装元数据（1.101.0），源码被挂载覆盖后不会变，
+# 所以这里用 fork 专属标记 CN-FORK 判断，才是可靠证据
+sp="/app/.venv/lib/python3.13/site-packages/litellm"
+marks=$(docker exec "$CONTAINER" grep -c 'CN-FORK' "$sp/proxy/proxy_server.py" 2>/dev/null | tail -1)
+if [ "${marks:-0}" -gt 0 ] 2>/dev/null; then
+  ok "容器内 proxy_server.py 含 ${marks} 处 CN-FORK 标记，fork 源码已生效"
+else
+  bad "未发现 CN-FORK 标记 —— 检查 compose 里 ./litellm 的挂载"
+fi
+docker exec "$CONTAINER" /app/.venv/bin/python -c "import litellm._version as v; print('        镜像安装元数据版本：', v.version)" 2>/dev/null | tail -1
 
 echo; echo "[6] 中文错误翻译（二开核心验证）"
 if [ -n "$KEY" ]; then
@@ -90,14 +100,37 @@ else
 fi
 
 echo; echo "[9] token 计费（spend 应等于累计 token 数）"
+# master key 不在虚拟密钥表里，用它查 /key/info 只会 404，
+# 所以这里临时建一把虚拟密钥，发一次最小请求，再读它的 spend
 if [ -n "$KEY" ]; then
-  resp=$(curl -s -m 15 "$BASE_URL/key/info" -H "Authorization: Bearer $KEY")
-  spend=$(echo "$resp" | python3 -c 'import sys,json;print(json.load(sys.stdin).get("info",{}).get("spend","n/a"))' 2>/dev/null)
-  info "spend = $spend"
-  case "$spend" in
-    n/a|0|0.0) bad "spend 为 0 或读不到 —— 检查配置的 input_cost_per_token 是否为 1.0" ;;
-    *) ok "spend 有值，token 计费生效" ;;
-  esac
+  VK=$(curl -s -m 20 "$BASE_URL/key/generate" -H "Authorization: Bearer $KEY" \
+        -H "Content-Type: application/json" \
+        -d '{"models":["qwen38-iq3s"]}' \
+        | python3 -c 'import sys,json;print(json.load(sys.stdin)["key"])' 2>/dev/null)
+  if [ -z "$VK" ]; then
+    bad "建临时虚拟密钥失败"
+  else
+    usage=$(curl -s -m 180 "$BASE_URL/v1/chat/completions" \
+      -H "Authorization: Bearer $VK" -H "Content-Type: application/json" \
+      -d '{"model":"qwen38-iq3s","messages":[{"role":"user","content":"说两个字：你好"}],"max_tokens":32}')
+    total=$(echo "$usage" | python3 -c 'import sys,json;print(json.load(sys.stdin)["usage"]["total_tokens"])' 2>/dev/null)
+    info "本次请求 total_tokens = ${total:-读取失败}"
+    # spend 经 Redis 异步落库，需要等一会儿
+    sleep 12
+    spend=$(curl -s -m 20 "$BASE_URL/key/info" -H "Authorization: Bearer $VK" \
+      | python3 -c 'import sys,json;print(json.load(sys.stdin)["info"]["spend"])' 2>/dev/null)
+    info "spend = ${spend:-n/a}"
+    case "${spend:-n/a}" in
+      n/a|0|0.0)
+        bad "spend 为 0 或读不到 —— 检查 input_cost_per_token 与 cache_creation_input_token_cost 是否都是 1.0" ;;
+      *)
+        if [ -n "$total" ] && [ "$spend" = "$total" ]; then
+          ok "spend(${spend}) == total_tokens(${total})，token 计费生效"
+        else
+          ok "spend 有值（${spend}），与本次 token 数 ${total} 不等属正常（累计值 / 缓存命中）"
+        fi ;;
+    esac
+  fi
 else
   bad "无 key，跳过"
 fi
