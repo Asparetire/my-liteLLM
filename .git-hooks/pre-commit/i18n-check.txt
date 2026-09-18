@@ -1,0 +1,8 @@
+#!/bin/sh
+# i18n 钩子：检查是否引入了美元符号（除非在注释中）
+echo "正在检查 i18n 规范..."
+if grep -r "\$" ui/litellm-dashboard/src --include="*.tsx" --include="*.ts" | grep -v "// " >/dev/null; then
+    echo "警告：发现 UI 文件中的美元符号，请检查是否已替换为 token 展示"
+fi
+echo "i18n 检查完成。"
+exit 0

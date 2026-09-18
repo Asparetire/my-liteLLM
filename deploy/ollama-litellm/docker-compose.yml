@@ -1,0 +1,87 @@
+# Ollama 已改为宿主机原生安装（systemd 管理），不再用容器
+# 本文件只负责 LiteLLM 网关 + Postgres + Redis
+#
+# 前置: 宿主机 Ollama 必须监听 0.0.0.0 而非 127.0.0.1，否则容器连不上
+#   sudo systemctl edit ollama   ->  加 Environment="OLLAMA_HOST=0.0.0.0:11434"
+#   curl http://<宿主机IP>:11434/api/tags   # 从容器网络验证可达性
+#
+# 注意: LiteLLM 官方镜像在 ghcr.io，registry-mirrors 只对 Docker Hub 生效，
+#       若 ghcr.io 拉不动，改用 pip 安装方案，见 README-原生部署.md
+
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: litellm
+    restart: unless-stopped
+    depends_on:
+      # 必须等 Postgres 真正可用（pg_isready 通过）再启动，
+      # 否则 LiteLLM 连不上库会直接崩，陷入重启循环
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml:ro
+      # Ollama prompt cache 计数补丁。详见 patches/README.md。
+      # 靠 PYTHONPATH 让解释器把 patches/sitecustomize.py 当 sitecustomize 自动加载，
+      # 所以挂载路径不带 Python 版本号，镜像升级后一般不用改。
+      - ./patches:/app/patches:ro
+    # 让容器能访问宿主机上原生运行的 Ollama
+    # host-gateway 需要 Docker 20.10+；若不支持，替换成宿主机的实际内网 IP
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      DATABASE_URL: postgresql://llmproxy:${PG_PASSWORD}@db:5432/litellm
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      # 容器内访问宿主机 Ollama；若 LiteLLM 改用宿主机 pip 部署，此变量设为 http://127.0.0.1:11434
+      OLLAMA_API_BASE: ${OLLAMA_API_BASE:-http://host.docker.internal:11434}
+      # 让 /app/patches/sitecustomize.py 在解释器启动时被自动加载（Ollama 缓存计数补丁）
+      PYTHONPATH: /app/patches
+      # 把 Ollama 未命中的 token 报成 Anthropic 的 cache_creation_input_tokens（默认 1）
+      # 设成 0 则只报 cache_read，未命中部分留在 input_tokens 里；详见 patches/README.md
+      LITELLM_OLLAMA_CACHE_CREATION: "1"
+    command: ["--config=/app/config.yaml", "--port", "4000"]
+    healthcheck:
+      # 该环境下 LiteLLM 启动会尝试从 GitHub 拉模型价格表并超时重试约 20 秒，
+      # 加上 Prisma 迁移，start_period 必须给足，否则会一直被判 unhealthy
+      test:
+        - CMD-SHELL
+        - python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness')"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  db:
+    image: postgres:16
+    container_name: litellm_db
+    restart: always
+    environment:
+      POSTGRES_DB: litellm
+      POSTGRES_USER: llmproxy
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+    volumes:
+      - ${PG_DATA_DIR:-./data/postgres}:/var/lib/postgresql/data
+    # 绑定 127.0.0.1：只在本机可达，外网无法直连数据库
+    # 保留映射是为了 LiteLLM 改用宿主机 pip 部署时仍能访问
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d litellm -U llmproxy"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: litellm_redis
+    restart: always
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - ${REDIS_DATA_DIR:-./data/redis}:/data
+    ports:
+      - "127.0.0.1:6379:6379"

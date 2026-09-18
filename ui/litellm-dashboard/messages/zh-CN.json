@@ -1,0 +1,76 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "add": "添加",
+    "back": "返回",
+    "home": "主页"
+  },
+  "login": {
+    "title": "登录",
+    "subtitle": "管理您的 LiteLLM 代理服务器",
+    "subtitle_subtitle": "访问管理员界面",
+    "username": "用户名",
+    "password": "密码",
+    "button": "登录",
+    "button_loading": "登录中...",
+    "no_api_key": "未配置 API key。设置 LITELLM_API_KEY 环境变量。",
+    "forbidden_message": "禁止访问。用户已被阻止。",
+    "default_username": "默认凭据",
+    "default_password": "默认密码",
+    "document_hint": "查看文档",
+    "username_code": "admin",
+    "password_code": "MASTER_KEY",
+    "placeholder_username": "请输入用户名",
+    "placeholder_password": "请输入密码",
+    "button_sso": "使用 SSO 登录",
+    "tooltip_sso_content": "请先配置 SSO 以使用 SSO 登录。"
+  },
+  "navigation": {
+    "dashboard": "仪表板",
+    "virtualKeys": "虚拟密钥",
+    "usage": "用量",
+    "budgets": "预算",
+    "models": "模型",
+    "settings": "设置"
+  },
+  "usage": {
+    "total_usage": "总用量",
+    "monthly_reset": "每月重置",
+    "cost_breakdown": "成本明细",
+    "tokens_used": "已用 Token",
+    "tokens_limit": "Token 限制",
+    "percentage_used": "使用百分比"
+  },
+  "budgets": {
+    "create_budget": "创建预算",
+    "edit_budget": "编辑预算",
+    "delete_budget": "删除预算",
+    "select_key": "选择密钥",
+    "select_team": "选择团队",
+    "monthly_limit": "月度限额",
+    "currency": "货币",
+    "budget_type": "预算类型"
+  },
+  "models": {
+    "create_model": "创建模型",
+    "edit_model": "编辑模型",
+    "delete_model": "删除模型",
+    "model_name": "模型名称",
+    "model_id": "模型 ID",
+    "api_key": "API key",
+    "base_url": "基础 URL",
+    "provider": "提供商"
+  },
+  "settings": {
+    "title": "设置",
+    "proxy_settings": "代理设置",
+    "general_settings": "通用设置",
+    "api_config": "API 配置"
+  }
+}

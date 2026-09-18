@@ -1,0 +1,313 @@
+# LiteLLM 二次开发总体方案
+
+> 目标：以 fork 仓库为基线，完成前端全面汉化与「token 计费」改造，并补充安全、国内化、部署等工程化改造，形成可持续跟随上游演进的自有版本
+> 基线版本：v1.102.0（上游 commit `8481bc27f9`，2026-09-14）
+> 状态：Fork 已完成（见第 1 节），其余为待实施方案
+
+> **本文是汇总级方案。** 需求级拆分文档见 [`dev-plans/`](./dev-plans/README.md)，共 10 份，每份含完整任务分解、代码锚点、验收标准与风险，可独立立项；两处如有出入以 `dev-plans/` 为准。
+
+| 编号 | 需求文档 |
+|---|---|
+| 01 | [仓库管理与上游同步](./dev-plans/01-仓库管理与上游同步.md) |
+| 02 | [前端 UI 全面汉化](./dev-plans/02-前端UI全面汉化.md) |
+| 03 | [后端错误信息汉化](./dev-plans/03-后端错误信息汉化.md) |
+| 04 | [用户文档汉化](./dev-plans/04-用户文档汉化.md) |
+| 05 | [计费阶段 A：配置层 Token 换算](./dev-plans/05-计费A-配置层Token换算.md) |
+| 06 | [计费阶段 B：展示层去美元化](./dev-plans/06-计费B-展示层去美元化.md) |
+| 07 | [计费阶段 C：原生 Token 配额](./dev-plans/07-计费C-原生Token配额.md) |
+| 08 | [国内 LLM 提供商接入](./dev-plans/08-国内LLM提供商接入.md) |
+| 09 | [安全加固与生产部署](./dev-plans/09-安全加固与生产部署.md) |
+| 10 | [测试与 CI 体系](./dev-plans/10-测试与CI体系.md) |
+
+---
+
+## 0. Fork 完成状态（已执行）
+
+### 1.1 仓库结构
+
+```
+upstream  ->  https://github.com/BerriAI/litellm.git   （只读，仅 fetch，用于同步上游）
+origin    ->  D:/project/litellm-fork.git              （自有独立裸仓库，读写，日常开发）
+```
+
+- 本地裸仓库 `D:\project\litellm-fork.git` 已创建，包含 `main`、`develop` 两个分支及全部历史与标签
+- `main` 与 `develop` 均已建立对 `origin` 的跟踪关系
+- 如后续迁移到 GitHub / GitLab / 内网 Gitea，只需一条命令：
+  ```bash
+  git remote set-url origin <新仓库地址> && git push -u origin main develop --tags
+  ```
+
+### 1.2 分支模型（铁律）
+
+| 分支 | 用途 |
+|---|---|
+| `main` | 与上游镜像，**永不携带自有改动**，保证 `merge --ff-only upstream/main` 零冲突 |
+| `develop` | 自有改动的集成基线，所有 feature 分支从它切出 |
+| `feat/i18n-*`、`feat/token-billing-*` 等 | 功能分支，完成后合回 `develop` |
+
+日常同步上游的固定流程：
+
+```bash
+git checkout main
+git fetch upstream
+git merge --ff-only upstream/main
+git push origin main
+
+git checkout develop
+git merge main        # 冲突只允许在这一步出现并集中处理
+```
+
+### 1.3 本机环境注意事项（重要）
+
+本开发机的 bash 沙箱存在一个已确认的怪癖：**bash 环境中 git 写入 `.git/refs/remotes/` 下的引用文件会被静默丢弃**（reflog 与对象库正常）。因此：
+
+- `git fetch` / `git branch --set-upstream-to` 在 bash 中会「假成功」，引用实际未落盘
+- 变通方案：涉及远程跟踪引用的操作改用 PowerShell 直接执行，或手动写引用文件
+- `git push` / `git commit` / `git branch <name>`（本地分支）不受影响
+
+---
+
+## 2. 现状调研结论（方案的代码依据）
+
+| 项 | 事实 | 位置 |
+|---|---|---|
+| UI 技术栈 | Next.js 16.3.3 + React 19，**无任何 i18n 依赖** | `ui/litellm-dashboard/package.json` |
+| 美元格式化 | 集中在 `getSpendString()` 一个函数（`$${formatted}`），另有零散字面量 | `ui/.../src/utils/dataUtils.ts:50` |
+| 预算数据模型 | `max_budget Float?` 遍布 key/user/team/org/审计表/tag/模型组，配套 `budget_duration`、`spend Float` | `litellm/proxy/schema.prisma` |
+| token 限流 | `tpm_limit BigInt?` 已存在（滚动 60 秒窗口），但**不是累计配额** | 同上 |
+| token 计量 | `LiteLLM_SpendLogs` 每请求已记录 `prompt_tokens`/`completion_tokens`/`total_tokens`；各日度汇总表也有 token 列 | 同上 |
+| 预算执行点 | user 级：pre-call hook 读 Redis 计数器 `spend:user:{id}`；key/team/org 级：认证阶段 budget check | `litellm/proxy/hooks/max_budget_limiter.py`、`litellm/proxy/auth/auth_checks.py` |
+| 预算重置 | 后台任务按 `budget_duration` 周期重置 | `litellm/proxy/common_utils/reset_budget_job.py` |
+| 计价入口 | `cost_per_token()`，单价来自 `model_prices_and_context_window.json` 或部署级 `input_cost_per_token` 配置 | `litellm/cost_calculator.py` |
+| 国内提供商 | volcengine 已原生支持；DashScope/千帆/MiniMax 等均可用 OpenAI 兼容模式接入 | `litellm/llms/volcengine/` |
+| 企业版 | `enterprise/` 为混淆 whl，**不可修改**，二开必须绕开 | `enterprise/` |
+
+**核心认知**：LiteLLM 的计量本来就是按 token 进行的，`spend` 只是「token × 单价」的派生值。「移除美元计价、改为 token 计费」的实质是**把配额单位与展示单位从美元换成 token**，计量链路无需重做。这决定了下文三阶段递进的改造策略。
+
+---
+
+## 3. 需求一：前端全面汉化
+
+### 3.1 分层策略（按投入产出比排序）
+
+**L1 — UI 界面文案（核心，收益最高）**
+
+引入 `next-intl`（对 App Router 支持最成熟）：
+
+```
+ui/litellm-dashboard/
+├── messages/
+│   ├── en.json        # 从代码抽取的原文（保持与上游一致，作为回退）
+│   └── zh-CN.json     # 译文
+├── i18n/
+│   ├── routing.ts     # locale 路由
+│   └── request.ts     # getRequestConfig
+└── next.config.ts     # 包一层 withNextIntl
+```
+
+改造方式：组件内硬编码字符串替换为 `t('namespace.key')`，默认 locale 设为 `zh-CN`，未翻译 key 自动回退英文（降级安全）。
+
+**汉化优先页面**（按用户触达频率）：
+
+| 批次 | 页面 | 关键文件 |
+|---|---|---|
+| 第 1 批 | 登录、左侧导航、虚拟密钥列表/创建/编辑 | `src/components/leftnav.tsx`、`VirtualKeysPage/`、`key_edit_view.tsx` |
+| 第 2 批 | 用量与预算：Usage、Budgets、Cost Tracking | `app/(dashboard)/usage/`、`budgets/_components/` |
+| 第 3 批 | 组织与成员：Users、Teams、Organizations | `app/(dashboard)/users/`、`components/Teams.tsx` |
+| 第 4 批 | 模型管理、设置、其余页面 | `models-and-endpoints/`、`EditModel` 等 |
+
+UI 已有完整的 vitest 组件测试基建（`npm run test:component`），每汉化一个批次跑一次对应测试即可回归。
+
+**L2 — 后端提示/错误信息（外挂式，几乎零冲突）**
+
+不逐个修改散落在 2000+ Python 文件里的 `raise`，而是新增独立模块统一拦截翻译：
+
+```
+litellm_cn/                    # 新目录，不改任何上游文件
+├── locale/
+│   ├── en.json
+│   └── zh-CN.json             # 原文 -> 译文 映射表（先收录高频报错 200-300 条）
+├── translator.py              # translate_message(text, locale)，未命中原样返回
+└── middleware.py             # FastAPI 响应中间件，改写 {"error": {"message": ...}}
+```
+
+挂载方式：LiteLLM 的 proxy_server 支持通过 `general_settings` 注册自定义钩子，`middleware.py` 提供 `install(app)`；唯一需要动上游文件的是在 `proxy_server.py` 加一处 3 行的 `[CN-FORK]` 标记挂载点。
+
+优点：未收录文案自动降级英文，不会出现空白或崩溃；翻译表独立演进。
+局限：内部日志仍为英文（可接受，排障时英文日志反而信息量更大）。
+
+**L3 — 面向用户的文档**
+
+在 `docs/zh-CN/` 维护译文，与代码完全解耦，零冲突。优先翻译：部署指南、虚拟密钥管理、预算与限流、模型接入配置四篇。
+
+### 3.2 汉化红线（不可触碰）
+
+- API 字段名（`max_budget`、`tpm_limit`…）、数据库列名、代码标识符：保持英文，否则与上游彻底无法合并
+- 日志级别、异常类型名：保持英文
+
+---
+
+## 4. 需求二：token 计费与配额改造
+
+### 4.1 目标澄清
+
+移除美元计价体系、改为 token 计费，等价于三件事：
+1. **配额单位**：`max_budget`（美元）改为 token 数量
+2. **展示单位**：UI 所有 `$` 金额显示改为 token 计数（`$12.34` → `12,340 tokens`）
+3. **口径明确**：输入/输出/缓存 token 的计费权重
+
+### 4.2 三阶段递进方案
+
+#### 阶段 A：配置层换算（零改码，当天可用，P0）
+
+给每个模型配置 token 权重单价，让 `spend` 语义直接变为「加权 token 数」：
+
+```yaml
+model_list:
+  - model_name: qwen3.5
+    litellm_params:
+      model: openai/qwen3.5          # OpenAI 兼容模式接 DashScope 等
+      api_base: https://dashscope.aliyuncs.com/compatible-mode/v1
+      input_cost_per_token: 1.0      # 1 输入 token = 1 单位
+      output_cost_per_token: 1.5     # 输出 token 权重更高时可区分
+```
+
+则 `max_budget = 1_000_000` 即「100 万加权 token」配额，`budget_duration = "30d"` 周期重置照常生效。立即获得：配额硬限制（429 拒绝）、按 key/user/team 多级配额、周期重置——**全链路零改码**。
+
+#### 阶段 B：展示层去美元化（改 1 个函数 + 少量文案，P0-P1）
+
+- `src/utils/dataUtils.ts` 的 `getSpendString()`：`$${formatted}` 改为 token 格式（千分位 + " tokens" 后缀，沿用现有缩写选项显示 `1.2M tokens`）
+- 清理各组件中残留的 `$` 字面量与 `USD` 字样（grep 已定位：`budget_modal.tsx`、`keyTableColumns.tsx`、`view_user_spend.tsx`、`ModelMaxBudgetEditor.tsx` 等）
+- 预算输入框标签：「Max Budget (USD)」→「Token 配额」，并加 tooltip 说明口径（输入 token ×1 / 输出 token ×1.5 之类，与配置一致）
+- 同步更新 `getSpendString` 相关单测（`dataUtils.test.ts`、`top_key_view.test.tsx` 等）
+
+此阶段完成后，用户可见层面已完全无美元；阶段 A+B 组合即是「最小可用版本」。
+
+#### 阶段 C：原生 token 配额模式（正式改造，P2）
+
+若需要语义干净的原生能力（字段就叫 token、整数精度、与金额体系彻底解耦），按下表实施：
+
+| 改动点 | 文件 | 内容 |
+|---|---|---|
+| 数据模型 | `litellm/proxy/schema.prisma` | `LiteLLM_VerificationToken`/`UserTable`/`TeamTable`/`OrganizationTable` 新增 `max_token_budget BigInt?`、`token_spend BigInt @default(0)`，全部 nullable，null = 未启用（即回退） |
+| 迁移 | `litellm-proxy-extras/` 新增 SQL | **只加列不重写行**（启动时同步执行迁移的硬约束） |
+| 执行逻辑 | `litellm/proxy/auth/auth_checks.py` | budget check 增加 token 分支：`max_token_budget` 非空时比较 `token_spend` |
+| 执行逻辑 | `litellm/proxy/hooks/max_budget_limiter.py` | user 级同样加 token 分支（Redis 计数器 `token_spend:user:{id}`） |
+| 计量埋点 | `litellm/proxy/hooks/proxy_track_cost_callback.py` | 请求完成后双写：`token_spend += total_tokens`（整数，无浮点误差） |
+| 管理端点 | `key_management_endpoints.py`、`internal_user_endpoints.py` | API 请求/响应**只增字段**（`max_token_budget`/`token_spend`） |
+| UI | `budget_modal.tsx`、`BudgetTableColumns.tsx`、`key_edit_view.tsx`、`user_info_view.tsx` 等 | 配额输入与进度展示切到 token；进度条 `token_spend / max_token_budget` |
+
+设计要点：
+- **整数精度**：token 全程用 `BigInt` 累加，杜绝浮点误差；金额仅在（可选的）展示换算层出现
+- **回退开关**：字段为 null 即完全回退金额模式，老数据无需迁移，可一键切回
+- **周期复用**：`budget_duration` + `reset_budget_job` 对 `token_spend` 同样重置，不另造轮子
+- **预置权重**：沿用阶段 A 的 `input/output_cost_per_token` 作为加权系数（设为 1/1 即纯计数），一套配置服务两种模式
+- **统计口径**（写进用户文档）：输入含缓存读/写 token，输出为 completion；缓存 token 可单独设权重；计量有分钟级延迟（Redis 队列 + 批量落库），不可用于秒级对账
+
+### 4.3 兼容性要求
+
+- 老数据 `spend` 字段原样保留，不删除不迁移
+- API 响应只增字段不改字段，老客户端无感知
+- 切换模式时在停机窗口 flush 相关 Redis 计数 key
+
+---
+
+## 5. 其他二次开发建议（按价值排序）
+
+### 5.1 国内 LLM 提供商接入模板（P1，成本低收益高）
+
+- DashScope（通义）、MiniMax、智谱、DeepSeek 等均提供 OpenAI 兼容端点，用 `openai/<model>` + `api_base` 即可接入，无需写代码，沉淀为配置模板与文档
+- `volcengine`（豆包）已有原生 provider；`ollama/`、`vllm/` 前缀支持本地私有模型
+- 仅当某提供商需要原生特性（如 DashScope 的 Qwen 特有参数、异步提交）时才新增 `litellm/llms/<provider>/` 目录，遵循 `BaseLLM` transformation 模式（参照 `volcengine/` 结构）
+
+### 5.2 安全加固（P1）
+
+- 基于 `docker-compose.hardened.yml` 部署；生产强制 Postgres（token 配额与预算依赖其事务性），弃用 SQLite
+- master key、各提供商 API key 全部走环境变量/secret 管理，不落配置文件
+- UI 管理台启用认证（注意 SSO 属企业版 license 功能，社区版用 username/password + enforce_sso 友好降级）
+- 限制 `general_settings` 中的跨域与回调白名单
+
+### 5.3 可观测性（P2）
+
+- 仓库自带 `prometheus.yml` 与 `/metrics` 端点：接入现有 Prometheus/Grafana，补 token 用量大盘（按 key/team/模型维度，直接用 SpendLogs token 列）
+- 保留请求级日志 + 日度汇总表做容量规划
+
+### 5.4 升级同步纪律（贯穿全程）
+
+- 自有代码尽量放新目录（`litellm_cn/`、`docs/zh-CN/`、UI 的 `messages/` 与 `i18n/`）
+- 必须改上游文件处，统一标记：
+
+```python
+# === [CN-FORK] BEGIN: <原因> ===
+...
+# === [CN-FORK] END ===
+```
+
+- 每月一次 `git merge upstream/main` 到 develop 的同步演练，冲突量可控时再升级跟进频率（上游每天数十个 PR，**跟随策略宜低频稳定**）
+
+### 5.5 测试与 CI（P1-P2）
+
+- UI：沿用 vitest（`test:component`/`test:integration`），汉化与计费改造的回归全靠它
+- 后端：`make test-unit`；token 配额模式需为 `auth_checks`、`max_budget_limiter` 补回归测试（沿用 `tests/test_litellm/` 镜像目录规范）
+- 端到端验收：curl 直打本地 4000 端口的 proxy 实例，验证配额用尽返回 429、响应字段完整
+- 建议搭建内网 CI（Jenkins/GitLab CI）跑 lint + 单测 + 构建，替代上游 GitHub Actions
+
+### 5.6 企业版边界（风险提示）
+
+`enterprise/` 是混淆的闭源 whl，无法汉化与修改。需审计自有功能不依赖其特性（SSO、部分高级预算报表）。涉及处的方案已在 3.1 / 4.2 中选择了社区版路径。
+
+---
+
+## 6. 优先级与实施路线图
+
+```
+P0（第 1 周）── 立即见效，验证可行性
+ ├─ 计费阶段 A：配置层 token 换算（半天，零改码）
+ ├─ 计费阶段 B：getSpendString 展示层去美元（1-2 天）
+ └─ UI i18n 基建：next-intl 接入 + 登录页汉化作为试点（2-3 天）
+
+P1（第 2-4 周）── 汉化主体 + 工程化
+ ├─ 汉化第 1-3 批页面（导航/密钥/用量/预算/成员）
+ ├─ 后端错误外挂翻译 litellm_cn/（2-3 天）
+ ├─ 国内提供商配置模板 + 文档
+ └─ 安全加固基线 + CI 流水线
+
+P2（第 5-8 周）── 深度改造
+ ├─ 计费阶段 C：原生 token 配额（schema + hook + UI，1-2 周含测试）
+ ├─ 汉化第 4 批页面收尾 + docs/zh-CN 核心文档
+ └─ 可观测性大盘
+
+P3（持续）── 运维节奏
+ ├─ 每月上游同步演练（develop 合并 main）
+ ├─ 翻译表/文档持续补全
+ └─ 回归测试与发布
+```
+
+依赖关系：阶段 B 依赖阶段 A 的口径确认；阶段 C 独立于 A/B 可并行，但建议 A+B 运行一个月、确认需要原生语义后再启动 C。
+
+---
+
+## 7. 验收标准
+
+| 项 | 验收 |
+|---|---|
+| Fork | `git fetch upstream` 成功；`main` 对上游永远 fast-forward；origin push/pull 正常 |
+| 汉化 L1 | 已汉化页面切中文无英文残留；未汉化 key 回退英文不报错；组件测试全绿 |
+| 汉化 L2 | 已收录报错返回中文；未收录报错返回英文且不影响错误码 |
+| 计费 A+B | UI 全程无 `$`/`USD` 字样；配额以 token 展示；配额用尽请求被 429 拒绝 |
+| 计费 C | token 模式下配额精确（整数）；null 字段回退金额模式行为不变；老数据可读 |
+| 兼容性 | API 响应只增字段；`make test-unit` 与 UI 测试通过 |
+| 同步 | 一次真实的 upstream 合并演练完成，冲突可预期 |
+
+---
+
+## 8. 风险矩阵
+
+| 风险 | 等级 | 缓解 |
+|---|---|---|
+| 上游合并冲突（上游日均数十 PR） | 高 | 自有代码独立目录 + `[CN-FORK]` 标记 + 低频稳定同步 |
+| 汉化不完整导致中英夹杂 | 中 | 回退英文而非空白；按批次推进 |
+| Prisma 迁移锁表 | 中 | 只加 nullable 列不重写行；测试库先演练 |
+| 计量延迟造成配额超扣 | 中 | 文档明示分钟级延迟；关键场景用 `budget_reservation` 预留机制 |
+| enterprise/ 功能依赖 | 低 | 全部走社区版路径，方案已规避 |
+| 本机 bash 沙箱丢弃 git 远程引用 | 低 | 涉及远程引用操作走 PowerShell（见 1.3） |

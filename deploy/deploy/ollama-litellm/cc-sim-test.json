@@ -1,0 +1,23 @@
+{
+  "model": "qwen3-8b",
+  "max_tokens": 8192,
+  "system": [
+    {"type": "text", "text": "You are Claude Code, Anthropic's official CLI for Claude. You are an interactive CLI tool that helps users with software engineering tasks. Use your capabilities to accomplish the task efficiently.\n\nIMPORTANT: Refuse to write code or explain code that may be used to maliciously compromise systems.\n\nHere is useful information about the environment you are working in:\n<env>\nWorking directory: /home/hifen37/project\nIs directory a git repo: yes\nPlatform: linux\nOS Version: Ubuntu 24.04\nToday's date: 2026-09-16\n</env>\n\nYou are an agent - please keep going until the user's query is completely resolved before ending your turn.\n\nIMPORTANT: You must NEVER generate or guess URLs unless you are confident that the URLs are for helping the user with programming.\n\nToday's date is 2026-09-16.\n\nIMPORTANT: You should NOT answer with unnecessary preamble or postamble.\n\n<system-reminder>\nAs you answer the user's questions, you can use the following context:\n# claudeMd\nThe user prefers direct answers with runnable commands.\nAlways check the actual config files before proposing changes.\n</system-reminder>"}
+  ],
+  "messages": [
+    {"role": "user", "content": "帮我写一个 Python 函数，计算斐波那契数列第 n 项"}
+  ],
+  "tools": [
+    {"name": "Bash", "description": "Execute a bash command in the shell. Use this when you need to run terminal commands.", "input_schema": {"type": "object", "properties": {"command": {"type": "string", "description": "The command to execute"}, "timeout": {"type": "number", "description": "Optional timeout in seconds"}}, "required": ["command"]}},
+    {"name": "Read", "description": "Reads a file from the local filesystem.", "input_schema": {"type": "object", "properties": {"file_path": {"type": "string", "description": "The absolute path to the file to read"}, "limit": {"type": "number"}, "offset": {"type": "number"}}, "required": ["file_path"]}},
+    {"name": "Write", "description": "Writes a file to the local filesystem.", "input_schema": {"type": "object", "properties": {"file_path": {"type": "string"}, "content": {"type": "string"}}, "required": ["file_path", "content"]}},
+    {"name": "Edit", "description": "This is a tool for editing files. For moving or renaming files, you should generally use the Bash tool.", "input_schema": {"type": "object", "properties": {"file_path": {"type": "string"}, "old_string": {"type": "string"}, "new_string": {"type": "string"}, "replace_all": {"type": "boolean"}}, "required": ["file_path", "old_string", "new_string"]}},
+    {"name": "Glob", "description": "Fast file pattern matching tool that works with any codebase size.", "input_schema": {"type": "object", "properties": {"pattern": {"type": "string"}, "path": {"type": "string"}}, "required": ["pattern"]}},
+    {"name": "Grep", "description": "A powerful search tool built on ripgrep.", "input_schema": {"type": "object", "properties": {"pattern": {"type": "string"}, "path": {"type": "string"}, "glob": {"type": "string"}, "output_mode": {"type": "string"}}, "required": ["pattern"]}},
+    {"name": "TodoWrite", "description": "Use this tool to create and manage a structured task list for your current coding session.", "input_schema": {"type": "object", "properties": {"todos": {"type": "array", "items": {"type": "object", "properties": {"content": {"type": "string"}, "status": {"type": "string"}, "activeForm": {"type": "string"}}, "required": ["content", "status", "activeForm"]}}}, "required": ["todos"]}},
+    {"name": "Task", "description": "Launch a new agent to handle complex, multi-step tasks autonomously.", "input_schema": {"type": "object", "properties": {"description": {"type": "string"}, "prompt": {"type": "string"}, "subagent_type": {"type": "string"}}, "required": ["description", "prompt", "subagent_type"]}},
+    {"name": "WebFetch", "description": "Fetches content from a specified URL and processes it using an AI model.", "input_schema": {"type": "object", "properties": {"url": {"type": "string"}, "prompt": {"type": "string"}}, "required": ["url", "prompt"]}},
+    {"name": "WebSearch", "description": "Allows Claude to search the web and use the results to inform responses.", "input_schema": {"type": "object", "properties": {"query": {"type": "string"}, "allowed_domains": {"type": "array", "items": {"type": "string"}}}, "required": ["query"]}}
+  ],
+  "stream": false
+}

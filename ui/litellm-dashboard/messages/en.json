@@ -1,0 +1,76 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "back": "Back",
+    "home": "Home"
+  },
+  "login": {
+    "title": "Login",
+    "subtitle": "Access your LiteLLM Admin UI",
+    "subtitle_subtitle": "Manage your LiteLLM Proxy Server",
+    "username": "Username",
+    "password": "Password",
+    "button": "Login",
+    "button_loading": "Logging in...",
+    "no_api_key": "No API key configured. Set LITELLM_API_KEY environment variable.",
+    "forbidden_message": "Access forbidden. The user has been blocked.",
+    "default_username": "Default Credentials",
+    "default_password": "Password is your LiteLLM Proxy MASTER_KEY",
+    "document_hint": "Check the documentation",
+    "username_code": "admin",
+    "password_code": "MASTER_KEY",
+    "placeholder_username": "Enter your username",
+    "placeholder_password": "Enter your password",
+    "button_sso": "Login with SSO",
+    "tooltip_sso_content": "Please configure SSO to log in with SSO."
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "virtualKeys": "Virtual Keys",
+    "usage": "Usage",
+    "budgets": "Budgets",
+    "models": "Models",
+    "settings": "Settings"
+  },
+  "usage": {
+    "total_usage": "Total Usage",
+    "monthly_reset": "Monthly Reset",
+    "cost_breakdown": "Cost Breakdown",
+    "tokens_used": "Tokens Used",
+    "tokens_limit": "Token Limit",
+    "percentage_used": "Percentage Used"
+  },
+  "budgets": {
+    "create_budget": "Create Budget",
+    "edit_budget": "Edit Budget",
+    "delete_budget": "Delete Budget",
+    "select_key": "Select Key",
+    "select_team": "Select Team",
+    "monthly_limit": "Monthly Limit",
+    "currency": "Currency",
+    "budget_type": "Budget Type"
+  },
+  "models": {
+    "create_model": "Create Model",
+    "edit_model": "Edit Model",
+    "delete_model": "Delete Model",
+    "model_name": "Model Name",
+    "model_id": "Model ID",
+    "api_key": "API Key",
+    "base_url": "Base URL",
+    "provider": "Provider"
+  },
+  "settings": {
+    "title": "Settings",
+    "proxy_settings": "Proxy Settings",
+    "general_settings": "General Settings",
+    "api_config": "API Configuration"
+  }
+}
