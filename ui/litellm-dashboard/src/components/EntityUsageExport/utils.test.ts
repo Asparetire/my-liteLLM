@@ -353,7 +353,7 @@ describe("EntityUsageExport utils", () => {
       expect(result[0]).toHaveProperty("Date");
       expect(result[0]).toHaveProperty("Team");
       expect(result[0]).toHaveProperty("Team ID");
-      expect(result[0]).toHaveProperty("Spend ($)");
+      expect(result[0]).toHaveProperty("Spend (tokens)");
       expect(result[0]).toHaveProperty("Requests");
       expect(result[0]).toHaveProperty("Successful Requests");
       expect(result[0]).toHaveProperty("Failed Requests");
@@ -443,7 +443,7 @@ describe("EntityUsageExport utils", () => {
     it("should format spend values correctly", () => {
       const result = generateDailyData(mockSpendData, "Team");
 
-      expect(result[0]["Spend ($)"]).toBeDefined();
+      expect(result[0]["Spend (tokens)"]).toBeDefined();
     });
 
     it("should handle missing optional token fields", () => {
@@ -628,7 +628,7 @@ describe("EntityUsageExport utils", () => {
       expect(result[0]).toHaveProperty("Team ID");
       expect(result[0]).toHaveProperty("Key Alias");
       expect(result[0]).toHaveProperty("Key ID");
-      expect(result[0]).toHaveProperty("Spend ($)");
+      expect(result[0]).toHaveProperty("Spend (tokens)");
       expect(result[0]).toHaveProperty("Requests");
       expect(result[0]).toHaveProperty("Successful Requests");
       expect(result[0]).toHaveProperty("Failed Requests");
@@ -962,7 +962,7 @@ describe("EntityUsageExport utils", () => {
     it("should format spend values correctly", () => {
       const result = generateDailyWithKeysData(mockSpendDataWithKeys, "Team");
 
-      expect(result[0]["Spend ($)"]).toBeDefined();
+      expect(result[0]["Spend (tokens)"]).toBeDefined();
     });
 
     it("should handle missing optional token fields", () => {
@@ -1169,7 +1169,7 @@ describe("EntityUsageExport utils", () => {
       expect(result[0]).toHaveProperty("Team");
       expect(result[0]).toHaveProperty("Team ID");
       expect(result[0]).toHaveProperty("Model");
-      expect(result[0]).toHaveProperty("Spend ($)");
+      expect(result[0]).toHaveProperty("Spend (tokens)");
       expect(result[0]).toHaveProperty("Requests");
       expect(result[0]).toHaveProperty("Successful");
       expect(result[0]).toHaveProperty("Failed");
@@ -1365,11 +1365,11 @@ describe("EntityUsageExport utils", () => {
       const gpt4Entry = result.find((r) => r.Model === "gpt-4");
       const gpt35Entry = result.find((r) => r.Model === "gpt-3.5-turbo");
 
-      expect(gpt4Entry?.["Spend ($)"]).toBe("5.0000");
+      expect(gpt4Entry?.["Spend (tokens)"]).toBe("5.0000");
       expect(gpt4Entry?.Requests).toBe(50);
       expect(gpt4Entry?.["Total Tokens"]).toBe(500);
 
-      expect(gpt35Entry?.["Spend ($)"]).toBe("5.5000");
+      expect(gpt35Entry?.["Spend (tokens)"]).toBe("5.5000");
       expect(gpt35Entry?.Requests).toBe(50);
       expect(gpt35Entry?.["Total Tokens"]).toBe(500);
     });
@@ -1474,10 +1474,10 @@ describe("EntityUsageExport utils", () => {
       const haiku = result.find((r) => r.Model === "claude-3-haiku");
       const sonnet = result.find((r) => r.Model === "claude-sonnet-4-5");
 
-      expect(haiku?.["Spend ($)"]).toBe("3.0000");
-      expect(sonnet?.["Spend ($)"]).toBe("5.0000");
+      expect(haiku?.["Spend (tokens)"]).toBe("3.0000");
+      expect(sonnet?.["Spend (tokens)"]).toBe("5.0000");
 
-      const totalSpend = result.reduce((sum, r) => sum + parseFloat(r["Spend ($)"].replace(/,/g, "")), 0);
+      const totalSpend = result.reduce((sum, r) => sum + parseFloat(r["Spend (tokens)"].replace(/,/g, "")), 0);
       const totalRequests = result.reduce((sum, r) => sum + r.Requests, 0);
       const totalTokens = result.reduce((sum, r) => sum + r["Total Tokens"], 0);
 
@@ -1581,7 +1581,7 @@ describe("EntityUsageExport utils", () => {
 
       expect(result).toHaveLength(1);
       expect(result[0].Model).toBe("gpt-4");
-      expect(result[0]["Spend ($)"]).toBe("5.0000");
+      expect(result[0]["Spend (tokens)"]).toBe("5.0000");
     });
 
     it("should use team alias when available", () => {
@@ -1918,13 +1918,13 @@ describe("EntityUsageExport utils", () => {
       },
     };
 
-    it("includes Flat Cost ($) and Total Cost ($) columns when total_flat_cost is present", () => {
+    it("includes Flat Cost (tokens) and Total Cost (tokens) columns when total_flat_cost is present", () => {
       const rows = generateDailyData(dayWithFlat, "Team", {});
       expect(rows).toHaveLength(1);
-      expect(rows[0]).toHaveProperty("Flat Cost ($)");
-      expect(rows[0]).toHaveProperty("Total Cost ($)");
-      expect(rows[0]["Flat Cost ($)"]).toBe("6.4500");
-      expect(rows[0]["Total Cost ($)"]).toBe("16.4500");
+      expect(rows[0]).toHaveProperty("Flat Cost (tokens)");
+      expect(rows[0]).toHaveProperty("Total Cost (tokens)");
+      expect(rows[0]["Flat Cost (tokens)"]).toBe("6.4500");
+      expect(rows[0]["Total Cost (tokens)"]).toBe("16.4500");
     });
 
     it("does not include Flat Cost / Total Cost columns when total_flat_cost is zero", () => {
@@ -1941,8 +1941,8 @@ describe("EntityUsageExport utils", () => {
       };
       const rows = generateDailyData(spendWithoutFlat, "User", {});
       expect(rows).toHaveLength(1);
-      expect(rows[0]).not.toHaveProperty("Flat Cost ($)");
-      expect(rows[0]).not.toHaveProperty("Total Cost ($)");
+      expect(rows[0]).not.toHaveProperty("Flat Cost (tokens)");
+      expect(rows[0]).not.toHaveProperty("Total Cost (tokens)");
     });
   });
 
@@ -2285,8 +2285,8 @@ describe("EntityUsageExport utils", () => {
         // Spend must aggregate per team-key, not repeat the model total per team.
         const team1 = result.find((r) => r["Team ID"] === "team-1");
         const team2 = result.find((r) => r["Team ID"] === "team-2");
-        expect(team1?.["Spend ($)"]).toBe("15.5000");
-        expect(team2?.["Spend ($)"]).toBe("20.3000");
+        expect(team1?.["Spend (tokens)"]).toBe("15.5000");
+        expect(team2?.["Spend (tokens)"]).toBe("20.3000");
       });
     });
   });
