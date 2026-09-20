@@ -155,10 +155,10 @@ const AddMarginForm: React.FC<AddMarginFormProps> = ({
         {marginType === "fixed" && (
           <Field>
             <FieldLabel htmlFor="margin-fixed-amount">
-              {labelWithHint("Fixed Margin Amount", "Enter a fixed amount in USD (e.g., 0.001 for $0.001 per request)")}
+              {/* [CN-FORK] REQ-06: USD wording removed; the fixed per-request surcharge semantics stay backend-defined for now. */}
+              {labelWithHint("Fixed Margin Amount", "Enter a fixed surcharge per request (e.g., 0.001)")}
             </FieldLabel>
             <div className="flex items-center gap-2">
-              <span className="text-muted-foreground">$</span>
               <Input
                 id="margin-fixed-amount"
                 placeholder="0.001"

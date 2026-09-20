@@ -21,6 +21,7 @@ import EditBudgetModal from "./edit_budget_modal";
 import { CREATE_END_USER_CURL_COMMAND, CHAT_COMPLETIONS_CURL_COMMAND, OPENAI_SDK_PYTHON_CODE } from "./constants";
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
 import { isProxyAdminRole } from "@/utils/roles";
+import { formatNumberWithCommas } from "@/utils/dataUtils";
 
 interface BudgetSettingsPageProps {
   accessToken: string | null;
@@ -83,7 +84,7 @@ const BudgetPanel: React.FC<BudgetSettingsPageProps> = ({ accessToken }) => {
         <PageHeader
           icon={<Wallet />}
           title="Budgets"
-          subtitle="Spend, TPM and RPM limits you can assign to customers."
+          subtitle="Token usage, TPM and RPM limits you can assign to customers."
           primaryAction={
             canModify ? (
               <Button onClick={() => setIsCreateModelVisible(true)}>
@@ -130,7 +131,13 @@ const BudgetPanel: React.FC<BudgetSettingsPageProps> = ({ accessToken }) => {
               resourceInformationTitle="Budget Information"
               resourceInformation={[
                 { label: "Budget ID", value: selectedBudget?.budget_id, code: true },
-                { label: "Max Budget", value: selectedBudget?.max_budget },
+                {
+                  label: "Max Budget",
+                  value:
+                    selectedBudget?.max_budget != null
+                      ? `${formatNumberWithCommas(selectedBudget.max_budget)} tokens`
+                      : null,
+                },
                 { label: "TPM", value: selectedBudget?.tpm_limit },
                 { label: "RPM", value: selectedBudget?.rpm_limit },
               ]}

@@ -49,7 +49,9 @@ const formatFilterValue = (columnId: string, value: unknown): string => {
   }
   if (columnId === "max_budget") {
     const { min, max, unlimitedOnly } = (value ?? {}) as MaxBudgetFilterValue;
-    return unlimitedOnly === true ? "Unlimited only" : `${min ? `$${min}` : "any"} to ${max ? `$${max}` : "any"}`;
+    return unlimitedOnly === true
+      ? "Unlimited only"
+      : `${min ? `${min} tokens` : "any"} to ${max ? `${max} tokens` : "any"}`;
   }
   if (columnId === "created_at") {
     const { from, to } = (value ?? {}) as CreatedAtFilterValue;
@@ -90,7 +92,7 @@ function EmptyState({ hasQuery }: { hasQuery: boolean }) {
       <div className="text-sm text-muted-foreground">
         {hasQuery
           ? "No budget matches your search or filters."
-          : "Create a budget to set spend, TPM and RPM limits for customers."}
+          : "Create a budget to set token usage, TPM and RPM limits for customers."}
       </div>
     </div>
   );
@@ -153,12 +155,12 @@ function BudgetFilterFields({ get, set }: FilterDraft) {
           onChange={(selected) => set("budget_duration", selected)}
         />
       </DataTableFilterField>
-      <DataTableFilterField label="Max Budget (USD)">
+      <DataTableFilterField label="Max Budget (tokens)">
         <div className="flex items-center gap-2">
           <Input
             type="number"
             min={0}
-            step="0.01"
+            step="1"
             value={maxBudget.min ?? ""}
             disabled={unlimitedOnly}
             onChange={(event) => set("max_budget", normalizeMaxBudget({ ...maxBudget, min: event.target.value }))}
@@ -169,7 +171,7 @@ function BudgetFilterFields({ get, set }: FilterDraft) {
           <Input
             type="number"
             min={0}
-            step="0.01"
+            step="1"
             value={maxBudget.max ?? ""}
             disabled={unlimitedOnly}
             onChange={(event) => set("max_budget", normalizeMaxBudget({ ...maxBudget, max: event.target.value }))}

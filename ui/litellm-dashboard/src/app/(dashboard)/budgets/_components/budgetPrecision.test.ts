@@ -3,14 +3,14 @@ import { describe, expect, it } from "vitest";
 import { applyBudgetPrecision } from "./budgetPrecision";
 
 describe("applyBudgetPrecision", () => {
-  it("rounds each precision field to two decimals, matching antd InputNumber precision={2}", () => {
+  it("rounds each budget field to an integer, since token and rate limits are whole numbers", () => {
     const typed = { budget_id: "b", tpm_limit: 500.567, rpm_limit: 7.005, max_budget: 42.567 };
-    const rounded = { budget_id: "b", tpm_limit: 500.57, rpm_limit: 7.01, max_budget: 42.57 };
+    const rounded = { budget_id: "b", tpm_limit: 501, rpm_limit: 7, max_budget: 43 };
 
     expect(applyBudgetPrecision(typed)).toEqual(rounded);
   });
 
-  it("leaves non-precision fields untouched even when numeric", () => {
+  it("leaves non-budget fields untouched even when numeric", () => {
     expect(applyBudgetPrecision({ soft_budget: 1.239, budget_duration: "30d" })).toEqual({
       soft_budget: 1.239,
       budget_duration: "30d",
@@ -25,12 +25,12 @@ describe("applyBudgetPrecision", () => {
     expect(applyBudgetPrecision({ tpm_limit: null, rpm_limit: undefined, max_budget: 1.005 })).toEqual({
       tpm_limit: null,
       rpm_limit: undefined,
-      max_budget: 1.01,
+      max_budget: 1,
     });
   });
 
-  it("rounds negatives away from zero the way antd does", () => {
-    expect(applyBudgetPrecision({ max_budget: -1.005 })).toEqual({ max_budget: -1.01 });
+  it("rounds a fractional negative with Math.round semantics", () => {
+    expect(applyBudgetPrecision({ max_budget: -1.005 })).toEqual({ max_budget: -1 });
   });
 
   it("returns non-finite values unchanged rather than emitting NaN", () => {
@@ -39,7 +39,7 @@ describe("applyBudgetPrecision", () => {
     });
   });
 
-  it("does not disturb a value that already has two or fewer decimals", () => {
-    expect(applyBudgetPrecision({ max_budget: 42.5, tpm_limit: 500 })).toEqual({ max_budget: 42.5, tpm_limit: 500 });
+  it("does not disturb a value that is already an integer", () => {
+    expect(applyBudgetPrecision({ max_budget: 42, tpm_limit: 500 })).toEqual({ max_budget: 42, tpm_limit: 500 });
   });
 });

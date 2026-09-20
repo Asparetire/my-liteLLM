@@ -72,7 +72,7 @@ describe("BudgetTable", () => {
   it("should display budget information", () => {
     renderWithProviders(<BudgetTable {...defaultProps} list={makeList()} />);
     expect(screen.getByText("budget-1")).toBeInTheDocument();
-    expect(screen.getByText("$100.00")).toBeInTheDocument();
+    expect(screen.getByText("100 tokens")).toBeInTheDocument();
     expect(screen.getByText("1000")).toBeInTheDocument();
     expect(screen.getByText("10")).toBeInTheDocument();
   });

@@ -108,7 +108,7 @@ export const getBudgetTableColumns = ({
     meta: { title: "Max Budget", numeric: true },
     header: ({ column }) => <DataTableSortHeader column={column} title="Max Budget" />,
     size: 120,
-    cell: ({ row }) => <MoneyCell value={row.original.max_budget} decimals={2} showZero emptyText="Unlimited" />,
+    cell: ({ row }) => <MoneyCell value={row.original.max_budget} showZero emptyText="Unlimited" />,
   },
   {
     id: "tpm_limit",
