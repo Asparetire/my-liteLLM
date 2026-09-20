@@ -58,12 +58,9 @@ export function BudgetWindowsEditor({ value, onChange }: BudgetWindowsEditorProp
                 </SelectContent>
               </Select>
               <InputGroup className="w-40">
-                <InputGroupAddon>
-                  <InputGroupText>$</InputGroupText>
-                </InputGroupAddon>
                 <InputGroupInput
                   type="number"
-                  step={0.01}
+                  step={1}
                   min={0}
                   value={window.max_budget ?? ""}
                   onChange={(event) => {
@@ -73,11 +70,14 @@ export function BudgetWindowsEditor({ value, onChange }: BudgetWindowsEditorProp
                   onBlur={(event) => {
                     const typed = event.target.valueAsNumber;
                     if (!Number.isNaN(typed)) {
-                      updateWindow(idx, "max_budget", Number(typed.toFixed(2)));
+                      updateWindow(idx, "max_budget", Math.round(typed));
                     }
                   }}
-                  placeholder="Max spend ($)"
+                  placeholder="Max spend (tokens)"
                 />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>tokens</InputGroupText>
+                </InputGroupAddon>
               </InputGroup>
               <Button
                 variant="ghost"

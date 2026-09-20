@@ -428,14 +428,14 @@ export function KeyEditView({
           <KeyBudgetNumberField
             control={form.control}
             name="max_budget"
-            label="Max Budget (USD)"
+            label="Max Budget (tokens)"
             placeholder="Enter a numerical value"
           />
 
           <KeyBudgetNumberField
             control={form.control}
             name="soft_budget"
-            label="Soft Budget (USD)"
+            label="Soft Budget (tokens)"
             placeholder="Get alerts when spend crosses this value, without blocking requests"
           />
 
@@ -454,7 +454,7 @@ export function KeyEditView({
             <FieldLabel>
               {labelWithHint(
                 "Budget Windows",
-                "Set multiple independent budget windows (e.g., hourly $10 AND monthly $200). Each window tracks spend separately and resets on its own schedule.",
+                "Set multiple independent budget windows (e.g., hourly 10,000 tokens AND monthly 200,000 tokens). Each window tracks spend separately and resets on its own schedule.",
               )}
             </FieldLabel>
             <BudgetWindowsEditor value={budgetLimits} onChange={setBudgetLimits} />

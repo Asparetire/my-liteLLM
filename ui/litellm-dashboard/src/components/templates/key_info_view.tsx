@@ -3,7 +3,7 @@ import { useProjects } from "@/app/(dashboard)/hooks/projects/useProjects";
 import { useUISettings } from "@/app/(dashboard)/hooks/uiSettings/useUISettings";
 import useTeams from "@/app/(dashboard)/hooks/useTeams";
 import { useOrganizations } from "@/app/(dashboard)/hooks/organizations/useOrganizations";
-import { formatNumberWithCommas } from "@/utils/dataUtils";
+import { formatNumberWithCommas, getSpendString } from "@/utils/dataUtils";
 import { mapEmptyStringToNull } from "@/utils/keyUpdateUtils";
 import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -465,7 +465,7 @@ export default function KeyInfoView({
         if (onKeyDataUpdate) {
           onKeyDataUpdate({ spend: 0 });
         }
-        toast.success("Key spend reset to $0");
+        toast.success("Key spend reset to 0 tokens");
         setIsResetSpendModalOpen(false);
       },
       onError: (error) => {
@@ -505,7 +505,12 @@ export default function KeyInfoView({
   const parentOrg = orgId ? organizations?.find((org) => org.organization_id === orgId) : null;
 
   const hasOwnBudget = currentKeyData.max_budget !== null;
-  const budgetDisplay = hasOwnBudget ? `$${formatNumberWithCommas(currentKeyData.max_budget, 2)}` : "Unlimited";
+  const budgetDisplay = hasOwnBudget
+    ? `${formatNumberWithCommas(currentKeyData.max_budget, 0)} tokens`
+    : "Unlimited";
+  // getSpendString(0) returns "-" for table cells; in prose a zero-spend key
+  // should read "0 tokens", so special-case it here.
+  const spendDisplay = (spend: number | null | undefined): string => (spend ? getSpendString(spend) : "0 tokens");
   const inheritedGates = hasOwnBudget ? [] : inheritedBudgetGates(parentTeam, parentOrg);
 
   return (
@@ -578,7 +583,7 @@ export default function KeyInfoView({
           },
           {
             label: "Spend",
-            value: currentKeyData?.spend ? `$${formatNumberWithCommas(currentKeyData.spend, 4)}` : "$0.0000",
+            value: spendDisplay(currentKeyData?.spend),
           },
         ]}
         onCancel={() => {
@@ -597,10 +602,10 @@ export default function KeyInfoView({
           </DialogHeader>
           <p>
             Reset spend for <strong>{currentKeyData?.key_alias || currentKeyData?.token_id || "this key"}</strong> to{" "}
-            <strong>$0</strong>?
+            <strong>0 tokens</strong>?
           </p>
           <p style={{ color: "#666", fontSize: "0.875rem", marginTop: 8 }}>
-            Current spend: <strong>${formatNumberWithCommas(currentKeyData.spend, 4)}</strong>. Spend history is
+            Current spend: <strong>{spendDisplay(currentKeyData.spend)}</strong>. Spend history is
             preserved in logs. This resets the current period spend counter, the same as an automatic budget reset.
           </p>
           <DialogFooter>
@@ -668,7 +673,7 @@ export default function KeyInfoView({
               <Card className="block p-6">
                 <p className="text-sm">Spend</p>
                 <div className="mt-2">
-                  <h3 className="text-lg font-medium">${formatNumberWithCommas(currentKeyData.spend, 4)}</h3>
+                  <h3 className="text-lg font-medium">{spendDisplay(currentKeyData.spend)}</h3>
                   <p className="text-sm">
                     of {budgetDisplay}
                     <InheritedBudgetHint gates={inheritedGates} />
@@ -930,16 +935,12 @@ export default function KeyInfoView({
 
                   <div>
                     <p className="text-sm font-medium">Spend</p>
-                    <p className="text-sm">${formatNumberWithCommas(currentKeyData.spend, 4)} USD</p>
+                    <p className="text-sm">{spendDisplay(currentKeyData.spend)}</p>
                   </div>
 
                   <div>
                     <p className="text-sm font-medium">Budget</p>
-                    <p className="text-sm">
-                      {currentKeyData.max_budget !== null
-                        ? `$${formatNumberWithCommas(currentKeyData.max_budget, 2)}`
-                        : "Unlimited"}
-                    </p>
+                    <p className="text-sm">{budgetDisplay}</p>
                   </div>
 
                   <div>

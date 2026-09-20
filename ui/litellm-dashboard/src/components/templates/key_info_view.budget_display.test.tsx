@@ -10,9 +10,9 @@ import { useOrganizations } from "@/app/(dashboard)/hooks/organizations/useOrgan
 import type { Organization } from "../networking";
 
 // IMPORTANT: do not mock `@/utils/dataUtils` here. We want to exercise the
-// real `formatNumberWithCommas` so this test catches the LIT-2845 regression
-// where the overview "Spend" card formatted `max_budget` with the default 0
-// decimals, truncating sub-dollar budgets (e.g. $0.10) to "$0".
+// real `formatNumberWithCommas`/`getSpendString` so this test catches the
+// LIT-2845 class of regression where the overview "Spend" card formats a
+// value with the wrong precision, truncating sub-1-token spend to "0 tokens".
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
@@ -160,7 +160,7 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
     mockOrganizations([]);
   });
 
-  it("renders a sub-dollar max_budget ($0.10) with 2-decimal precision in the overview Spend card", async () => {
+  it("renders a fractional max_budget (0.1) as whole tokens in the overview Spend card", async () => {
     renderWithProviders(
       <KeyInfoView
         keyData={{ ...MOCK_KEY_DATA, max_budget: 0.1 }}
@@ -171,17 +171,15 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
       />,
     );
 
-    // Regression for LIT-2845: the overview card used to call
-    // `formatNumberWithCommas(max_budget)` with no second arg, which
-    // defaults to 0 decimals — so $0.10 rendered as "$0".
-    // After the fix it must render "$0.10".
+    // Budgets are token counts now, so a fractional budget renders as the
+    // rounded whole-token count followed by "tokens".
     await waitFor(() => {
-      expect(screen.getByText(/of \$0\.10/)).toBeInTheDocument();
+      expect(screen.getByText(/of 0 tokens/)).toBeInTheDocument();
     });
-    expect(screen.queryByText(/of \$0$/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/of \$/)).not.toBeInTheDocument();
   });
 
-  it("still renders whole-dollar max_budget with 2-decimal precision", async () => {
+  it("still renders a whole-number max_budget with thousands separators", async () => {
     renderWithProviders(
       <KeyInfoView
         keyData={{ ...MOCK_KEY_DATA, max_budget: 100 }}
@@ -192,8 +190,41 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
       />,
     );
     await waitFor(() => {
-      // 2-decimal formatting -> "$100.00"
-      expect(screen.getByText(/of \$100\.00/)).toBeInTheDocument();
+      expect(screen.getByText(/of 100 tokens/)).toBeInTheDocument();
+    });
+  });
+
+  it("renders spend in token semantics: '< 1 token' for 0.0001 and '0 tokens' for zero", async () => {
+    renderWithProviders(
+      <KeyInfoView
+        keyData={MOCK_KEY_DATA}
+        onClose={() => {}}
+        keyId={"test-key-id"}
+        onKeyDataUpdate={() => {}}
+        teams={[]}
+      />,
+    );
+    // Regression for the token-semantics migration: sub-1-token spend must
+    // not be truncated to "0 tokens"; zero spend must read "0 tokens",
+    // not the "-" that getSpendString returns for 0. The value renders both
+    // in the Overview card and the keep-mounted Settings tab.
+    await waitFor(() => {
+      expect(screen.getAllByText("< 1 token").length).toBeGreaterThan(0);
+    });
+  });
+
+  it("renders exactly-zero spend as '0 tokens' in the overview Spend card", async () => {
+    renderWithProviders(
+      <KeyInfoView
+        keyData={{ ...MOCK_KEY_DATA, spend: 0 }}
+        onClose={() => {}}
+        keyId={"test-key-id"}
+        onKeyDataUpdate={() => {}}
+        teams={[]}
+      />,
+    );
+    await waitFor(() => {
+      expect(screen.getAllByText("0 tokens").length).toBeGreaterThan(0);
     });
   });
 
@@ -229,10 +260,10 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
     await waitFor(() => {
       expect(screen.getByText(/of Unlimited/)).toBeInTheDocument();
     });
-    expect(screen.queryByText(/of \$1,200\.00/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/of 1,200 tokens/)).not.toBeInTheDocument();
     expect(screen.queryByText(/\(Team: Test Budget/)).not.toBeInTheDocument();
     await userEvent.setup().hover(screen.getByLabelText("question-circle"));
-    expect(screen.getByTestId("inherited-budget-hint")).toHaveTextContent("Team Test Budget: $1,200.00 / 30d");
+    expect(screen.getByTestId("inherited-budget-hint")).toHaveTextContent("Team Test Budget: 1,200 tokens / 30d");
   });
 
   it("lists the organization budget in the hint when the team's org has one", async () => {
@@ -254,7 +285,7 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
       expect(screen.getByText(/of Unlimited/)).toBeInTheDocument();
     });
     await userEvent.setup().hover(screen.getByLabelText("question-circle"));
-    expect(screen.getByTestId("inherited-budget-hint")).toHaveTextContent("Organization Acme Org: $5,000.00");
+    expect(screen.getByTestId("inherited-budget-hint")).toHaveTextContent("Organization Acme Org: 5,000 tokens");
     expect(screen.getByTestId("inherited-budget-hint")).not.toHaveTextContent("Team Org Team");
   });
 
@@ -293,7 +324,7 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByText(/of \$25\.00/)).toBeInTheDocument();
+      expect(screen.getByText(/of 25 tokens/)).toBeInTheDocument();
     });
     expect(screen.queryByLabelText("question-circle")).not.toBeInTheDocument();
   });
@@ -339,7 +370,7 @@ describe("KeyInfoView budget reset visibility", () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByText(/of \$0\.10/)).toBeInTheDocument();
+      expect(screen.getByText(/of 0 tokens/)).toBeInTheDocument();
     });
     expect(screen.queryByText(/^Resets /)).not.toBeInTheDocument();
   });

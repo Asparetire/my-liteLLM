@@ -53,8 +53,8 @@ describe("InheritedBudgetHint", () => {
   it("shows each gate with its budget and duration on hover", async () => {
     render(<InheritedBudgetHint gates={inheritedBudgetGates(team, organization)} />);
     await userEvent.setup().hover(screen.getByLabelText("question-circle"));
-    expect(screen.getByTestId("inherited-budget-hint")).toHaveTextContent("Team Platform: $1,200.00 / 30d");
-    expect(screen.getByTestId("inherited-budget-hint")).toHaveTextContent("Organization Acme: $5,000.00");
-    expect(screen.getByTestId("inherited-budget-hint")).not.toHaveTextContent("Organization Acme: $5,000.00 /");
+    expect(screen.getByTestId("inherited-budget-hint")).toHaveTextContent("Team Platform: 1,200 tokens / 30d");
+    expect(screen.getByTestId("inherited-budget-hint")).toHaveTextContent("Organization Acme: 5,000 tokens");
+    expect(screen.getByTestId("inherited-budget-hint")).not.toHaveTextContent("Organization Acme: 5,000 tokens /");
   });
 });
