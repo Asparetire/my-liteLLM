@@ -11,7 +11,7 @@ const roleOptions = [
 ];
 
 const additionalFields = [
-  { name: "max_budget_in_team", label: "Team Member Budget (USD)", type: "numerical" as const, step: 0.01, min: 0 },
+  { name: "max_budget_in_team", label: "Team Member Budget (tokens)", type: "numerical" as const, step: 1, min: 0 },
   { name: "budget_duration", label: "Budget Reset Period", type: "budget-duration" as const },
   { name: "tpm_limit", label: "Team Member TPM Limit", type: "numerical" as const, step: 1, min: 0 },
   { name: "rpm_limit", label: "Team Member RPM Limit", type: "numerical" as const, step: 1, min: 0 },
@@ -58,7 +58,7 @@ describe("EditMembership submit payload", () => {
       user_id: "u1",
       user_email: "a@b.com",
       role: "user",
-      max_budget_in_team: 12.5,
+      max_budget_in_team: 125,
       budget_duration: "24h",
       tpm_limit: 100,
       rpm_limit: 20,
@@ -75,7 +75,7 @@ describe("EditMembership submit payload", () => {
       user_email: "a@b.com",
       user_id: "u1",
       role: "user",
-      max_budget_in_team: 12.5,
+      max_budget_in_team: 125,
       budget_duration: "24h",
       tpm_limit: 100,
       rpm_limit: 20,
@@ -139,13 +139,13 @@ describe("EditMembership submit payload", () => {
   it("submits a typed numeric field as the raw string and a cleared one as null", async () => {
     renderEdit(teamMemberConfig, { user_id: "u1", user_email: "a@b.com", role: "user", tpm_limit: 7 });
 
-    fireEvent.change(screen.getByLabelText("Team Member Budget (USD)"), { target: { value: "42.56" } });
+    fireEvent.change(screen.getByLabelText("Team Member Budget (tokens)"), { target: { value: "42" } });
     fireEvent.change(screen.getByLabelText("Team Member TPM Limit"), { target: { value: "" } });
 
     save();
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
-    expect(submitted().max_budget_in_team).toBe("42.56");
+    expect(submitted().max_budget_in_team).toBe("42");
     expect(submitted().tpm_limit).toBeNull();
   });
 
@@ -226,9 +226,9 @@ describe("EditMembership submit payload", () => {
   });
 
   it.each([
-    ["Team Member Budget (USD)", "42.567", "stepMismatch"],
+    ["Team Member Budget (tokens)", "42.567", "stepMismatch"],
     ["Team Member TPM Limit", "12.7", "stepMismatch"],
-    ["Team Member Budget (USD)", "-5", "rangeUnderflow"],
+    ["Team Member Budget (tokens)", "-5", "rangeUnderflow"],
   ])("blocks submission when %s holds %s", async (label, value, violation) => {
     renderEdit(teamMemberConfig, { user_id: "u1", user_email: "a@b.com", role: "user" });
 

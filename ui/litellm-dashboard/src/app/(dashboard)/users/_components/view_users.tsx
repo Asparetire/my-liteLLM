@@ -17,6 +17,7 @@ import {
 import OnboardingModal, { InvitationLink } from "@/components/onboarding_link";
 
 import { DEBOUNCE_WAIT_MS } from "@/utils/debounceConstants";
+import { getSpendString } from "@/utils/dataUtils";
 import { isAdminRole, isProxyAdminRole } from "@/utils/roles";
 import { useDebouncedValue } from "@tanstack/react-pacer/debouncer";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -414,7 +415,7 @@ const ViewUserDashboard: React.FC<ViewUserDashboardProps> = ({
             value:
               (userToDelete && possibleUIRoles?.[userToDelete.user_role]?.ui_label) || userToDelete?.user_role || "-",
           },
-          { label: "Total Spend (USD)", value: userToDelete?.spend?.toFixed(2) },
+          { label: "Total Spend (tokens)", value: getSpendString(userToDelete?.spend) },
         ]}
         onCancel={cancelDelete}
         onOk={confirmDelete}

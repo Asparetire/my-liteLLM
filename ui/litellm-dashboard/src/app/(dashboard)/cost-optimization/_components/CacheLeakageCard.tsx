@@ -9,7 +9,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
-import { CacheLeakageDimension, CacheLeakageRow, computeCacheLeakage, pct, usd } from "./costOptimizationUtils";
+import {
+  CacheLeakageDimension,
+  CacheLeakageRow,
+  computeCacheLeakage,
+  pct,
+  tokenSpend,
+} from "./costOptimizationUtils";
 import { DailyActivityRange } from "./useDailyActivityRange";
 
 interface CacheLeakageCardProps {
@@ -170,7 +176,7 @@ const CacheLeakageCard: React.FC<CacheLeakageCardProps> = ({ activity }) => {
                     <TableCell className="text-right">{formatNumberWithCommas(row.uncachedPromptTokens)}</TableCell>
                     <TableCell className="text-right">{pct(row.cacheHitRatio)}</TableCell>
                     <TableCell className="text-right">
-                      {row.potentialSavings == null ? "—" : usd(row.potentialSavings)}
+                      {row.potentialSavings == null ? "—" : tokenSpend(row.potentialSavings)}
                     </TableCell>
                   </TableRow>
                 ))}

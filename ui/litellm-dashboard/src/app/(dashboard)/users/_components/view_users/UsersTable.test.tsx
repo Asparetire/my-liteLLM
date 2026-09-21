@@ -112,8 +112,8 @@ describe("UsersTable", () => {
       "Status",
       "Global Proxy Role",
       "User Alias",
-      "Spend (USD)",
-      "Budget (USD)",
+      "Spend (tokens)",
+      "Budget (tokens)",
       "SSO ID",
       "Virtual Keys",
       "Created At",
@@ -123,10 +123,10 @@ describe("UsersTable", () => {
     });
   });
 
-  it("renders spend with two decimal places", () => {
+  it("renders spend in whole tokens", () => {
     render(<Harness data={[makeUser({ spend: 98.854 })]} />);
 
-    expect(screen.getByText("$98.85")).toBeInTheDocument();
+    expect(screen.getByText("99 tokens")).toBeInTheDocument();
   });
 
   // Sorting is server-side and the backend only accepts these five keys, so a sort

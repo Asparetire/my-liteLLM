@@ -47,20 +47,21 @@ export const formatNumberWithCommas = (
   return `${sign}${scaled.toLocaleString("en-US", opts)}${suffix}`;
 };
 
-export const getSpendString = (value: number | null | undefined, decimals: number = 6): string => {
+// [CN-FORK] spend carries weighted token counts (REQ-05/06); display tokens, not USD.
+// Token counts are integers, so the legacy decimals parameter is gone.
+export const getSpendString = (value: number | null | undefined): string => {
   if (value === null || value === undefined || !Number.isFinite(value) || value === 0) {
     return "-";
   }
 
-  const formatted = formatNumberWithCommas(value, decimals, false, false);
+  const formatted = formatNumberWithCommas(value, 0);
   const numericFormatted = Number(formatted.replace(/,/g, ""));
 
   if (numericFormatted === 0) {
-    const threshold = (1 / 10 ** decimals).toFixed(decimals);
-    return `< $${threshold}`;
+    return "< 1 token";
   }
 
-  return `$${formatted}`;
+  return numericFormatted === 1 ? "1 token" : `${formatted} tokens`;
 };
 
 export const copyToClipboard = async (

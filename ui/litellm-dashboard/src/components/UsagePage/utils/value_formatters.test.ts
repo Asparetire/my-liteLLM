@@ -32,33 +32,33 @@ describe("valueFormatter", () => {
 });
 
 describe("valueFormatterSpend", () => {
-  it("should return '$0' when the value is exactly zero", () => {
-    expect(valueFormatterSpend(0)).toBe("$0");
+  it("should return '0 tokens' when the value is exactly zero", () => {
+    expect(valueFormatterSpend(0)).toBe("0 tokens");
   });
 
-  it("should format numbers >= 1,000,000 as dollar millions", () => {
-    expect(valueFormatterSpend(1_000_000)).toBe("$1M");
-    expect(valueFormatterSpend(2_500_000)).toBe("$2.5M");
-    expect(valueFormatterSpend(10_000_000)).toBe("$10M");
+  it("should format numbers >= 1,000,000 as abbreviated token millions", () => {
+    expect(valueFormatterSpend(1_000_000)).toBe("1M tokens");
+    expect(valueFormatterSpend(2_500_000)).toBe("2.5M tokens");
+    expect(valueFormatterSpend(10_000_000)).toBe("10M tokens");
   });
 
-  it("should format numbers >= 1,000 as dollar thousands", () => {
-    expect(valueFormatterSpend(1_000)).toBe("$1k");
-    expect(valueFormatterSpend(5_500)).toBe("$5.5k");
-    expect(valueFormatterSpend(999_999)).toBe("$999.999k");
+  it("should format numbers >= 1,000 as abbreviated token thousands", () => {
+    expect(valueFormatterSpend(1_000)).toBe("1k tokens");
+    expect(valueFormatterSpend(5_500)).toBe("5.5k tokens");
+    expect(valueFormatterSpend(999_999)).toBe("999.999k tokens");
   });
 
-  it("should format numbers below 1,000 as plain dollar amounts", () => {
-    expect(valueFormatterSpend(1)).toBe("$1");
-    expect(valueFormatterSpend(99.99)).toBe("$99.99");
-    expect(valueFormatterSpend(999)).toBe("$999");
+  it("should format numbers below 1,000 as plain token counts", () => {
+    expect(valueFormatterSpend(1)).toBe("1 tokens");
+    expect(valueFormatterSpend(99.99)).toBe("99.99 tokens");
+    expect(valueFormatterSpend(999)).toBe("999 tokens");
   });
 
   it("should treat exactly 1,000,000 as the millions boundary", () => {
-    expect(valueFormatterSpend(1_000_000)).toBe("$1M");
+    expect(valueFormatterSpend(1_000_000)).toBe("1M tokens");
   });
 
   it("should treat exactly 1,000 as the thousands boundary", () => {
-    expect(valueFormatterSpend(1_000)).toBe("$1k");
+    expect(valueFormatterSpend(1_000)).toBe("1k tokens");
   });
 });

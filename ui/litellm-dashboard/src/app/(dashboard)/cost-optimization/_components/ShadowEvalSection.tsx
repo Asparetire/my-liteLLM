@@ -12,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ApiError } from "@/lib/http/client";
 
-import { usd } from "./costOptimizationUtils";
+import { tokenSpend } from "./costOptimizationUtils";
 import { StartForm } from "./ShadowEvalStartForm";
 import {
   useShadowEvalJob,
@@ -173,10 +173,10 @@ const SliceTable: React.FC<{
           <TableCell className="text-right tabular-nums">{pct(slice.tie_rate_pct)}</TableCell>
           <TableCell className="text-right tabular-nums">{slice.avg_judge_confidence.toFixed(2)}</TableCell>
           <TableCell className="text-right tabular-nums">
-            {routerSliceSpend(direction, slice) > 0 ? usd(routerSliceSpend(direction, slice)) : "-"}
+            {routerSliceSpend(direction, slice) > 0 ? tokenSpend(routerSliceSpend(direction, slice)) : "-"}
           </TableCell>
           <TableCell className="text-right tabular-nums">
-            {otherSliceSpend(direction, slice) > 0 ? usd(otherSliceSpend(direction, slice)) : "-"}
+            {otherSliceSpend(direction, slice) > 0 ? tokenSpend(otherSliceSpend(direction, slice)) : "-"}
           </TableCell>
         </TableRow>
       ))}
@@ -213,7 +213,7 @@ const CostComparison: React.FC<{
         {savingsPct != null ? `${savingsPct > 0 ? "-" : "+"}${Math.abs(savingsPct).toFixed(1)}%` : "n/a"}
       </p>
       <p className="text-xs text-muted-foreground">
-        {usd(routerSpend)} vs {usd(otherSpend)} on the same judged turns
+        {tokenSpend(routerSpend)} vs {tokenSpend(otherSpend)} on the same judged turns
         {cacheHits > 0 ? `; ${cacheHits.toLocaleString()} cache-served turns excluded` : ""}
       </p>
     </div>
@@ -289,7 +289,7 @@ const TargetTable: React.FC<{ job: ShadowEvalJob }> = ({ job }) => {
               </TableCell>
               <TableCell className="text-right tabular-nums">
                 {target.max_budget != null
-                  ? `${usd(target.spend ?? 0)} / ${usd(target.max_budget)}`
+                  ? `${tokenSpend(target.spend ?? 0)} / ${tokenSpend(target.max_budget)}`
                   : `${(target.attempt_count ?? slice?.turn_count ?? 0).toLocaleString()} / ${target.max_turns.toLocaleString()} turns`}
               </TableCell>
               {slice ? (
@@ -392,8 +392,8 @@ const JobResults: React.FC<{
             <p className="text-sm font-medium text-foreground">{jobHeadline(job)}</p>
             <p className="text-xs text-muted-foreground">
               {(job.judged_count ?? 0).toLocaleString()} turns judged · {(job.error_count ?? 0).toLocaleString()}{" "}
-              errored · {usd(totalSpend(job))}
-              {totalBudget(job) !== null ? ` of ${usd(totalBudget(job) ?? 0)}` : ""} eval spend
+              errored · {tokenSpend(totalSpend(job))}
+              {totalBudget(job) !== null ? ` of ${tokenSpend(totalBudget(job) ?? 0)}` : ""} eval spend
               {active && remaining ? ` · ${remaining}` : ""}
             </p>
           </div>
@@ -438,7 +438,7 @@ const PreviousJob: React.FC<{ job: ShadowEvalJob }> = ({ job }) => {
             <p className="text-sm font-medium text-foreground">{jobHeadline(shown)}</p>
             <p className="text-xs text-muted-foreground">
               {shown.judged_count != null &&
-                `${shown.judged_count.toLocaleString()} judged · ${(shown.error_count ?? 0).toLocaleString()} errored · ${usd(totalSpend(shown))} eval spend · `}
+                `${shown.judged_count.toLocaleString()} judged · ${(shown.error_count ?? 0).toLocaleString()} errored · ${tokenSpend(totalSpend(shown))} eval spend · `}
               {new Date(shown.created_at).toLocaleDateString()}
             </p>
           </div>

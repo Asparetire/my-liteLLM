@@ -101,9 +101,9 @@ uv run --no-sync pytest -xvs tests/path/to/test.py
 
 ## 📚 详细文档
 
-- [开发管理规范](GIT-开发管理规范.md) - Git 操作规范
+- [开发管理规范](../../dev-plans/GIT-开发管理规范.md) - Git 操作规范
 - [分支管理回滚指南](.git-hooks/branch-manage.md) - 回滚操作
-- [总览方案](../../FORK-AND-LOCALIZATION-PLAN.md) - 完整需求
+- [总览方案](../../dev-plans/00-总体方案.md) - 完整需求
 
 ## 📞 需要帮助？
 

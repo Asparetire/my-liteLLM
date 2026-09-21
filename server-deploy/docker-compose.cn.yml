@@ -1,0 +1,98 @@
+# LiteLLM 二开版编排 —— 与现有原版（4000）完全隔离
+#
+# 用法：
+#   cd ~/litellm-src
+#   docker compose -f docker-compose.cn.yml -p litellm-cn up -d
+#
+# 隔离策略：
+#   端口 4001（原版 4000 不动）
+#   独立 Postgres（127.0.0.1:5433）与独立 Redis（127.0.0.1:6380）
+#   Ollama 仍是宿主机原生服务，通过 host.docker.internal 访问
+#
+# 前置：同目录需有 .env，内容至少两项
+#   LITELLM_MASTER_KEY=sk-...      # 建议直接沿用原版，客户端免改
+#   PG_PASSWORD=<新库密码>
+
+services:
+  litellm-cn:
+    # 阶段一：复用现网已拉取的官方镜像（内为 litellm 1.101.0 / python 3.13）
+    # 阶段二：改成自建镜像 litellm-cn:1.102.0，并删掉下面三个源码挂载
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: litellm-cn
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "4001:4000"
+    volumes:
+      - ./litellm_config.cn.yaml:/app/config.yaml:ro
+      # fork 源码覆盖镜像内置的 litellm 包
+      # 注意：这里必须是可读写。因为下面要把编译好的 _native.abi3.so 挂进这个目录，
+      # 而 Docker 在只读挂载点里无法创建挂载点文件（会报 read-only file system）
+      - ./litellm:/app/.venv/lib/python3.13/site-packages/litellm
+      # 中文错误中间件外挂包；靠 proxy_cli.py 的 sys.path.append(os.getcwd()) 被 import
+      - ./litellm_cn:/app/litellm_cn:ro
+      # 上一步挂载会盖掉镜像里编译好的 Rust 扩展，这里补回来
+      - ./rust_bridge/_native.abi3.so:/app/.venv/lib/python3.13/site-packages/litellm/rust_bridge/_native.abi3.so:ro
+      # fork 的 proxy_cli.py 比镜像内置的 litellm_proxy_extras 新（175 vs 167 个迁移，
+      # prisma_toolchain 多了 prisma_cli_available），必须整包一起挂，否则启动时 ImportError
+      - ./litellm-proxy-extras/litellm_proxy_extras:/app/.venv/lib/python3.13/site-packages/litellm_proxy_extras:ro
+      # 沿用原版的 Ollama prompt cache 计数补丁
+      - /home/hifen37/ollama-litellm/patches:/app/patches:ro
+      # 汉化 UI 构建好之后启用下面两行（见方案文档 7.2）
+      # - ./ui_cn:/app/ui_cn:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      DATABASE_URL: postgresql://llmproxy:${PG_PASSWORD}@db:5432/litellm
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      OLLAMA_API_BASE: ${OLLAMA_API_BASE:-http://host.docker.internal:11434}
+      PYTHONPATH: /app/patches
+      LITELLM_OLLAMA_CACHE_CREATION: "1"
+      # 服务器访问 raw.githubusercontent.com 超时，强制用本地价格表，
+      # 否则每次启动都要重试三次、多花 20-30 秒
+      LITELLM_LOCAL_MODEL_COST_MAP: "True"
+      # 启用汉化 UI 时取消注释
+      # LITELLM_UI_PATH: /app/ui_cn
+    command: ["--config=/app/config.yaml", "--port", "4000"]
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness')"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  db:
+    image: postgres:16
+    container_name: litellm_cn_db
+    restart: always
+    environment:
+      POSTGRES_DB: litellm
+      POSTGRES_USER: llmproxy
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d litellm -U llmproxy"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: litellm_cn_redis
+    restart: always
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "127.0.0.1:6380:6379"

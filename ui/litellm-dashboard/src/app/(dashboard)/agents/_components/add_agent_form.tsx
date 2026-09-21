@@ -617,12 +617,12 @@ const AddAgentForm: React.FC<AddAgentFormProps> = ({ visible, onClose, accessTok
               <p className="mt-1 text-xs text-muted-foreground">Hard cap on LLM calls per session</p>
             </Field>
             <Field className="gap-1">
-              <FieldLabel htmlFor="agent-max-budget-per-session">Max Budget Per Session ($)</FieldLabel>
+              <FieldLabel htmlFor="agent-max-budget-per-session">Max Budget Per Session (tokens)</FieldLabel>
               <Input
                 id="agent-max-budget-per-session"
                 type="number"
                 step="any"
-                placeholder="e.g. 5.00"
+                placeholder="e.g. 5000"
                 disabled={!requireTraceIdOutbound}
                 value={maxBudgetPerSession ?? ""}
                 onChange={(event) =>

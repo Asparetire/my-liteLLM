@@ -266,7 +266,7 @@ export function UserEditView({
             name="max_budget"
             label={
               <>
-                Max Budget (USD)
+                Max Budget (tokens)
                 <label className="ml-3 inline-flex items-center gap-2 font-normal">
                   <Checkbox checked={unlimitedBudget} onCheckedChange={handleUnlimitedBudgetChange} />
                   Unlimited Budget
@@ -279,7 +279,7 @@ export function UserEditView({
                 {...control}
                 ref={ref}
                 type="number"
-                step={0.01}
+                step={1}
                 value={value ?? ""}
                 onChange={(event) => onChange(event.target.value)}
                 onWheel={(event) => event.currentTarget.blur()}

@@ -731,7 +731,9 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                                 return (
                                   <div className="bg-card p-4 shadow-lg rounded-lg border">
                                     <p className="font-bold">{data.date}</p>
-                                    <p className="text-info">Spend: ${formatNumberWithCommas(data.metrics.spend, 2)}</p>
+                                    <p className="text-info">
+                                      Spend: {formatNumberWithCommas(data.metrics.spend, 0)} tokens
+                                    </p>
                                     <p className="text-muted-foreground">Requests: {data.metrics.api_requests}</p>
                                     <p className="text-muted-foreground">
                                       Successful: {data.metrics.successful_requests}
@@ -841,7 +843,9 @@ const UsagePage: React.FC<UsagePageProps> = ({ teams, organizations }) => {
                                       return (
                                         <div className="bg-card p-4 shadow-lg rounded-lg border">
                                           <p className="font-bold">{data.key}</p>
-                                          <p className="text-info">Spend: ${formatNumberWithCommas(data.spend, 2)}</p>
+                                          <p className="text-info">
+                                            Spend: {formatNumberWithCommas(data.spend, 0)} tokens
+                                          </p>
                                           <p className="text-muted-foreground">
                                             Total Requests: {data.requests.toLocaleString()}
                                           </p>

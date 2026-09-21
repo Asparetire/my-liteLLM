@@ -1,10 +1,11 @@
-import { formatNumberWithCommas, getSpendString } from "@/utils/dataUtils";
+import { getSpendString } from "@/utils/dataUtils";
 
 export type UsageUnits = Readonly<Record<string, number>>;
 
+// [CN-FORK] spend carries weighted token counts (REQ-06); cost figures are tokens, not USD.
 export const formatCost = (cost: number | null | undefined): string => {
   if (cost == null) return "—";
-  return cost === 0 ? `$${formatNumberWithCommas(0, 4)}` : getSpendString(cost, 4);
+  return cost === 0 ? "0 tokens" : getSpendString(cost);
 };
 
 export const totalUnits = (units: UsageUnits): number => Object.values(units).reduce((sum, n) => sum + n, 0);
@@ -37,7 +38,7 @@ export const unitPrice = (row: CounterMath): number | null => {
 
 export const formatUnitPrice = (price: number): string => {
   const fixed = price.toFixed(6).replace(/\.?0+$/, "");
-  return price > 0 && Number(fixed) === 0 ? "< $0.000001" : `$${fixed}`;
+  return price > 0 && Number(fixed) === 0 ? "< 0.000001" : fixed;
 };
 
 export interface MathRow {

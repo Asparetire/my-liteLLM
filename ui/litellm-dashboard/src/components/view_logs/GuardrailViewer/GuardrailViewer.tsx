@@ -470,11 +470,11 @@ const RequestLifecycle = ({ entries }: { entries: GuardrailInformation[] }) => {
 
 // ── Evaluation Card ─────────────────────────────────────────────────────────
 
-// Shared spend formatter so this chip renders the same dollar string as the
-// Cost Breakdown panel above it (and never falls into JS e-notation below 1e-6).
+// [CN-FORK] Shared spend formatter so this chip renders the same token string as the
+// Cost Breakdown panel above it (REQ-06: tokens, not USD).
 const formatGuardrailCost = (cost: number): string => {
-  if (cost === 0) return "$0.00";
-  return getSpendString(cost, 8);
+  if (cost === 0) return "0 tokens";
+  return getSpendString(cost);
 };
 
 const EvaluationCard = ({ entry }: { entry: GuardrailInformation }) => {

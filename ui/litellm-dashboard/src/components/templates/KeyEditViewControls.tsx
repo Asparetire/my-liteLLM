@@ -140,7 +140,7 @@ export const KeyBudgetNumberField = ({
       <NumericalInput
         {...field}
         value={field.value ?? ""}
-        step={0.01}
+        step={1}
         style={{ width: "100%" }}
         placeholder={placeholder}
       />

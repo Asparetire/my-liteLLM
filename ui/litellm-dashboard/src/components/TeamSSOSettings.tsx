@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/combobox";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Input } from "@/components/ui/input";
+import { formatNumberWithCommas } from "@/utils/dataUtils";
 import { UiLoadingSpinner } from "@/components/ui/ui-loading-spinner";
 
 import { getDefaultTeamSettings, updateDefaultTeamSettings, Organization } from "./networking";
@@ -233,17 +234,21 @@ const TeamSSOSettings: React.FC<TeamSSOSettingsProps> = ({ accessToken }) => {
           <div className="border-t border-border">
             <SettingRow
               label="Max Budget"
-              description="Maximum budget (in USD) for new automatically created teams."
+              description="Maximum budget (in tokens) for new automatically created teams."
               isEditing={isEditing}
               viewContent={
-                values.max_budget != null ? <span>${Number(values.max_budget).toLocaleString()}</span> : <NotSet />
+                values.max_budget != null ? (
+                  <span>{formatNumberWithCommas(Number(values.max_budget), 0)} tokens</span>
+                ) : (
+                  <NotSet />
+                )
               }
               editContent={
                 <InputGroup className="max-w-80">
-                  <InputGroupAddon>$</InputGroupAddon>
+                  <InputGroupAddon>tokens</InputGroupAddon>
                   <InputGroupInput
                     type="number"
-                    step="any"
+                    step={1}
                     min={0}
                     value={editedValues.max_budget ?? ""}
                     onChange={(event) =>

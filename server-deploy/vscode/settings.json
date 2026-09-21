@@ -1,0 +1,73 @@
+{
+  "//": "复制为 ~/litellm-src/.vscode/settings.json。仓库很大（3000+ py、enterprise/、cookbook/、helm/、litellm-rust/），不排除监听会让 VS Code 与服务器都变卡。",
+
+  "python.defaultInterpreterPath": "/home/hifen37/litellm-src/.venv/bin/python",
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": ["tests"],
+  "python.analysis.exclude": [
+    "**/node_modules",
+    "**/.venv",
+    "**/enterprise/**",
+    "**/litellm/proxy/_experimental/out/**"
+  ],
+
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.venv/**": true,
+    "**/__pycache__/**": true,
+    "**/.pytest_cache/**": true,
+    "**/.ruff_cache/**": true,
+    "**/enterprise/**": true,
+    "**/cookbook/**": true,
+    "**/helm/**": true,
+    "**/litellm-rust/**": true,
+    "**/litellm/proxy/_experimental/out/**": true,
+    "**/ui/litellm-dashboard/out/**": true,
+    "**/data/**": true
+  },
+
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.venv": true,
+    "**/enterprise": true,
+    "**/cookbook": true,
+    "**/helm": true,
+    "**/litellm-rust": true,
+    "**/litellm/proxy/_experimental/out": true,
+    "**/ui/litellm-dashboard/out": true,
+    "**/data": true,
+    "**/*.svg": true,
+    "**/package-lock.json": true
+  },
+
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true
+  },
+
+  "editor.rulers": [120],
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.rulers": [120]
+  },
+  "[json]": { "editor.rulers": [120] },
+  "[typescript]": { "editor.rulers": [120] },
+  "[typescriptreact]": { "editor.rulers": [120] },
+
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+
+  "git.autofetch": false,
+  "git.confirmSync": false,
+
+  "remote.SSH.remotePlatform": { "litellm-server": "linux" },
+  "remote.SSH.connectTimeout": 30,
+  "remote.SSH.showLoginTerminal": true,
+
+  "terminal.integrated.defaultProfile.linux": "bash"
+}

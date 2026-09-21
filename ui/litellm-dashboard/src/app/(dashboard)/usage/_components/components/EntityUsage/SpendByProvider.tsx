@@ -115,7 +115,7 @@ const SpendByProvider: React.FC<SpendByProviderProps> = ({ loading, isDateChangi
               data={filteredProviderSpend}
               index="provider"
               category="spend"
-              valueFormatter={(value) => `$${formatNumberWithCommas(value, 2)}`}
+              valueFormatter={(value) => `${formatNumberWithCommas(value, 0)} tokens`}
               colors={["cyan"]}
               showLabel
               startAngle={90}

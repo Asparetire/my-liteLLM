@@ -238,9 +238,9 @@ const KeysPanel: React.FC<Props> = ({ accessToken, userId, premiumUser }) => {
                       {record.key_alias && <div className="text-xs text-muted-foreground">{record.key_alias}</div>}
                     </TableCell>
                     <TableCell className="text-[13px]">
-                      ${record.spend?.toFixed(2) ?? "0.00"}
+                      {`${(record.spend ?? 0).toLocaleString()} tokens`}
                       {record.max_budget != null && record.max_budget > 0 && (
-                        <span className="text-muted-foreground"> / ${record.max_budget.toFixed(2)}</span>
+                        <span className="text-muted-foreground"> / {record.max_budget.toLocaleString()} tokens</span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -295,7 +295,7 @@ const KeysPanel: React.FC<Props> = ({ accessToken, userId, premiumUser }) => {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <Label>Max Budget (USD)</Label>
+                  <Label>Max Budget (tokens)</Label>
                   <Input
                     type="number"
                     step="0.01"

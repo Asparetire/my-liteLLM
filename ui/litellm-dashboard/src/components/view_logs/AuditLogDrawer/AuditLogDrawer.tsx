@@ -5,6 +5,7 @@ import { AuditLogEntry, AUDIT_TABLE_NAME_DISPLAY } from "../AuditLogsTableColumn
 import DefaultProxyAdminTag from "../../common_components/DefaultProxyAdminTag";
 import CopyButton from "@/components/shared/CopyButton";
 import { StatusBadge, type StatusTone } from "@/components/shared/table_cells/status_badge";
+import { formatNumberWithCommas } from "@/utils/dataUtils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
@@ -143,12 +144,14 @@ function DiffSection({ log }: { log: AuditLogEntry }) {
               )}
               {value.spend !== undefined && (
                 <p>
-                  <span className="text-muted-foreground">Spend:</span> ${Number(value.spend).toFixed(6)}
+                  <span className="text-muted-foreground">Spend:</span>{" "}
+                  {formatNumberWithCommas(Number(value.spend), 0)} tokens
                 </p>
               )}
               {value.max_budget !== undefined && (
                 <p>
-                  <span className="text-muted-foreground">Max Budget:</span> ${Number(value.max_budget).toFixed(6)}
+                  <span className="text-muted-foreground">Max Budget:</span>{" "}
+                  {formatNumberWithCommas(Number(value.max_budget), 0)} tokens
                 </p>
               )}
             </div>

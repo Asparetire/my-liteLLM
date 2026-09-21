@@ -268,8 +268,8 @@ describe("TeamMembersComponent", () => {
       />,
     );
 
-    expect(screen.getByText("$100.50")).toBeInTheDocument();
-    expect(screen.getByText("$1,538.26")).toBeInTheDocument();
+    expect(screen.getByText("101 tokens")).toBeInTheDocument();
+    expect(screen.getByText("1,538 tokens")).toBeInTheDocument();
     expect(screen.getByText(/100 RPM/)).toBeInTheDocument();
     expect(screen.getByText(/10000 TPM/)).toBeInTheDocument();
   });
@@ -301,7 +301,7 @@ describe("TeamMembersComponent", () => {
       />,
     );
 
-    expect(screen.getByText("$1,000.00")).toBeInTheDocument();
+    expect(screen.getByText("1,000 tokens")).toBeInTheDocument();
     expect(screen.getByText("Unlimited")).toBeInTheDocument();
   });
 

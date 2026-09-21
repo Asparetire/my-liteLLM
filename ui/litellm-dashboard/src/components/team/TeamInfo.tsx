@@ -16,7 +16,7 @@ import {
   teamUpdateCall,
 } from "@/components/networking";
 import { useGuardrails, GuardrailListItem } from "@/app/(dashboard)/hooks/guardrails/useGuardrails";
-import { formatNumberWithCommas } from "@/utils/dataUtils";
+import { formatNumberWithCommas, getSpendString } from "@/utils/dataUtils";
 import { mapEmptyStringToNull } from "@/utils/keyUpdateUtils";
 import type { ObjectPermission } from "@/components/object_permission_types";
 import { isProxyAdminRole } from "@/utils/roles";
@@ -1151,13 +1151,13 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
           <Card className="block p-6">
             <p>Budget Status</p>
             <div className="mt-2">
-              <h3 className="text-lg font-medium">${formatNumberWithCommas(info.spend, 2)}</h3>
-              <p>of {info.max_budget === null ? "Unlimited" : `$${formatNumberWithCommas(info.max_budget, 2)}`}</p>
+              <h3 className="text-lg font-medium">{getSpendString(info.spend)}</h3>
+              <p>of {info.max_budget === null ? "Unlimited" : `${formatNumberWithCommas(info.max_budget, 0)} tokens`}</p>
               {info.budget_duration && <p className="text-muted-foreground">Reset: {info.budget_duration}</p>}
               <br />
               {info.team_member_budget_table && (
                 <p className="text-muted-foreground">
-                  Team Member Budget: ${formatNumberWithCommas(info.team_member_budget_table.max_budget, 2)}
+                  Team Member Budget: {formatNumberWithCommas(info.team_member_budget_table.max_budget, 0)} tokens
                 </p>
               )}
             </div>
@@ -1379,15 +1379,15 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
                     />
                   </Field>
 
-                  <FormField control={form.control} name="max_budget" label="Max Budget (USD)">
+                  <FormField control={form.control} name="max_budget" label="Max Budget (tokens)">
                     {({ ref, value, ...field }) => (
-                      <NumericalInput {...field} ref={ref} value={value ?? ""} step={0.01} precision={2} />
+                      <NumericalInput {...field} ref={ref} value={value ?? ""} step={1} />
                     )}
                   </FormField>
 
-                  <FormField control={form.control} name="soft_budget" label="Soft Budget (USD)">
+                  <FormField control={form.control} name="soft_budget" label="Soft Budget (tokens)">
                     {({ ref, value, ...field }) => (
-                      <NumericalInput {...field} ref={ref} value={value ?? ""} step={0.01} precision={2} />
+                      <NumericalInput {...field} ref={ref} value={value ?? ""} step={1} />
                     )}
                   </FormField>
 
@@ -1448,12 +1448,12 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
                           control={form.control}
                           name="team_member_budget"
                           label={labelWithHint(
-                            "Default Budget (USD)",
+                            "Default Budget (tokens)",
                             "Default spend budget for each member in this team.",
                           )}
                         >
                           {({ ref, value, ...field }) => (
-                            <NumericalInput {...field} ref={ref} value={value ?? ""} step={0.01} precision={2} />
+                            <NumericalInput {...field} ref={ref} value={value ?? ""} step={1} />
                           )}
                         </FormField>
                         <FormField
@@ -2024,12 +2024,12 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
               <div>
                 <p className="font-medium">Team Budget</p>
                 <div>
-                  Max Budget: {info.max_budget !== null ? `$${formatNumberWithCommas(info.max_budget, 4)}` : "No Limit"}
+                  Max Budget: {info.max_budget !== null ? `${formatNumberWithCommas(info.max_budget, 0)} tokens` : "No Limit"}
                 </div>
                 <div>
                   Soft Budget:{" "}
                   {info.soft_budget !== null && info.soft_budget !== undefined
-                    ? `$${formatNumberWithCommas(info.soft_budget, 4)}`
+                    ? `${formatNumberWithCommas(info.soft_budget, 0)} tokens`
                     : "No Limit"}
                 </div>
                 <div>Budget Reset: {info.budget_duration || "Never"}</div>
@@ -2204,14 +2204,14 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
               name: "max_budget_in_team",
               label: (
                 <span>
-                  Team Member Budget (USD){" "}
-                  <SimpleTooltip content="Maximum amount in USD this member can spend within this team. This is separate from any global user budget limits">
+                  Team Member Budget (tokens){" "}
+                  <SimpleTooltip content="Maximum amount in tokens this member can spend within this team. This is separate from any global user budget limits">
                     <Info className="ml-1 inline size-3.5 align-text-bottom" />
                   </SimpleTooltip>
                 </span>
               ),
               type: "numerical" as const,
-              step: 0.01,
+              step: 1,
               min: 0,
               placeholder: "Budget limit for this member within this team",
             },

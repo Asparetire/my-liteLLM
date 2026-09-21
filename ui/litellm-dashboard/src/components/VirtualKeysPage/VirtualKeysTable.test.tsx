@@ -231,8 +231,8 @@ it("should display key information correctly", async () => {
   await waitFor(() => {
     expect(screen.getByText("Test Key Alias")).toBeInTheDocument();
     expect(screen.getByText("Test Team")).toBeInTheDocument();
-    expect(screen.getByText("$5.5000")).toBeInTheDocument();
-    expect(screen.getByText("of $100")).toBeInTheDocument();
+    expect(screen.getByText("6 tokens")).toBeInTheDocument();
+    expect(screen.getByText("of 100 tokens")).toBeInTheDocument();
   });
 });
 

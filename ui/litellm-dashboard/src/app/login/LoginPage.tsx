@@ -23,7 +23,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { z } from "zod/v4";
 import { useWorker } from "@/hooks/useWorker";
-import { useTranslations } from "next-intl";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Please enter your username"),
@@ -65,12 +64,9 @@ function LoginPageContent() {
   const { workers, selectWorker } = useWorker();
   const [selectedWorkerId, setSelectedWorkerId] = useState<string | null>(null);
   const workerFieldId = useId();
-  const translate = useTranslations("login");
 
-  // 获取翻译文本的工具函数
-  const t = (key: string) => {
-    return translate(key, key);
-  };
+  // 临时兜底：需求02 接入 next-intl 前，文案取内联中文默认值（与 messages/zh-CN.json 一致）
+  const t = (key: string, fallback?: string): string => fallback ?? key;
   const form = useZodForm(loginSchema, { defaultValues: { username: "", password: "" } });
 
   // Pre-select worker from URL param (e.g. /ui/login?worker=team-b)
@@ -229,11 +225,11 @@ function LoginPageContent() {
           <TooltipProvider>
             <div className="flex w-full flex-col gap-4">
               <div className="text-center">
-                <h2 className="text-3xl font-semibold text-foreground">{t("title")}</h2>
+                <h2 className="text-3xl font-semibold text-foreground">{t("title", "登录")}</h2>
               </div>
 
               <div className="text-center">
-                <h3 className="text-2xl font-semibold text-foreground">{t("subtitle", "登录")}</h3>
+                <h3 className="text-2xl font-semibold text-foreground">{t("subtitle", "访问管理员界面")}</h3>
                 <p className="text-sm text-muted-foreground">{t("subtitle_subtitle", "管理您的 LiteLLM 代理服务器，访问管理界面。")}</p>
               </div>
 
@@ -289,7 +285,7 @@ function LoginPageContent() {
                     </Field>
                   )}
 
-                  <FormField control={form.control} name="username" label={t("username")}>
+                  <FormField control={form.control} name="username" label={t("username", "用户名")}>
                     {({ ref, ...field }) => (
                       <Input
                         {...field}
@@ -302,7 +298,7 @@ function LoginPageContent() {
                     )}
                   </FormField>
 
-                  <FormField control={form.control} name="password" label={t("password")}>
+                  <FormField control={form.control} name="password" label={t("password", "密码")}>
                     {({ ref, ...field }) => (
                       <PasswordInput
                         {...field}
@@ -328,7 +324,6 @@ function LoginPageContent() {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>{t("tooltip_sso_content", "请先配置 SSO 以使用 SSO 登录。")}</TooltipContent>
-                    </Tooltip>
                     </Tooltip>
                   ) : (
                     <Button

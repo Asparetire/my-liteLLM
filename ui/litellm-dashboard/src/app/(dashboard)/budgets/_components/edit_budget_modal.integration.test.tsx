@@ -36,7 +36,7 @@ const save = async (user: ReturnType<typeof userEvent.setup>) =>
 
 const openOptionalSettings = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.click(screen.getByText("Optional Settings"));
-  await screen.findByLabelText("Max Budget (USD)");
+  await screen.findByLabelText("Max Budget (tokens)");
 };
 
 describe("EditBudgetModal", () => {
@@ -56,7 +56,7 @@ describe("EditBudgetModal", () => {
     await waitFor(() => expect(updateMock).toHaveBeenCalledTimes(1));
     expect(updateMock.mock.calls[0][0]).toEqual({
       budget_id: "budget-alpha",
-      tpm_limit: 500.57,
+      tpm_limit: 501,
       rpm_limit: 10,
     });
   });
@@ -71,8 +71,8 @@ describe("EditBudgetModal", () => {
     fireEvent.change(screen.getByLabelText("Max Requests per minute"), { target: { value: "7" } });
 
     await openOptionalSettings(user);
-    await user.clear(screen.getByLabelText("Max Budget (USD)"));
-    fireEvent.change(screen.getByLabelText("Max Budget (USD)"), { target: { value: "42.567" } });
+    await user.clear(screen.getByLabelText("Max Budget (tokens)"));
+    fireEvent.change(screen.getByLabelText("Max Budget (tokens)"), { target: { value: "42.567" } });
 
     await chooseSelectOption(user, screen.getByRole("combobox"), "monthly");
 
@@ -81,9 +81,9 @@ describe("EditBudgetModal", () => {
     await waitFor(() => expect(updateMock).toHaveBeenCalledTimes(1));
     const expected = {
       budget_id: "budget-alpha",
-      tpm_limit: 500.57,
+      tpm_limit: 501,
       rpm_limit: 7,
-      max_budget: 42.57,
+      max_budget: 43,
       budget_duration: "30d",
     };
 
@@ -95,18 +95,18 @@ describe("EditBudgetModal", () => {
     renderModal();
 
     await openOptionalSettings(user);
-    const maxBudget = screen.getByLabelText("Max Budget (USD)");
+    const maxBudget = screen.getByLabelText("Max Budget (tokens)");
     await user.clear(maxBudget);
     fireEvent.change(maxBudget, { target: { value: "99.25" } });
 
     await user.click(screen.getByText("Optional Settings"));
     await user.click(screen.getByText("Optional Settings"));
 
-    expect(await screen.findByLabelText("Max Budget (USD)")).toHaveValue(99.25);
+    expect(await screen.findByLabelText("Max Budget (tokens)")).toHaveValue(99.25);
 
     await save(user);
 
     await waitFor(() => expect(updateMock).toHaveBeenCalledTimes(1));
-    expect(updateMock.mock.calls[0][0]).toMatchObject({ max_budget: 99.25 });
+    expect(updateMock.mock.calls[0][0]).toMatchObject({ max_budget: 99 });
   });
 });

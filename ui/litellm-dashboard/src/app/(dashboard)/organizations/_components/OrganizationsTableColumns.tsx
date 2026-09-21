@@ -129,16 +129,16 @@ export const getOrganizationsTableColumns = ({
   {
     id: "spend",
     accessorKey: "spend",
-    meta: { title: "Spend (USD)" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Spend (USD)" />,
+    meta: { title: "Spend (tokens)" },
+    header: ({ column }) => <DataTableSortHeader column={column} title="Spend (tokens)" />,
     size: 120,
     enableSorting: true,
     cell: ({ row }) => <MoneyCell value={row.original.spend} decimals={4} />,
   },
   {
     id: "max_budget",
-    meta: { title: "Budget (USD)" },
-    header: "Budget (USD)",
+    meta: { title: "Budget (tokens)" },
+    header: "Budget (tokens)",
     size: 120,
     enableSorting: false,
     cell: ({ row }) => (

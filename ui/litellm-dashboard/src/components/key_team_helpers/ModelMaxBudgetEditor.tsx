@@ -5,6 +5,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, X } from "lucide-react";
 import React, { useState } from "react";
+import { formatNumberWithCommas, getSpendString } from "@/utils/dataUtils";
 
 export interface ModelBudgetConfig {
   budget_limit: number;
@@ -163,23 +164,23 @@ export function ModelMaxBudgetEditor({
 
             <div className="flex gap-2 items-center">
               <InputGroup className="w-40">
-                <InputGroupAddon>
-                  <InputGroupText>$</InputGroupText>
-                </InputGroupAddon>
                 <InputGroupInput
                   type="number"
-                  // A per-model cap is often a fraction of a cent, so a 0.01
-                  // step would make the browser refuse the value on submit.
-                  step="any"
+                  // Token budgets are whole numbers; a fractional step would
+                  // make the browser refuse the value on submit.
+                  step={1}
                   min={0}
                   value={entry.budgetLimit ?? ""}
                   onChange={(event) => {
                     const typed = event.target.valueAsNumber;
                     updateEntry(entry.id, { budgetLimit: Number.isNaN(typed) ? null : typed });
                   }}
-                  placeholder="Max spend ($)"
+                  placeholder="Max spend (tokens)"
                   disabled={!premiumUser}
                 />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>tokens</InputGroupText>
+                </InputGroupAddon>
               </InputGroup>
               <Select
                 items={MODEL_BUDGET_PERIOD_OPTIONS}
@@ -201,8 +202,8 @@ export function ModelMaxBudgetEditor({
 
             {spent !== undefined && (
               <div className="text-[11px] text-muted-foreground mt-2 ml-1">
-                Current window spend: ${spent}
-                {entry.budgetLimit !== null && ` of $${entry.budgetLimit}`}
+                Current window spend: {spent === 0 ? "0 tokens" : getSpendString(spent)}
+                {entry.budgetLimit !== null && ` of ${formatNumberWithCommas(entry.budgetLimit, 0)} tokens`}
               </div>
             )}
           </div>

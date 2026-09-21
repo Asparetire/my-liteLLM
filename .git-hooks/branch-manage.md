@@ -164,6 +164,6 @@ git tag v-pre-reset-$(date +%Y%m%d)
 
 如遇到复杂冲突场景：
 
-1. 查阅 [`FORK-AND-LOCALIZATION-PLAN.md`](../FORK-AND-LOCALIZATION-PLAN.md) 第 1 节分支模型
+1. 查阅 [`00-总体方案.md`](../dev-plans/00-总体方案.md) 第 1 节分支模型
 2. 参考上游仓库文档：[GitHub CLAUDE.md](https://github.com/BerriAI/litellm/blob/main/CLAUDE.md)
-3. 查看本次创建的 `docs/zh-CN/GIT-开发管理规范.md`
+3. 查看本次创建的 `dev-plans/GIT-开发管理规范.md`

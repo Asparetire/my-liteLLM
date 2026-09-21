@@ -1,0 +1,144 @@
+# LiteLLM 二开版配置
+# 来源：沿用服务器现网 /home/hifen37/ollama-litellm/litellm_config.yaml 的全部调优参数，
+#       仅改两处，详见文件末尾「相对原版的改动」。
+# 硬件前提：RTX 5060 Ti 16GB 单卡，Ollama 宿主机原生运行
+
+model_list:
+  # ===== qwen3:8b（主力轻量模型）=====
+  # num_ctx 是关键：Claude Code 的 system prompt + 工具定义通常就有 5000-10000 token，
+  # num_ctx=8192 时会被截断到仅剩约 4000 token（实测 26700 token 请求只收到 4098），
+  # 表现为「思考半天输出胡话 / 调用莫名其妙的工具」。32768 单槽 KV 约 4.8GB，16GB 卡安全。
+  - model_name: qwen3-8b
+    litellm_params:
+      model: ollama_chat/qwen3:8b
+      api_base: os.environ/OLLAMA_API_BASE
+      num_ctx: 32768
+      keep_alive: 24h
+      # qwen3 默认开思考模式，token 全耗在 reasoning_content 导致正文为空，
+      # Claude Code 等客户端完全拿不到输出。none = 关闭思考
+      reasoning_effort: none
+      input_cost_per_token: 1.0
+      output_cost_per_token: 1.0
+      # 必填：开了 LITELLM_OLLAMA_CACHE_CREATION 后，prompt token 会被记成 cache-write，
+      # 而 cache_creation_input_token_cost 默认 0 —— 不写这两行，输入 token 全部免费，
+      # spend 只统计输出 token（实测 16 进 / 2 出的请求只记了 2.0）
+      cache_creation_input_token_cost: 1.0
+      cache_read_input_token_cost: 1.0
+
+  # ===== qwen3.5:9b =====
+  # num_ctx=204800（200K）仅对 qwen3.5 成立，不要照搬：
+  # qwen3.5 是混合架构（32 层里只有 8 层带 KV cache），KV 只要 32 KiB/token，200K 约 6.25 GiB。
+  # 对比 qwen3:8b（标准全注意力，144 KiB/token），200K 需要 27 GiB，必 OOM。
+  # 代价：200K prompt 首字延迟可达分钟级，适合「整份文档灌进去」而非高频交互。
+  - model_name: qwen3.5
+    litellm_params:
+      model: ollama_chat/qwen3.5:9b
+      api_base: os.environ/OLLAMA_API_BASE
+      num_ctx: 204800
+      keep_alive: 24h
+      reasoning_effort: none
+      input_cost_per_token: 1.0
+      output_cost_per_token: 1.0
+      # 必填：开了 LITELLM_OLLAMA_CACHE_CREATION 后，prompt token 会被记成 cache-write，
+      # 而 cache_creation_input_token_cost 默认 0 —— 不写这两行，输入 token 全部免费，
+      # spend 只统计输出 token（实测 16 进 / 2 出的请求只记了 2.0）
+      cache_creation_input_token_cost: 1.0
+      cache_read_input_token_cost: 1.0
+
+  # ===== qwen3.8-27B IQ3_S（ollama 名 qwen38-iq3s，13GB）=====
+  # 架构：64 层混合（48 层线性注意力 + 16 层带 KV），只有 16 层 KV 随上下文增长，约 66 KiB/token。
+  # 100K 上下文 KV 约 6.4 GB。服务端已开 OLLAMA_KV_CACHE_TYPE=q8_0，KV 实际减半。
+  # 16GB 卡实测（单并发）：16384→28.8 tok/s、32768→20.5、65536→8.5、102400→5.2、204800→3.6
+  # 注意：Ollama 的 num_ctx 在模型加载时固定，下面两个条目会互相踢掉重载（约 7-10 秒）
+  - model_name: qwen38-iq3s
+    litellm_params:
+      model: ollama_chat/qwen38-iq3s
+      api_base: os.environ/OLLAMA_API_BASE
+      num_ctx: 102400
+      keep_alive: 24h
+      reasoning_effort: none
+      input_cost_per_token: 1.0
+      output_cost_per_token: 1.0
+      # 必填：开了 LITELLM_OLLAMA_CACHE_CREATION 后，prompt token 会被记成 cache-write，
+      # 而 cache_creation_input_token_cost 默认 0 —— 不写这两行，输入 token 全部免费，
+      # spend 只统计输出 token（实测 16 进 / 2 出的请求只记了 2.0）
+      cache_creation_input_token_cost: 1.0
+      cache_read_input_token_cost: 1.0
+
+  # 同一模型的快速档（32K），日常对话 / Agent 场景用，比上面快约 3.9 倍
+  - model_name: qwen38-27b-fast
+    litellm_params:
+      model: ollama_chat/qwen38-iq3s
+      api_base: os.environ/OLLAMA_API_BASE
+      num_ctx: 32768
+      keep_alive: 24h
+      reasoning_effort: none
+      input_cost_per_token: 1.0
+      output_cost_per_token: 1.0
+      # 必填：开了 LITELLM_OLLAMA_CACHE_CREATION 后，prompt token 会被记成 cache-write，
+      # 而 cache_creation_input_token_cost 默认 0 —— 不写这两行，输入 token 全部免费，
+      # spend 只统计输出 token（实测 16 进 / 2 出的请求只记了 2.0）
+      cache_creation_input_token_cost: 1.0
+      cache_read_input_token_cost: 1.0
+
+  # 需要推理链的场景（数学、复杂逻辑），走思考模式
+  # 思考内容在 reasoning_content 字段，正文仍可能较短，max_tokens 要给足
+  - model_name: qwen3-8b-think
+    litellm_params:
+      model: ollama_chat/qwen3:8b
+      api_base: os.environ/OLLAMA_API_BASE
+      num_ctx: 8192
+      keep_alive: 24h
+      reasoning_effort: medium
+      input_cost_per_token: 1.0
+      output_cost_per_token: 1.0
+      # 必填：开了 LITELLM_OLLAMA_CACHE_CREATION 后，prompt token 会被记成 cache-write，
+      # 而 cache_creation_input_token_cost 默认 0 —— 不写这两行，输入 token 全部免费，
+      # spend 只统计输出 token（实测 16 进 / 2 出的请求只记了 2.0）
+      cache_creation_input_token_cost: 1.0
+      cache_read_input_token_cost: 1.0
+
+  # ===== 可选扩展（启用前必须先 ollama pull，否则启动会反复重试注册导致卡住 2 分钟以上）=====
+  # - model_name: qwen2.5-coder
+  #   litellm_params:
+  #     model: ollama_chat/qwen2.5-coder:7b
+  #     api_base: os.environ/OLLAMA_API_BASE
+  #     num_ctx: 16384
+  #     keep_alive: 24h
+  #     input_cost_per_token: 1.0
+  #     output_cost_per_token: 1.0
+  #
+  # - model_name: qwen3-embed          # 嵌入模型，RAG 用
+  #   litellm_params:
+  #     model: ollama/qwen3-embedding:0.6b
+  #     api_base: os.environ/OLLAMA_API_BASE
+  #     input_cost_per_token: 1.0
+  #     output_cost_per_token: 1.0
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+  # 关闭后启动时不再往数据库写模型元数据，可缩短启动耗时
+  store_model_in_db: false
+
+litellm_settings:
+  drop_params: true
+  # 本地大模型单次响应通常 5-20 秒，默认超时会误杀
+  request_timeout: 600
+
+# ============================================================
+# 相对原版的改动
+# ============================================================
+# 1. token 计费（二开需求 05 第一阶段）
+#    原版所有模型都是 input_cost_per_token: 0 / output_cost_per_token: 0，
+#    这会让 spend 恒为 0、max_budget 形同虚设。改成 1.0 后，
+#    spend 的数值就等于 token 数，配额立刻生效。
+#    想先验证与原版的一致性，把全部 1.0 改回 0 即可。
+#
+# 2. 每个模型额外补了 cache_creation_input_token_cost / cache_read_input_token_cost。
+#    因为服务器开了 LITELLM_OLLAMA_CACHE_CREATION=1，prompt token 会被整段记为
+#    cache-write，这两项默认 0 会让输入 token 完全不计费（实测 16 进 / 2 出只记 2.0）。
+#    补成 1.0 之后 spend 才等于「输入 + 输出」的真实 token 数。
+#
+# 3. database_url 改为环境变量注入（原版也是），实际指向新的独立库，
+#    由 docker-compose.cn.yml 的 DATABASE_URL 决定，配置本身不含连接串。

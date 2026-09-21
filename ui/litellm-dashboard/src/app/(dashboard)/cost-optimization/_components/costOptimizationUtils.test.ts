@@ -15,6 +15,7 @@ import {
   savingsSeriesOf,
   toCumulative,
   topToolsBySpend,
+  tokenSpend,
   usd,
   withStartAnchor,
 } from "./costOptimizationUtils";
@@ -416,6 +417,24 @@ describe("classificationRatePer1kTurns", () => {
   it("reports zero when there are no turns or no classification cost", () => {
     expect(classificationRatePer1kTurns(0, 0)).toBe("($0.00 / 1K turns)");
     expect(classificationRatePer1kTurns(0, 100)).toBe("($0.00 / 1K turns)");
+  });
+});
+
+describe("tokenSpend", () => {
+  it("renders a spend total as a whole weighted-token count", () => {
+    expect(tokenSpend(1234.56)).toBe("1,235 tokens");
+    expect(tokenSpend(1)).toBe("1 tokens");
+    expect(tokenSpend(0.5)).toBe("1 tokens");
+  });
+
+  it("renders zero as an explicit zero rather than a dash", () => {
+    expect(tokenSpend(0)).toBe("0 tokens");
+  });
+
+  it("abbreviates on request so large tile counts stay readable", () => {
+    expect(tokenSpend(1234567, true)).toBe("1M tokens");
+    expect(tokenSpend(1500, true)).toBe("2K tokens");
+    expect(tokenSpend(1234567)).toBe("1,234,567 tokens");
   });
 });
 

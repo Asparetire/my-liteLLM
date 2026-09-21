@@ -167,7 +167,7 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Max Budget (USD)")).toBeInTheDocument();
+      expect(screen.getByText("Max Budget (tokens)")).toBeInTheDocument();
     });
   });
 
@@ -353,7 +353,7 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Max Budget (USD)")).toBeInTheDocument();
+      expect(screen.getByText("Max Budget (tokens)")).toBeInTheDocument();
     });
 
     const budgetInput = screen.getByRole("spinbutton", { name: /max budget/i });
@@ -581,7 +581,7 @@ describe("UserEditView", () => {
       renderWithProviders(<UserEditView {...defaultProps} />);
 
       const budgetInput = await screen.findByRole("spinbutton", { name: /max budget/i });
-      expect(budgetInput).toHaveAttribute("step", "0.01");
+      expect(budgetInput).toHaveAttribute("step", "1");
       expect(budgetInput).not.toHaveAttribute("min");
       expect(budgetInput.closest("form")).not.toHaveAttribute("novalidate");
     });
@@ -700,7 +700,7 @@ describe("UserEditView", () => {
           />,
         );
 
-        const [aliasRow, canonicalRow] = await screen.findAllByPlaceholderText("Max spend ($)");
+        const [aliasRow, canonicalRow] = await screen.findAllByPlaceholderText("Max spend (tokens)");
         expect(aliasRow).toHaveValue(5);
 
         fireEvent.change(canonicalRow, { target: { value: "3" } });
@@ -732,11 +732,11 @@ describe("UserEditView", () => {
         const { rerender } = renderWithProviders(
           <UserEditView {...defaultProps} premiumUser={true} userData={withBudget(5, "user-a")} />,
         );
-        expect(await screen.findByPlaceholderText("Max spend ($)")).toHaveValue(5);
+        expect(await screen.findByPlaceholderText("Max spend (tokens)")).toHaveValue(5);
 
         rerender(<UserEditView {...defaultProps} premiumUser={true} userData={withBudget(99, "user-b")} />);
 
-        expect(await screen.findByPlaceholderText("Max spend ($)")).toHaveValue(99);
+        expect(await screen.findByPlaceholderText("Max spend (tokens)")).toHaveValue(99);
       });
 
       // BulkEditUsers copies a fixed field list into its payload and never reads
@@ -760,19 +760,19 @@ describe("UserEditView", () => {
         );
 
         await screen.findByRole("button", { name: /save changes/i });
-        expect(screen.queryByPlaceholderText("Max spend ($)")).not.toBeInTheDocument();
+        expect(screen.queryByPlaceholderText("Max spend (tokens)")).not.toBeInTheDocument();
       });
 
       it("should lock the editor when the proxy has no enterprise license", async () => {
         renderWithProviders(<UserEditView {...defaultProps} userData={withStoredBudgets} />);
 
-        expect(await screen.findByPlaceholderText("Max spend ($)")).toBeDisabled();
+        expect(await screen.findByPlaceholderText("Max spend (tokens)")).toBeDisabled();
       });
 
       it("should leave the editor usable when the proxy has one", async () => {
         renderWithProviders(<UserEditView {...defaultProps} userData={withStoredBudgets} premiumUser={true} />);
 
-        expect(await screen.findByPlaceholderText("Max spend ($)")).toBeEnabled();
+        expect(await screen.findByPlaceholderText("Max spend (tokens)")).toBeEnabled();
       });
     });
 

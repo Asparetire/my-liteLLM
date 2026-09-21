@@ -94,7 +94,7 @@ describe("LoginPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Login" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "登录" })).toBeInTheDocument();
     });
   });
 
@@ -172,7 +172,7 @@ describe("LoginPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Login" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "登录" })).toBeInTheDocument();
     });
 
     expect(mockPush).not.toHaveBeenCalled();
@@ -256,10 +256,10 @@ describe("LoginPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Login" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "登录" })).toBeInTheDocument();
     });
 
-    expect(screen.getByRole("button", { name: "Login with SSO" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "使用 SSO 登录" })).toBeInTheDocument();
   });
 
   it("should show disabled Login with SSO button with popover when sso_configured is false", async () => {
@@ -283,10 +283,10 @@ describe("LoginPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Login" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "登录" })).toBeInTheDocument();
     });
 
-    const ssoButton = screen.getByRole("button", { name: "Login with SSO" });
+    const ssoButton = screen.getByRole("button", { name: "使用 SSO 登录" });
     expect(ssoButton).toBeInTheDocument();
     expect(ssoButton).toBeDisabled();
   });
@@ -335,7 +335,7 @@ describe("LoginPage", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole("heading", { name: "Login" })).toBeInTheDocument();
+        expect(screen.getByRole("heading", { name: "登录" })).toBeInTheDocument();
       });
 
       expect(document.cookie).not.toContain("token=attacker.jwt.value");

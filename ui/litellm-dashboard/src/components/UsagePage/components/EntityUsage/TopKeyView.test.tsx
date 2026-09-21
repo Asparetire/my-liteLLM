@@ -81,7 +81,7 @@ describe("TopKeyView", () => {
     render(<TopKeyView {...baseProps} />);
     expect(screen.getByText("Key ID")).toBeInTheDocument();
     expect(screen.getByText("Key Alias")).toBeInTheDocument();
-    expect(screen.getByText("Spend (USD)")).toBeInTheDocument();
+    expect(screen.getByText("Spend (tokens)")).toBeInTheDocument();
   });
 
   it("should display Tags column when showTags is true", () => {
@@ -115,7 +115,7 @@ describe("TopKeyView", () => {
     expect(screen.getByText("Test Key")).toBeInTheDocument();
     expect(screen.getByText(/tag-1/)).toBeInTheDocument();
     expect(screen.getByText(/tag-2/)).toBeInTheDocument();
-    expect(screen.getByText("$100.00")).toBeInTheDocument();
+    expect(screen.getByText("100 tokens")).toBeInTheDocument();
   });
 
   it("should switch to chart view when chart view button is clicked", async () => {
@@ -223,7 +223,7 @@ describe("TopKeyView", () => {
     expect(screen.getByText("-")).toBeInTheDocument();
   });
 
-  it("should format spend values with two decimal places", () => {
+  it("should format spend values as whole token counts", () => {
     render(
       <TopKeyView
         {...baseProps}
@@ -236,10 +236,10 @@ describe("TopKeyView", () => {
         ]}
       />,
     );
-    expect(screen.getByText("$123.46")).toBeInTheDocument();
+    expect(screen.getByText("123 tokens")).toBeInTheDocument();
   });
 
-  it("should display sub-cent spend as < $0.01", () => {
+  it("should display sub-token spend as < 1 token", () => {
     render(
       <TopKeyView
         {...baseProps}
@@ -252,7 +252,7 @@ describe("TopKeyView", () => {
         ]}
       />,
     );
-    expect(screen.getByText("< $0.01")).toBeInTheDocument();
+    expect(screen.getByText("< 1 token")).toBeInTheDocument();
   });
 
   it("should display zero spend as a dash", () => {
@@ -269,7 +269,7 @@ describe("TopKeyView", () => {
       />,
     );
     expect(screen.getByText("-")).toBeInTheDocument();
-    expect(screen.queryByText("$0.00")).not.toBeInTheDocument();
+    expect(screen.queryByText("0 tokens")).not.toBeInTheDocument();
   });
 
   it("should display dash for empty tags", () => {

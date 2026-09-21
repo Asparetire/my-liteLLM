@@ -10,6 +10,12 @@ export const usd = (value: number): string => {
   return `${value < 0 ? "-" : ""}$${formatNumberWithCommas(magnitude, decimals)}`;
 };
 
+// [CN-FORK] spend aggregates carry weighted token counts (REQ-05/06). Where usd()
+// prices a real per-request or per-unit cost, tokenSpend() renders a spend total.
+// Abbreviate when a chart axis or tile would otherwise carry a very long count.
+export const tokenSpend = (value: number, abbreviate: boolean = false): string =>
+  `${formatNumberWithCommas(value, 0, abbreviate)} tokens`;
+
 export const classificationRatePer1kTurns = (classifierCost: number, turns: number): string => {
   if (turns <= 0) return `(${usd(0)} / 1K turns)`;
   const rate = (classifierCost * 1000) / turns;

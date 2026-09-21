@@ -395,7 +395,7 @@ export const StartForm: React.FC = () => {
           </Field>
           <Field label="Spend budget">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">$</span>
+              <span className="text-sm text-muted-foreground">tokens</span>
               <Input
                 type="number"
                 min={0.01}

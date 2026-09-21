@@ -131,12 +131,12 @@ export const generateDailyData = (
         Date: day.date,
         [entityLabel]: alias,
         [`${entityLabel} ID`]: id,
-        "Spend ($)": formatNumberWithCommas(data.metrics.spend, 4),
+        "Spend (tokens)": formatNumberWithCommas(data.metrics.spend, 4),
       };
       if (includeFlatCost) {
         const flatCost = data.metrics.flat_cost || 0;
-        row["Flat Cost ($)"] = formatNumberWithCommas(flatCost, 4);
-        row["Total Cost ($)"] = formatNumberWithCommas((data.metrics.spend || 0) + flatCost, 4);
+        row["Flat Cost (tokens)"] = formatNumberWithCommas(flatCost, 4);
+        row["Total Cost (tokens)"] = formatNumberWithCommas((data.metrics.spend || 0) + flatCost, 4);
       }
       row.Requests = data.metrics.api_requests;
       row["Successful Requests"] = data.metrics.successful_requests;
@@ -236,7 +236,7 @@ export const generateDailyWithKeysData = (
     [`${entityLabel} ID`]: item.entityId,
     "Key Alias": item.keyAlias || "-",
     "Key ID": item.keyId,
-    "Spend ($)": formatNumberWithCommas(item.metrics.spend, 4),
+    "Spend (tokens)": formatNumberWithCommas(item.metrics.spend, 4),
     Requests: item.metrics.api_requests,
     "Successful Requests": item.metrics.successful_requests,
     "Failed Requests": item.metrics.failed_requests,
@@ -310,7 +310,7 @@ export const generateDailyWithModelsData = (
           [entityLabel]: alias,
           [`${entityLabel} ID`]: id,
           Model: model,
-          "Spend ($)": formatNumberWithCommas(metrics.spend, 4),
+          "Spend (tokens)": formatNumberWithCommas(metrics.spend, 4),
           Requests: metrics.requests,
           Successful: metrics.successful,
           Failed: metrics.failed,
