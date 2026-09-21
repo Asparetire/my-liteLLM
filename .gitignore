@@ -156,3 +156,6 @@ coverage-rust.xml
 
 # [CN-FORK] Work buddy scratch dir (transient agent working files, never tracked).
 .workbuddy/
+
+# Rust bridge 构建产物
+litellm/rust_bridge/_native.pdb
