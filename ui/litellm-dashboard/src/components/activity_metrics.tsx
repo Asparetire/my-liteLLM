@@ -346,9 +346,7 @@ export const ActivityMetrics: React.FC<ActivityMetricsProps> = ({ modelMetrics, 
           <Card>
             <CardContent>
               <p className="text-sm text-muted-foreground">Total Spend</p>
-              <h3 className="text-lg font-medium text-foreground">
-                ${formatNumberWithCommas(totalMetrics.total_spend, 2)}
-              </h3>
+              <h3 className="text-lg font-medium text-foreground">{getSpendString(totalMetrics.total_spend)}</h3>
             </CardContent>
           </Card>
         </div>
