@@ -2,6 +2,7 @@ import { useProjectDetails } from "@/app/(dashboard)/hooks/projects/useProjectDe
 import { useTeam } from "@/app/(dashboard)/hooks/teams/useTeams";
 import { BarChart } from "@/components/shared/charts";
 import { ArrowLeftIcon, DollarSignIcon, EditIcon, UsersIcon } from "lucide-react";
+import { formatNumberWithCommas, getSpendString } from "@/utils/dataUtils";
 import { useMemo, useState } from "react";
 import DefaultProxyAdminTag from "@/components/common_components/DefaultProxyAdminTag";
 import CopyButton from "@/components/shared/CopyButton";
@@ -135,9 +136,9 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <div>
-              <p className="text-[28px] leading-none font-medium text-foreground">${spend.toFixed(2)}</p>
+              <p className="text-[28px] leading-none font-medium text-foreground">{getSpendString(spend)}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {hasLimit ? `of $${maxBudget.toFixed(2)} budget` : "No budget limit"}
+                {hasLimit ? `of ${formatNumberWithCommas(maxBudget, 0)} tokens budget` : "No budget limit"}
               </p>
             </div>
             {hasLimit && (
@@ -167,7 +168,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                 categories={["spend"]}
                 colors={["cyan"]}
                 layout="vertical"
-                valueFormatter={(value) => `$${value.toFixed(4)}`}
+                valueFormatter={(value) => `${formatNumberWithCommas(value, 0)} tokens`}
                 yAxisWidth={140}
                 showLegend={false}
                 style={{ height: Math.max(modelSpendData.length * 40, 120) }}
@@ -226,9 +227,9 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                       <div className="mb-0.5 flex items-center justify-between">
                         <span className="text-xs text-muted-foreground">Spend</span>
                         <span className="text-xs text-foreground">
-                          ${teamSpend.toFixed(2)}
+                          {getSpendString(teamSpend)}
                           <span className="text-muted-foreground">
-                            {teamHasLimit ? ` / $${teamBudget.toFixed(2)}` : " (Unlimited)"}
+                            {teamHasLimit ? ` / ${formatNumberWithCommas(teamBudget, 0)} tokens` : " (Unlimited)"}
                           </span>
                         </span>
                       </div>

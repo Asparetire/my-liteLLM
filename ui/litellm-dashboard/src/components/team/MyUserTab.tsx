@@ -1,5 +1,5 @@
 import { formatBudgetReset } from "@/utils/budgetUtils";
-import { formatNumberWithCommas } from "@/utils/dataUtils";
+import { formatNumberWithCommas, getSpendString } from "@/utils/dataUtils";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,11 +19,6 @@ const labelWithTooltip = (label: string, tooltip: string) => (
     </SimpleTooltip>
   </span>
 );
-
-const formatNumber = (value: number | null | undefined, digits = 4): string => {
-  if (value === null || value === undefined) return "0";
-  return formatNumberWithCommas(value, digits);
-};
 
 const formatRateLimit = (value: number | null | undefined): string => {
   if (value === null || value === undefined) return "Unlimited";
@@ -94,13 +89,13 @@ export default function MyUserTab({ teamId }: MyUserTabProps) {
         <Card>
           <CardContent>
             {labelWithTooltip(
-              "Current Cycle Spend (USD)",
-              "Spend for the current budget cycle. Resets to $0 when the budget window rolls over.",
+              "Current Cycle Spend (tokens)",
+              "Spend for the current budget cycle. Resets to 0 when the budget window rolls over.",
             )}
             <div className="mt-2">
-              <h3 className="text-2xl font-semibold">${formatNumber(spend, 4)}</h3>
+              <h3 className="text-2xl font-semibold">{getSpendString(spend)}</h3>
               <span className="text-muted-foreground">
-                of {maxBudget === null ? "Unlimited" : `$${formatNumber(maxBudget, 4)}`}
+                of {maxBudget === null ? "Unlimited" : `${formatNumberWithCommas(maxBudget, 0)} tokens`}
               </span>
             </div>
             {budgetReset && <div className="mt-1 text-muted-foreground">Resets {budgetReset}</div>}
@@ -120,8 +115,8 @@ export default function MyUserTab({ teamId }: MyUserTabProps) {
 
         <Card>
           <CardContent>
-            {labelWithTooltip("Total Spend (USD)", "Cumulative spend across all budget cycles within this team.")}
-            <h4 className="mt-2 text-xl font-semibold">${formatNumber(totalSpend, 4)}</h4>
+            {labelWithTooltip("Total Spend (tokens)", "Cumulative spend across all budget cycles within this team.")}
+            <h4 className="mt-2 text-xl font-semibold">{getSpendString(totalSpend)}</h4>
           </CardContent>
         </Card>
 

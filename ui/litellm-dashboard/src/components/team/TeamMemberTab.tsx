@@ -134,8 +134,8 @@ export default function TeamMemberTab({
     {
       title: (
         <span className="flex items-center gap-1">
-          Current Cycle Spend (USD)
-          <SimpleTooltip content="Spend for the current budget cycle. Resets to $0 when the member's budget window rolls over. This is the value checked against the member's budget.">
+          Current Cycle Spend (tokens)
+          <SimpleTooltip content="Spend for the current budget cycle. Resets to 0 when the member's budget window rolls over. This is the value checked against the member's budget.">
             <CircleHelp className="size-4" aria-label="Current cycle spend information" />
           </SimpleTooltip>
         </span>
@@ -147,7 +147,7 @@ export default function TeamMemberTab({
     {
       title: (
         <span className="flex items-center gap-1">
-          Total Spend (USD)
+          Total Spend (tokens)
           <SimpleTooltip content="Cumulative spend by this member within this team, across all budget cycles. Tracking began 2026-04-21; spend from before that date is not included.">
             <CircleHelp className="size-4" aria-label="Total spend information" />
           </SimpleTooltip>
@@ -158,7 +158,7 @@ export default function TeamMemberTab({
       render: (record: Member) => <MoneyCell value={getUserTotalSpend(record.user_id)} decimals={2} />,
     },
     {
-      title: "Team Member Budget (USD)",
+      title: "Team Member Budget (tokens)",
       key: "budget",
       sortValue: (record: Member) => getUserBudget(record.user_id),
       render: (record: Member) => (

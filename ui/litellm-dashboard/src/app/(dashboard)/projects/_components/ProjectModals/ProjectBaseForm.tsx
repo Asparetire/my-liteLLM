@@ -193,18 +193,19 @@ export function ProjectBaseForm({ form, advancedOpen, onAdvancedOpenChange }: Pr
         </FormField>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <FormField control={form.control} name="max_budget" label="Max Budget (USD)">
+          <FormField control={form.control} name="max_budget" label="Max Budget (tokens)">
             {({ ref, value, onChange, ...field }) => (
               <InputGroup>
                 <InputGroupAddon>
-                  <InputGroupText>$</InputGroupText>
+                  <InputGroupText>tokens</InputGroupText>
                 </InputGroupAddon>
                 <InputGroupInput
                   {...field}
                   ref={ref}
                   type="number"
                   min={0}
-                  placeholder="0.00"
+                  step={1}
+                  placeholder="0"
                   value={Number.isNaN(value) ? "" : value ?? ""}
                   onInput={(event) => {
                     if (event.currentTarget.validity.badInput || Number.isNaN(value)) {

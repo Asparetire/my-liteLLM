@@ -7,7 +7,7 @@ import CopyButton from "@/components/shared/CopyButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatNumberWithCommas } from "@/utils/dataUtils";
+import { formatNumberWithCommas, getSpendString } from "@/utils/dataUtils";
 import { teamDetailHref } from "@/utils/entityLinks";
 import { createTeamAliasMap } from "@/utils/teamUtils";
 import { BadgeLink } from "@/components/shared/BadgeLink";
@@ -126,7 +126,7 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
 
   const orgExtraColumns: MemberTableColumn[] = [
     {
-      title: "Spend (USD)",
+      title: "Spend (tokens)",
       key: "spend",
       sortValue: (record: Member) => orgMemberFor(record)?.spend ?? null,
       render: (record: Member) => <MoneyCell value={orgMemberFor(record)?.spend} decimals={4} />,
@@ -188,12 +188,12 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
               <CardContent>
                 <p className="text-sm text-muted-foreground">Budget Status</p>
                 <div className="mt-2 text-sm text-foreground">
-                  <p className="text-xl font-semibold">${formatNumberWithCommas(orgData.spend, 4)}</p>
+                  <p className="text-xl font-semibold">{getSpendString(orgData.spend)}</p>
                   <p>
                     of{" "}
                     {orgData.litellm_budget_table.max_budget === null
                       ? "Unlimited"
-                      : `$${formatNumberWithCommas(orgData.litellm_budget_table.max_budget, 4)}`}
+                      : `${formatNumberWithCommas(orgData.litellm_budget_table.max_budget, 0)} tokens`}
                   </p>
                   {orgData.litellm_budget_table.budget_duration && (
                     <p className="text-muted-foreground">Reset: {orgData.litellm_budget_table.budget_duration}</p>
@@ -321,7 +321,7 @@ const OrganizationInfoView: React.FC<OrganizationInfoProps> = ({
                     <div>
                       Max:{" "}
                       {orgData.litellm_budget_table.max_budget !== null
-                        ? `$${formatNumberWithCommas(orgData.litellm_budget_table.max_budget, 4)}`
+                        ? `${formatNumberWithCommas(orgData.litellm_budget_table.max_budget, 0)} tokens`
                         : "No Limit"}
                     </div>
                     <div>Reset: {orgData.litellm_budget_table.budget_duration || "Never"}</div>

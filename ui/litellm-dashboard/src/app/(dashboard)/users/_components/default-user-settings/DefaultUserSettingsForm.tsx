@@ -136,7 +136,7 @@ const TeamsField = ({ control }: { control: SettingsControl }) => {
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             <TeamPickerField control={control} index={index} />
 
-            <FormField control={control} name={`teams.${index}.max_budget_in_team`} label="Max Budget in Team (USD)">
+            <FormField control={control} name={`teams.${index}.max_budget_in_team`} label="Max Budget in Team (tokens)">
               {({ ref, ...budgetField }) => (
                 <Input {...budgetField} ref={ref} type="number" step="any" min={0} placeholder="Optional" />
               )}
@@ -199,7 +199,7 @@ const SettingsView = ({ values, roleOptions }: SettingsViewProps) => {
   return (
     <div className="flex flex-col gap-4">
       <ViewRow label="Default Role">{roleLabel === "" ? "Not set" : roleLabel}</ViewRow>
-      <ViewRow label="Max Budget (USD)">{values.max_budget === "" ? "Not set" : values.max_budget}</ViewRow>
+      <ViewRow label="Max Budget (tokens)">{values.max_budget === "" ? "Not set" : values.max_budget}</ViewRow>
       <ViewRow label="Reset Budget">{durationLabel}</ViewRow>
       <ViewRow label="Default Models">
         {values.models.length === 0
@@ -214,7 +214,7 @@ const SettingsView = ({ values, roleOptions }: SettingsViewProps) => {
           values.teams.map((team) => (
             <p key={team.team_id} className="text-sm text-muted-foreground">
               {team.team_id}
-              {team.max_budget_in_team !== "" && <> · ${team.max_budget_in_team} max budget</>}
+              {team.max_budget_in_team !== "" && <> · {team.max_budget_in_team} tokens max budget</>}
               <> · {team.user_role}</>
             </p>
           ))
@@ -286,7 +286,7 @@ const SettingsForm = ({ initialValues, roleOptions, updateSettings, onCancel, on
         <FormField
           control={form.control}
           name="max_budget"
-          label="Max Budget (USD)"
+          label="Max Budget (tokens)"
           description="Default maximum budget for new users"
         >
           {({ ref, ...field }) => <Input {...field} ref={ref} type="number" step="any" min={0} />}

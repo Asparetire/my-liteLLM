@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { modelAvailableCall } from "./networking";
-import { formatNumberWithCommas } from "@/utils/dataUtils";
+import { formatNumberWithCommas, getSpendString } from "@/utils/dataUtils";
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
 
 // Define the props type
@@ -107,16 +107,17 @@ const ViewUserSpend: React.FC<ViewUserSpendProps> = ({ userSpend, userMaxBudget,
     modelsToDisplay = userModels;
   }
 
-  const displayMaxBudget = maxBudget !== null ? `$${formatNumberWithCommas(Number(maxBudget), 4)} limit` : "No limit";
+  const displayMaxBudget =
+    maxBudget !== null ? `${formatNumberWithCommas(Number(maxBudget), 0)} tokens limit` : "No limit";
 
-  const roundedSpend = spend !== undefined ? formatNumberWithCommas(spend, 4) : null;
+  const spendDisplay = getSpendString(spend);
 
   return (
     <div className="flex items-center">
       <div className="flex justify-between gap-x-6">
         <div>
           <p className="text-sm text-muted-foreground">Total Spend</p>
-          <p className="text-2xl font-semibold text-foreground">${roundedSpend}</p>
+          <p className="text-2xl font-semibold text-foreground">{spendDisplay}</p>
         </div>
         <div>
           <p className="text-sm text-muted-foreground">Max Budget</p>

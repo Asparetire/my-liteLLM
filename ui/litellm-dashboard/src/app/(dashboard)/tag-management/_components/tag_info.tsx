@@ -97,10 +97,10 @@ const TagEditForm: React.FC<TagEditFormProps> = ({ tag, seedBudgetFields, userMo
             <FormField
               control={form.control}
               name="max_budget"
-              label="Max Budget (USD)"
-              description="Maximum amount in USD this tag can spend"
+              label="Max Budget (tokens)"
+              description="Maximum amount in tokens this tag can spend"
             >
-              {({ ref, value, ...field }) => <NumericalInput {...field} value={value ?? ""} step={0.01} />}
+              {({ ref, value, ...field }) => <NumericalInput {...field} value={value ?? ""} step={1} />}
             </FormField>
 
             <FormField

@@ -79,7 +79,7 @@ describe("TagInfoView save payload", () => {
 
     await user.click(screen.getByRole("button", { name: /Budget & Rate Limits/ }));
 
-    const maxBudgetInput = await screen.findByLabelText("Max Budget (USD)");
+    const maxBudgetInput = await screen.findByLabelText("Max Budget (tokens)");
     await user.clear(maxBudgetInput);
     fireEvent.change(maxBudgetInput, { target: { value: "150.75" } });
 
@@ -113,14 +113,14 @@ describe("TagInfoView save payload", () => {
     const toggle = () => screen.getByRole("button", { name: /Budget & Rate Limits/ });
 
     await user.click(toggle());
-    const maxBudgetInput = await screen.findByLabelText("Max Budget (USD)");
+    const maxBudgetInput = await screen.findByLabelText("Max Budget (tokens)");
     await user.clear(maxBudgetInput);
     fireEvent.change(maxBudgetInput, { target: { value: "150.75" } });
 
     await user.click(toggle());
     await user.click(toggle());
 
-    expect(await screen.findByLabelText("Max Budget (USD)")).toHaveValue(150.75);
+    expect(await screen.findByLabelText("Max Budget (tokens)")).toHaveValue(150.75);
 
     await user.click(screen.getByRole("button", { name: "Save Changes" }));
 

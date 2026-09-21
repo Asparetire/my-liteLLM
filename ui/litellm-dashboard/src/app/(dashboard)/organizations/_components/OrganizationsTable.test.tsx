@@ -42,8 +42,8 @@ describe("OrganizationsTable", () => {
       "Organization ID",
       "Organization Name",
       "Created",
-      "Spend (USD)",
-      "Budget (USD)",
+      "Spend (tokens)",
+      "Budget (tokens)",
       "Models",
       "TPM / RPM Limits",
       "Members",
@@ -142,7 +142,7 @@ describe("OrganizationsTable", () => {
       />,
     );
 
-    expect(screen.getByText("$100.00")).toBeInTheDocument();
+    expect(screen.getByText("100 tokens")).toBeInTheDocument();
     expect(screen.getByText("TPM: 1000")).toBeInTheDocument();
     expect(screen.getByText("RPM: 60")).toBeInTheDocument();
     expect(screen.getByText("3 Members")).toBeInTheDocument();

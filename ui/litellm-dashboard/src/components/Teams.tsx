@@ -795,9 +795,9 @@ const Teams: React.FC<TeamProps> = ({ accessToken, userID, userRole, premiumUser
                     )}
                   </FormField>
 
-                  <FormField control={form.control} name="max_budget" label="Max Budget (USD)">
+                  <FormField control={form.control} name="max_budget" label="Max Budget (tokens)">
                     {({ ref, value, ...field }) => (
-                      <NumericalInput {...field} ref={ref} value={value ?? ""} step={0.01} precision={2} width={200} />
+                      <NumericalInput {...field} ref={ref} value={value ?? ""} step={1} width={200} />
                     )}
                   </FormField>
                   <FormField control={form.control} name="budget_duration" className="mt-8" label="Reset Budget">
@@ -858,7 +858,7 @@ const Teams: React.FC<TeamProps> = ({ accessToken, userID, userRole, premiumUser
                           control={form.control}
                           name="team_member_budget"
                           label={labelWithHint(
-                            "Team Member Budget (USD)",
+                            "Team Member Budget (tokens)",
                             "This is the individual budget for a user in the team.",
                           )}
                         >
@@ -870,8 +870,7 @@ const Teams: React.FC<TeamProps> = ({ accessToken, userID, userRole, premiumUser
                               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                                 onChange(event.target.value ? Number(event.target.value) : undefined)
                               }
-                              step={0.01}
-                              precision={2}
+                              step={1}
                               width={200}
                             />
                           )}
