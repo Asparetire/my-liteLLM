@@ -23,7 +23,7 @@ import {
   sumOverDays,
   toCumulative,
   topToolsBySpend,
-  usd,
+  tokenSpend,
   withStartAnchor,
 } from "./costOptimizationUtils";
 import SavingsTiles from "@/components/shared/SavingsTiles";
@@ -158,7 +158,7 @@ const UsageTab: React.FC<UsageTabProps> = ({ accessToken, activity }) => {
                 index="date"
                 categories={SAVINGS_SERIES}
                 colors={SAVINGS_COLORS}
-                valueFormatter={usd}
+                valueFormatter={tokenSpend}
                 showLegend={false}
                 showDots={overTime.length <= MAX_POINTS_WITH_DOTS}
               />
@@ -171,7 +171,7 @@ const UsageTab: React.FC<UsageTabProps> = ({ accessToken, activity }) => {
                 index="date"
                 categories={SAVINGS_SERIES}
                 colors={SAVINGS_COLORS}
-                valueFormatter={usd}
+                valueFormatter={tokenSpend}
                 showLegend={false}
               />
             )}
@@ -188,9 +188,9 @@ const UsageTab: React.FC<UsageTabProps> = ({ accessToken, activity }) => {
               index="driver"
               category="usd"
               colors={byDriver.map((d) => d.color)}
-              valueFormatter={usd}
+              valueFormatter={tokenSpend}
               showLabel
-              label={usd(plottedDriverTotal)}
+              label={tokenSpend(plottedDriverTotal)}
             />
           </CardContent>
         </Card>
@@ -225,7 +225,7 @@ const UsageTab: React.FC<UsageTabProps> = ({ accessToken, activity }) => {
                     yAxisWidth={140}
                     maxBarSize={64}
                     showLegend={false}
-                    valueFormatter={usd}
+                    valueFormatter={tokenSpend}
                   />
                 </div>
                 <div>
@@ -238,7 +238,7 @@ const UsageTab: React.FC<UsageTabProps> = ({ accessToken, activity }) => {
                     colors={toolColors}
                     stack
                     maxBarSize={64}
-                    valueFormatter={usd}
+                    valueFormatter={tokenSpend}
                     showLegend={false}
                   />
                 </div>

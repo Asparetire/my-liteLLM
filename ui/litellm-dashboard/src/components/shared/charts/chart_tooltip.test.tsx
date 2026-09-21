@@ -43,10 +43,10 @@ describe("CustomTooltip", () => {
     expect(screen.getByText("1,000")).toBeInTheDocument();
   });
 
-  it("formats spend values as dollars with two decimals", () => {
+  it("formats spend values as weighted token counts", () => {
     render(<CustomTooltip active={true} payload={[metricsPayload("metrics.spend", 1234.567)]} label="2026-01-15" />);
 
-    expect(screen.getByText("$1,234.57")).toBeInTheDocument();
+    expect(screen.getByText("1,234.567 tokens")).toBeInTheDocument();
   });
 
   it("shows N/A for metrics missing from the row payload", () => {

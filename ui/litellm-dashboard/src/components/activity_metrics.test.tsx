@@ -392,7 +392,7 @@ describe("ActivityMetrics", () => {
     render(<ActivityMetrics modelMetrics={mockModelMetrics} />);
     const avgSpendElements = screen.getAllByText(/per successful request/);
     expect(avgSpendElements.length).toBeGreaterThan(0);
-    expect(avgSpendElements.some((el) => el.textContent?.includes("1.058"))).toBe(true);
+    expect(avgSpendElements.some((el) => el.textContent?.includes("1 token per successful request"))).toBe(true);
   });
 
   it("should handle zero successful requests without division error", () => {
@@ -576,11 +576,11 @@ describe("ActivityMetrics charts", () => {
     expect(screen.getAllByText("Cache Creation Input Tokens").length).toBeGreaterThan(0);
   });
 
-  it("formats axis ticks as currency on the spend chart and compact numbers on token charts", () => {
+  it("formats axis ticks as token counts on the spend chart and compact numbers on token charts", () => {
     render(<ActivityMetrics modelMetrics={twoDayModelMetrics} />);
 
     const spendTicks = tickTexts(chartTitled("Spend per day"));
-    expect(spendTicks.some((text) => text.startsWith("$"))).toBe(true);
+    expect(spendTicks.some((text) => text.endsWith("tokens"))).toBe(true);
 
     const tokenTicks = tickTexts(chartTitled("Total Tokens"));
     expect(tokenTicks.some((text) => text.endsWith("k"))).toBe(true);

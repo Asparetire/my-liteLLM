@@ -30,7 +30,7 @@ import {
   type BenchmarkView,
   type BucketRow,
 } from "./autoRouterBenchmarks";
-import { classificationRatePer1kTurns, formatRangeLabel, usd } from "./costOptimizationUtils";
+import { classificationRatePer1kTurns, formatRangeLabel, tokenSpend, usd } from "./costOptimizationUtils";
 import ShadowEvalSection from "./ShadowEvalSection";
 import TierTurnsChart from "./TierTurnsChart";
 import { useAutoRouterBenchmarks } from "./useAutoRouterBenchmarks";
@@ -83,7 +83,7 @@ const HeroCard: React.FC<{ view: BenchmarkView }> = ({ view }) => {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <p className="min-w-0 break-all text-center text-4xl font-semibold tracking-tight text-foreground xl:text-6xl">
-              {usd(stats.saved_spend)}
+              {tokenSpend(stats.saved_spend)}
             </p>
             <Badge
               variant="secondary"
@@ -96,12 +96,12 @@ const HeroCard: React.FC<{ view: BenchmarkView }> = ({ view }) => {
         </div>
 
         <div className="flex flex-col justify-center border-t p-6 md:border-t-0 md:border-l">
-          <SpendRow label="Actual auto-router spend" value={usd(stats.spend)} />
+          <SpendRow label="Actual auto-router spend" value={tokenSpend(stats.spend)} />
           <div className="mb-3 border-l-2 pl-4">
             <SpendRow
               subdued
               label="LLM spend"
-              value={stats.classifier_cost == null ? "Unavailable" : usd(stats.spend - stats.classifier_cost)}
+              value={stats.classifier_cost == null ? "Unavailable" : tokenSpend(stats.spend - stats.classifier_cost)}
             />
             <SpendRow
               subdued
@@ -120,7 +120,7 @@ const HeroCard: React.FC<{ view: BenchmarkView }> = ({ view }) => {
             </p>
           )}
           <Separator />
-          <SpendRow label="Estimated spend at highest-tier model" value={usd(stats.baseline_spend)} />
+          <SpendRow label="Estimated spend at highest-tier model" value={tokenSpend(stats.baseline_spend)} />
         </div>
       </div>
     </Card>
@@ -279,7 +279,7 @@ const BenchmarksBody: React.FC<BenchmarksBodyProps> = ({ isPending, error, data,
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Metric
           label="Avg saved per session"
-          value={usd(stats.saved_per_session)}
+          value={tokenSpend(stats.saved_per_session)}
           hint={`· ${stats.sessions.toLocaleString()} sessions`}
         />
         <Metric label="Avg turns per session" value={stats.avg_turns_per_session.toFixed(1)} />

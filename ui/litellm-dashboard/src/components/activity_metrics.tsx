@@ -1,5 +1,5 @@
 import { AreaChart, BarChart, CustomLegend, CustomTooltip } from "@/components/shared/charts";
-import { formatNumberWithCommas } from "@/utils/dataUtils";
+import { formatNumberWithCommas, getSpendString } from "@/utils/dataUtils";
 import { resolveTeamAliasFromTeamID } from "@/utils/teamUtils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -55,10 +55,9 @@ const ModelSection = ({
         <Card>
           <CardContent>
             <p className="text-sm text-muted-foreground">Total Spend</p>
-            <h3 className="text-lg font-medium text-foreground">${formatNumberWithCommas(metrics.total_spend, 2)}</h3>
+            <h3 className="text-lg font-medium text-foreground">{getSpendString(metrics.total_spend)}</h3>
             <p className="text-sm text-muted-foreground">
-              ${formatNumberWithCommas(metrics.total_spend / metrics.total_successful_requests, 3)} per successful
-              request
+              {getSpendString(metrics.total_spend / metrics.total_successful_requests)} per successful request
             </p>
           </CardContent>
         </Card>
@@ -77,7 +76,7 @@ const ModelSection = ({
                       {keyData.team_id && <p className="text-xs text-muted-foreground">Team: {keyData.team_id}</p>}
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">${formatNumberWithCommas(keyData.spend, 2)}</p>
+                      <p className="font-medium">{getSpendString(keyData.spend)}</p>
                       <p className="text-xs text-muted-foreground">
                         {keyData.requests.toLocaleString()} requests | {keyData.tokens.toLocaleString()} tokens
                       </p>
@@ -105,7 +104,7 @@ const ModelSection = ({
             index="date"
             categories={["metrics.spend"]}
             colors={["green"]}
-            valueFormatter={(value: number) => `$${formatNumberWithCommas(value, 2, true)}`}
+            valueFormatter={(value: number) => `${formatNumberWithCommas(value, 0, true)} tokens`}
             yAxisWidth={72}
           />
         </CardContent>
@@ -414,7 +413,7 @@ export const ActivityMetrics: React.FC<ActivityMetricsProps> = ({ modelMetrics, 
                   {modelMetrics[modelName].label || "Unknown Item"}
                 </h3>
                 <div className="flex space-x-4 text-sm text-muted-foreground">
-                  <span>${formatNumberWithCommas(modelMetrics[modelName].total_spend, 2)}</span>
+                  <span>{getSpendString(modelMetrics[modelName].total_spend)}</span>
                   <span>{modelMetrics[modelName].total_requests.toLocaleString()} requests</span>
                 </div>
               </div>

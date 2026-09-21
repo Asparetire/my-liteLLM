@@ -433,14 +433,14 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                     <p className="font-bold">{data.date}</p>
                     {showFlatCost ? (
                       <>
-                        <p className="text-info">Request cost: ${formatNumberWithCommas(requestSpend, 2)}</p>
-                        <p className="text-violet-500">Flat cost: ${formatNumberWithCommas(flatCost, 2)}</p>
+                        <p className="text-info">Request cost: {formatNumberWithCommas(requestSpend, 0)} tokens</p>
+                        <p className="text-violet-500">Flat cost: {formatNumberWithCommas(flatCost, 0)} tokens</p>
                         <p className="font-semibold">
-                          Total cost: ${formatNumberWithCommas(requestSpend + flatCost, 2)}
+                          Total cost: {formatNumberWithCommas(requestSpend + flatCost, 0)} tokens
                         </p>
                       </>
                     ) : (
-                      <p className="text-info">Total Spend: ${formatNumberWithCommas(data.metrics.spend, 2)}</p>
+                      <p className="text-info">Total Spend: {formatNumberWithCommas(data.metrics.spend, 0)} tokens</p>
                     )}
                     <p className="text-muted-foreground">Total Requests: {data.metrics.api_requests}</p>
                     <p className="text-muted-foreground">Successful: {data.metrics.successful_requests}</p>
@@ -462,8 +462,8 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                           const metrics = entityData as EntityMetrics;
                           return (
                             <p key={entity} className="text-sm text-muted-foreground">
-                              {getEntityLabel(entity, metrics.metadata)}: $
-                              {formatNumberWithCommas(metrics.metrics.spend, 2)}
+                              {getEntityLabel(entity, metrics.metadata)}:{" "}
+                              {formatNumberWithCommas(metrics.metrics.spend, 0)} tokens
                             </p>
                           );
                         })}
@@ -514,7 +514,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                     return (
                       <div className="bg-card p-4 shadow-lg rounded-lg border">
                         <p className="font-bold">{data.metadata.alias}</p>
-                        <p className="text-info">Spend: ${formatNumberWithCommas(data.metrics.spend, 4)}</p>
+                        <p className="text-info">Spend: {formatNumberWithCommas(data.metrics.spend, 0)} tokens</p>
                         <p className="text-muted-foreground">Requests: {data.metrics.api_requests.toLocaleString()}</p>
                         <p className="text-success">Successful: {data.metrics.successful_requests.toLocaleString()}</p>
                         <p className="text-destructive">Failed: {data.metrics.failed_requests.toLocaleString()}</p>
@@ -612,7 +612,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                   data={providerSpend}
                   index="provider"
                   category="spend"
-                  valueFormatter={(value) => `$${formatNumberWithCommas(value, 2)}`}
+                  valueFormatter={(value) => `${formatNumberWithCommas(value, 0)} tokens`}
                   colors={["cyan", "blue", "indigo", "violet", "purple"]}
                   showLabel
                   startAngle={90}

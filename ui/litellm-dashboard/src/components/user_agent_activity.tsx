@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatNumberWithCommas } from "@/utils/dataUtils";
 import {
   Combobox,
   ComboboxChip,
@@ -447,7 +448,9 @@ const UserAgentActivity: React.FC<UserAgentActivityProps> = ({ accessToken, user
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Total Cost</p>
-                          <p className="text-lg font-semibold">${formatAbbreviatedNumber(tag.total_spend, 4)}</p>
+                          <p className="text-lg font-semibold">
+                            {formatNumberWithCommas(tag.total_spend, 0, true)} tokens
+                          </p>
                         </div>
                       </div>
                     </CardContent>

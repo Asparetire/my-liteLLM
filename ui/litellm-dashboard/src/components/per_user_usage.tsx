@@ -4,6 +4,7 @@ import { BarChart } from "@/components/shared/charts";
 import { DataTable } from "@/components/shared/DataTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { perUserAnalyticsCall } from "./networking";
+import { formatNumberWithCommas } from "@/utils/dataUtils";
 
 interface PerUserMetrics {
   user_id: string;
@@ -115,7 +116,7 @@ const PerUserUsage: React.FC<PerUserUsageProps> = ({ accessToken, selectedTags, 
       header: "Total Cost",
       accessorKey: "spend",
       meta: { numeric: true },
-      cell: ({ row }) => `$${formatAbbreviatedNumber(row.original.spend, 4)}`,
+      cell: ({ row }) => `${formatNumberWithCommas(row.original.spend, 0, true)} tokens`,
     },
   ];
 

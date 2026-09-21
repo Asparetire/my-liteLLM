@@ -218,7 +218,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
     return `${year}-${monthStr}-${dayStr}`;
   }
 
-  const valueFormatter = (number: number) => `$ ${formatNumberWithCommas(number, 2)}`;
+  const valueFormatter = (number: number) => `${formatNumberWithCommas(number, 0)} tokens`;
 
   const fetchAndSetData = async (
     fetchFunction: () => Promise<any>,
@@ -622,7 +622,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
                         layout="vertical"
                         showXAxis={false}
                         showLegend={false}
-                        valueFormatter={(value) => `$${formatNumberWithCommas(value, 2)}`}
+                        valueFormatter={(value) => `${formatNumberWithCommas(value, 0)} tokens`}
                       />
                     </CardContent>
                   </Card>
@@ -643,7 +643,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
                             index="provider"
                             category="spend"
                             colors={["cyan"]}
-                            valueFormatter={(value) => `$${formatNumberWithCommas(value, 2)}`}
+                            valueFormatter={(value) => `${formatNumberWithCommas(value, 0)} tokens`}
                           />
                         </div>
                         <div className="col-span-1">
