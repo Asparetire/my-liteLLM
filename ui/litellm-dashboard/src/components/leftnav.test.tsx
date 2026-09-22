@@ -179,49 +179,50 @@ describe("Sidebar (leftnav)", () => {
     renderWithProviders(<Sidebar {...defaultProps} />);
 
     const topLevelLabels = [
-      "Virtual Keys",
-      "Playground",
-      "Models + Endpoints",
-      "Agentic",
-      "MCP Servers",
-      "Guardrails",
-      "Policies",
-      "Tools",
-      "Usage",
-      "Logs",
-      "Guardrails Monitor",
-      "Teams",
-      "Internal Users",
-      "Organizations",
-      "Access Groups",
-      "Budgets",
-      "API Reference",
-      "AI Hub",
-      "Learning Resources",
-      "Experimental",
-      "Settings",
+      "虚拟密钥",
+      "演练场",
+      "模型与端点",
+      "智能体应用",
+      "MCP 服务器",
+      "护栏",
+      "策略",
+      "工具",
+      "用量",
+      "日志",
+      "护栏监控",
+      "团队",
+      "内部用户",
+      "组织",
+      "访问组",
+      "预算",
+      "API 参考",
+      "AI 中心",
+      "学习资源",
+      "实验性功能",
     ];
 
     topLevelLabels.forEach((label) => {
       expect(screen.getByText(label)).toBeInTheDocument();
     });
+    // "设置" also matches the SETTINGS group label, so query the item button instead.
+    expect(screen.getByRole("button", { name: "设置" })).toBeInTheDocument();
   });
 
   it("expands a nested tab to reveal its children (Tools > Search Tools)", async () => {
     renderWithProviders(<Sidebar {...defaultProps} />);
 
-    expect(screen.queryByText("Search Tools")).not.toBeInTheDocument();
+    expect(screen.queryByText("搜索工具")).not.toBeInTheDocument();
     act(() => {
-      fireEvent.click(screen.getByText("Tools"));
+      fireEvent.click(screen.getByText("工具"));
     });
     await waitFor(() => {
-      expect(screen.getByText("Search Tools")).toBeInTheDocument();
+      expect(screen.getByText("搜索工具")).toBeInTheDocument();
     });
   });
   it("reports whether a nested tab is expanded", async () => {
     renderWithProviders(<Sidebar {...defaultProps} />);
 
-    const toggle = screen.getByText("Tools").closest("button")!;
+    const toggle = screen.getByText("工具").closest("button")!;
     expect(toggle).toHaveAttribute("aria-expanded", "false");
 
     act(() => {
@@ -268,13 +269,13 @@ describe("Sidebar (leftnav)", () => {
     it("hides Playground from Admin Viewer (cost-incurring action)", () => {
       mockUseAuthorized.mockReturnValue(adminViewerAuth);
       renderWithProviders(<Sidebar {...defaultProps} />);
-      expect(screen.queryByText("Playground")).not.toBeInTheDocument();
+      expect(screen.queryByText("演练场")).not.toBeInTheDocument();
     });
 
     it("shows Models + Endpoints to Admin Viewer (read-only)", () => {
       mockUseAuthorized.mockReturnValue(adminViewerAuth);
       renderWithProviders(<Sidebar {...defaultProps} />);
-      expect(screen.getByText("Models + Endpoints")).toBeInTheDocument();
+      expect(screen.getByText("模型与端点")).toBeInTheDocument();
     });
 
     it("shows Agents (under Agentic) to Admin Viewer (read-only)", async () => {
@@ -283,17 +284,17 @@ describe("Sidebar (leftnav)", () => {
       // Agents is now nested under the "Agentic" submenu — expand parent
       // first to render the children, then assert Agents is visible.
       act(() => {
-        fireEvent.click(screen.getByText("Agentic"));
+        fireEvent.click(screen.getByText("智能体应用"));
       });
       await waitFor(() => {
-        expect(screen.getByText("Agents")).toBeInTheDocument();
+        expect(screen.getByText("智能体列表")).toBeInTheDocument();
       });
     });
 
     it("shows Logs to Admin Viewer", () => {
       mockUseAuthorized.mockReturnValue(adminViewerAuth);
       renderWithProviders(<Sidebar {...defaultProps} />);
-      expect(screen.getByText("Logs")).toBeInTheDocument();
+      expect(screen.getByText("日志")).toBeInTheDocument();
     });
   });
 
@@ -319,22 +320,22 @@ describe("Sidebar (leftnav)", () => {
       renderWithProviders(<Sidebar {...defaultProps} />);
 
       act(() => {
-        fireEvent.click(screen.getByText("Tools"));
+        fireEvent.click(screen.getByText("工具"));
       });
       await waitFor(() => {
-        expect(screen.getByText("Search Tools")).toBeInTheDocument();
+        expect(screen.getByText("搜索工具")).toBeInTheDocument();
       });
-      expect(screen.queryByText("Tool Policies")).not.toBeInTheDocument();
+      expect(screen.queryByText("工具策略")).not.toBeInTheDocument();
     });
 
     it("should show Tool Policies to admins", async () => {
       renderWithProviders(<Sidebar {...defaultProps} />);
 
       act(() => {
-        fireEvent.click(screen.getByText("Tools"));
+        fireEvent.click(screen.getByText("工具"));
       });
       await waitFor(() => {
-        expect(screen.getByText("Tool Policies")).toBeInTheDocument();
+        expect(screen.getByText("工具策略")).toBeInTheDocument();
       });
     });
 
@@ -342,8 +343,8 @@ describe("Sidebar (leftnav)", () => {
       mockUseAuthorized.mockReturnValue(internalAuth);
       renderWithProviders(<Sidebar {...defaultProps} />);
 
-      expect(screen.getByText("Guardrails")).toBeInTheDocument();
-      expect(screen.queryByText("Policies")).not.toBeInTheDocument();
+      expect(screen.getByText("护栏")).toBeInTheDocument();
+      expect(screen.queryByText("策略")).not.toBeInTheDocument();
     });
 
     it("should hide the Prompts entry from internal users while keeping other Experimental children", async () => {
@@ -351,12 +352,12 @@ describe("Sidebar (leftnav)", () => {
       renderWithProviders(<Sidebar {...defaultProps} />);
 
       act(() => {
-        fireEvent.click(screen.getByText("Experimental"));
+        fireEvent.click(screen.getByText("实验性功能"));
       });
       await waitFor(() => {
-        expect(screen.getByText("API Playground")).toBeInTheDocument();
+        expect(screen.getByText("API 调试")).toBeInTheDocument();
       });
-      expect(screen.queryByText("Prompts")).not.toBeInTheDocument();
+      expect(screen.queryByText("提示词")).not.toBeInTheDocument();
     });
 
     it("should hide Old Usage from internal users while keeping other Experimental children", async () => {
@@ -364,22 +365,22 @@ describe("Sidebar (leftnav)", () => {
       renderWithProviders(<Sidebar {...defaultProps} />);
 
       act(() => {
-        fireEvent.click(screen.getByText("Experimental"));
+        fireEvent.click(screen.getByText("实验性功能"));
       });
       await waitFor(() => {
-        expect(screen.getByText("API Playground")).toBeInTheDocument();
+        expect(screen.getByText("API 调试")).toBeInTheDocument();
       });
-      expect(screen.queryByText("Old Usage")).not.toBeInTheDocument();
+      expect(screen.queryByText("旧版用量")).not.toBeInTheDocument();
     });
 
     it("should show Old Usage to admins", async () => {
       renderWithProviders(<Sidebar {...defaultProps} />);
 
       act(() => {
-        fireEvent.click(screen.getByText("Experimental"));
+        fireEvent.click(screen.getByText("实验性功能"));
       });
       await waitFor(() => {
-        expect(screen.getByText("Old Usage")).toBeInTheDocument();
+        expect(screen.getByText("旧版用量")).toBeInTheDocument();
       });
     });
   });
@@ -411,15 +412,15 @@ describe("Sidebar (leftnav)", () => {
       renderWithProviders(<Sidebar {...defaultProps} />);
 
       act(() => {
-        fireEvent.click(screen.getByText("Agentic"));
+        fireEvent.click(screen.getByText("智能体应用"));
       });
       // Liveness gate: the sibling Agents child stays visible to this role, so
       // the absences below mean the gate fired, not that the group never opened.
       await waitFor(() => {
-        expect(screen.getByText("Agents")).toBeInTheDocument();
+        expect(screen.getByText("智能体列表")).toBeInTheDocument();
       });
-      expect(screen.queryByText("Workflow Runs")).not.toBeInTheDocument();
-      expect(screen.queryByText("Memory")).not.toBeInTheDocument();
+      expect(screen.queryByText("工作流运行")).not.toBeInTheDocument();
+      expect(screen.queryByText("记忆")).not.toBeInTheDocument();
     });
 
     // An org admin's session role is "Org Admin", which no capability list
@@ -433,44 +434,44 @@ describe("Sidebar (leftnav)", () => {
       renderWithProviders(<Sidebar {...defaultProps} />);
 
       // Liveness gate: Logs carries no role list, so it proves the sidebar rendered.
-      expect(screen.getByText("Logs")).toBeInTheDocument();
-      expect(screen.queryByText("Agentic")).not.toBeInTheDocument();
-      expect(screen.queryByText("Workflow Runs")).not.toBeInTheDocument();
-      expect(screen.queryByText("Memory")).not.toBeInTheDocument();
+      expect(screen.getByText("日志")).toBeInTheDocument();
+      expect(screen.queryByText("智能体应用")).not.toBeInTheDocument();
+      expect(screen.queryByText("工作流运行")).not.toBeInTheDocument();
+      expect(screen.queryByText("记忆")).not.toBeInTheDocument();
     });
 
     it("keeps the Agentic group for an internal user, who can still see Agents", () => {
       mockUseAuthorized.mockReturnValue(authFor("internal"));
       renderWithProviders(<Sidebar {...defaultProps} />);
 
-      expect(screen.getByText("Agentic")).toBeInTheDocument();
+      expect(screen.getByText("智能体应用")).toBeInTheDocument();
     });
 
     it("shows Workflow Runs and Memory to admins", async () => {
       renderWithProviders(<Sidebar {...defaultProps} />);
 
       act(() => {
-        fireEvent.click(screen.getByText("Agentic"));
+        fireEvent.click(screen.getByText("智能体应用"));
       });
       await waitFor(() => {
-        expect(screen.getByText("Workflow Runs")).toBeInTheDocument();
+        expect(screen.getByText("工作流运行")).toBeInTheDocument();
       });
-      expect(screen.getByText("Memory")).toBeInTheDocument();
+      expect(screen.getByText("记忆")).toBeInTheDocument();
     });
 
     it("hides Guardrails Monitor from an internal user while keeping Usage and Cost Optimization", () => {
       mockUseAuthorized.mockReturnValue(authFor("internal"));
       renderWithProviders(<Sidebar {...defaultProps} />);
 
-      expect(screen.queryByText("Guardrails Monitor")).not.toBeInTheDocument();
-      expect(screen.getByText("Usage")).toBeInTheDocument();
-      expect(screen.getByText("Cost Optimization")).toBeInTheDocument();
+      expect(screen.queryByText("护栏监控")).not.toBeInTheDocument();
+      expect(screen.getByText("用量")).toBeInTheDocument();
+      expect(screen.getByText("成本优化")).toBeInTheDocument();
     });
 
     it("shows Guardrails Monitor to admins", () => {
       renderWithProviders(<Sidebar {...defaultProps} />);
 
-      expect(screen.getByText("Guardrails Monitor")).toBeInTheDocument();
+      expect(screen.getByText("护栏监控")).toBeInTheDocument();
     });
   });
 
@@ -511,50 +512,50 @@ describe("Sidebar (leftnav)", () => {
 
     renderWithProviders(<Sidebar {...defaultProps} />);
 
-    expect(screen.getByText("Organizations")).toBeInTheDocument();
+    expect(screen.getByText("组织")).toBeInTheDocument();
   });
 
   it("marks the nav item for the current route active", () => {
     navState.pathname = "/ui/logs";
     renderWithProviders(<Sidebar {...defaultProps} />);
-    expect(screen.getByRole("link", { name: "Logs" })).toHaveAttribute("data-active", "true");
-    expect(screen.getByRole("link", { name: "Virtual Keys" })).not.toHaveAttribute("data-active");
+    expect(screen.getByRole("link", { name: "日志" })).toHaveAttribute("data-active", "true");
+    expect(screen.getByRole("link", { name: "虚拟密钥" })).not.toHaveAttribute("data-active");
   });
 
   it("marks Virtual Keys active at the dashboard root", () => {
     navState.pathname = "/ui/";
     renderWithProviders(<Sidebar {...defaultProps} />);
-    expect(screen.getByRole("link", { name: "Virtual Keys" })).toHaveAttribute("data-active", "true");
+    expect(screen.getByRole("link", { name: "虚拟密钥" })).toHaveAttribute("data-active", "true");
   });
 
   it("expands the parent group of the current nested route and marks the child active", () => {
     navState.pathname = "/ui/search-tools";
     renderWithProviders(<Sidebar {...defaultProps} />);
-    expect(screen.getByRole("link", { name: "Search Tools" })).toHaveAttribute("data-active", "true");
-    expect(screen.getByRole("button", { name: "Tools" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("link", { name: "搜索工具" })).toHaveAttribute("data-active", "true");
+    expect(screen.getByRole("button", { name: "工具" })).toHaveAttribute("aria-expanded", "true");
   });
 
   it("links every leaf to its path route, including the ids that differ from their route", () => {
     renderWithProviders(<Sidebar {...defaultProps} />);
     act(() => {
-      fireEvent.click(screen.getByText("Experimental"));
+      fireEvent.click(screen.getByText("实验性功能"));
     });
 
     const expectHref = (label: string, href: string) =>
       expect(screen.getByRole("link", { name: label })).toHaveAttribute("href", href);
-    expectHref("Virtual Keys", "/ui/api-keys");
-    expectHref("Playground", "/ui/playground");
-    expectHref("Models + Endpoints", "/ui/models-and-endpoints");
-    expectHref("Usage", "/ui/usage");
-    expectHref("API Reference", "/ui/api-reference");
-    expectHref("Old Usage", "/ui/old-usage");
+    expectHref("虚拟密钥", "/ui/api-keys");
+    expectHref("演练场", "/ui/playground");
+    expectHref("模型与端点", "/ui/models-and-endpoints");
+    expectHref("用量", "/ui/usage");
+    expectHref("API 参考", "/ui/api-reference");
+    expectHref("旧版用量", "/ui/old-usage");
   });
 
   it("never links a leaf to the legacy ?page= switch", () => {
     renderWithProviders(<Sidebar {...defaultProps} enableProjectsUI />);
-    for (const group of ["Agentic", "Tools", "Experimental", "Settings"]) {
+    for (const group of ["智能体应用", "工具", "实验性功能", "设置"]) {
       act(() => {
-        fireEvent.click(screen.getByText(group));
+        fireEvent.click(screen.getByRole("button", { name: group }));
       });
     }
     const hrefs = screen.getAllByRole("link").map((link) => link.getAttribute("href") ?? "");
@@ -568,7 +569,7 @@ describe("Sidebar (leftnav)", () => {
     // The item stays navigable in the icon-only rail: its link still renders with
     // an icon (asserting the <a> + svg, not the text, so a removed icon would
     // fail here), while the label is present but CSS-hidden.
-    const label = screen.getByText("Virtual Keys");
+    const label = screen.getByText("虚拟密钥");
     const link = label.closest("a");
     expect(link).not.toBeNull();
     expect(link!.querySelector("svg")).not.toBeNull();
@@ -580,7 +581,7 @@ describe("Sidebar (leftnav)", () => {
 
     const costOptimization = container.querySelector('a[href*="cost-optimization"]');
     expect(costOptimization).not.toBeNull();
-    expect(costOptimization!).toHaveTextContent(/Cost Optimization/);
+    expect(costOptimization!).toHaveTextContent(/成本优化/);
     expect(costOptimization!).toHaveTextContent(/Beta/);
 
     expect(container.querySelector('a[href*="projects"]')).toBeNull();

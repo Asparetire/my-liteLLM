@@ -113,6 +113,51 @@ vi.mock("@/app/(dashboard)/hooks/useAuthorized", () => ({
   }),
 }));
 
+// Global mock for next-intl's useTranslations: components resolve messages without needing a
+// NextIntlClientProvider with a specific locale. Resolution order is zh-CN, then en, then the
+// raw key, so translated components render Chinese in tests and untranslated keys still show
+// their English source instead of a key string. NextIntlClientProvider and useLocale stay
+// real so LocaleProvider and anything rendering under it keep working.
+vi.mock("next-intl", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("next-intl")>();
+  const zhCN = (await import("../messages/zh-CN.json")).default as Record<string, unknown>;
+  const en = (await import("../messages/en.json")).default as Record<string, unknown>;
+
+  const resolveMessage = (messages: Record<string, unknown>, key: string): string | undefined => {
+    let current: unknown = messages;
+    for (const segment of key.split(".")) {
+      if (current === null || typeof current !== "object") return undefined;
+      current = (current as Record<string, unknown>)[segment];
+    }
+    return typeof current === "string" ? current : undefined;
+  };
+
+  const createTranslator = (namespace: string) => {
+    const resolve = (key: string): string => {
+      const fullKey = namespace ? `${namespace}.${key}` : key;
+      return resolveMessage(zhCN, fullKey) ?? resolveMessage(en, fullKey) ?? fullKey;
+    };
+    const translator = ((key: string) => resolve(key)) as ((key: string) => string) & {
+      has: (key: string) => boolean;
+      rich: (key: string) => string;
+      markup: (key: string) => string;
+    };
+    translator.has = (key: string) => {
+      const fullKey = namespace ? `${namespace}.${key}` : key;
+      return resolveMessage(zhCN, fullKey) !== undefined || resolveMessage(en, fullKey) !== undefined;
+    };
+    // Test suites only assert plain strings; rich/markup drop their tag chunks.
+    translator.rich = (key: string) => resolve(key);
+    translator.markup = (key: string) => resolve(key);
+    return translator;
+  };
+
+  return {
+    ...actual,
+    useTranslations: ((namespace?: string) => createTranslator(namespace ?? "")) as unknown as typeof actual.useTranslations,
+  };
+});
+
 // Unmounting a Base UI dialog that is still open leaves its scroll lock behind: the <html>
 // and <body> inline styles and the marker attribute survive cleanup() and make every later
 // test in the file see a locked page, where popups compute pointer-events: none and clicks

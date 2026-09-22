@@ -6,6 +6,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ThemeProvider } from "next-themes";
 
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LocaleProvider } from "@/i18n/LocaleProvider";
 import ReactQueryProvider from "@/contexts/ReactQueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -27,14 +28,16 @@ export default function RootLayout({
     // cannot predict; suppressHydrationWarning confines that mismatch to this element.
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <NuqsAdapter>
-            <ReactQueryProvider>
-              <AuthProvider>{children}</AuthProvider>
-              <Toaster />
-            </ReactQueryProvider>
-          </NuqsAdapter>
-        </ThemeProvider>
+        <LocaleProvider>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+            <NuqsAdapter>
+              <ReactQueryProvider>
+                <AuthProvider>{children}</AuthProvider>
+                <Toaster />
+              </ReactQueryProvider>
+            </NuqsAdapter>
+          </ThemeProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

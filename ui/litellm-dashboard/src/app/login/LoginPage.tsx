@@ -19,6 +19,7 @@ import { clearTokenCookies, getCookieFromDocument } from "@/utils/cookieUtils";
 import { isJwtExpired } from "@/utils/jwtUtils";
 import { consumeReturnUrl, getLoginUrl, getReturnUrl, isValidReturnUrl } from "@/utils/returnUrlUtils";
 import { CircleAlert, Info, TriangleAlert, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { z } from "zod/v4";
@@ -65,8 +66,7 @@ function LoginPageContent() {
   const [selectedWorkerId, setSelectedWorkerId] = useState<string | null>(null);
   const workerFieldId = useId();
 
-  // 临时兜底：需求02 接入 next-intl 前，文案取内联中文默认值（与 messages/zh-CN.json 一致）
-  const t = (key: string, fallback?: string): string => fallback ?? key;
+  const t = useTranslations("login");
   const form = useZodForm(loginSchema, { defaultValues: { username: "", password: "" } });
 
   // Pre-select worker from URL param (e.g. /ui/login?worker=team-b)
@@ -225,23 +225,23 @@ function LoginPageContent() {
           <TooltipProvider>
             <div className="flex w-full flex-col gap-4">
               <div className="text-center">
-                <h2 className="text-3xl font-semibold text-foreground">{t("title", "登录")}</h2>
+                <h2 className="text-3xl font-semibold text-foreground">{t("title")}</h2>
               </div>
 
               <div className="text-center">
-                <h3 className="text-2xl font-semibold text-foreground">{t("subtitle", "访问管理员界面")}</h3>
-                <p className="text-sm text-muted-foreground">{t("subtitle_subtitle", "管理您的 LiteLLM 代理服务器，访问管理界面。")}</p>
+                <h3 className="text-2xl font-semibold text-foreground">{t("subtitle")}</h3>
+                <p className="text-sm text-muted-foreground">{t("subtitle_subtitle")}</p>
               </div>
 
               {!uiConfig?.hide_default_credentials_hint && (
                 <Alert variant="info">
                   <Info />
-                  <AlertTitle>{t("default_username", "默认凭据")}</AlertTitle>
+                  <AlertTitle>{t("default_username")}</AlertTitle>
                   <AlertDescription>
                     <p className="text-sm">
-                      默认情况下，用户名是<code className="bg-muted px-1 py-0.5 rounded-sm text-xs">{t("username_code", "admin")}</code>，
+                      默认情况下，用户名是<code className="bg-muted px-1 py-0.5 rounded-sm text-xs">{t("username_code")}</code>，
                       密码是您的 LiteLLM Proxy
-                      <code className="bg-muted px-1 py-0.5 rounded-sm text-xs">{t("password_code", "MASTER_KEY")}</code>。
+                      <code className="bg-muted px-1 py-0.5 rounded-sm text-xs">{t("password_code")}</code>。
                     </p>
                     <p className="mt-2 text-sm">
                       需要设置 UI 凭据或使用 SSO？{" "}
@@ -285,12 +285,12 @@ function LoginPageContent() {
                     </Field>
                   )}
 
-                  <FormField control={form.control} name="username" label={t("username", "用户名")}>
+                  <FormField control={form.control} name="username" label={t("username")}>
                     {({ ref, ...field }) => (
                       <Input
                         {...field}
                         ref={ref}
-                        placeholder={t("placeholder_username", "请输入用户名")}
+                        placeholder={t("placeholder_username")}
                         autoComplete="username"
                         disabled={isLoginLoading}
                         className="h-10 rounded-md"
@@ -298,12 +298,12 @@ function LoginPageContent() {
                     )}
                   </FormField>
 
-                  <FormField control={form.control} name="password" label={t("password", "密码")}>
+                  <FormField control={form.control} name="password" label={t("password")}>
                     {({ ref, ...field }) => (
                       <PasswordInput
                         {...field}
                         ref={ref}
-                        placeholder={t("placeholder_password", "请输入密码")}
+                        placeholder={t("placeholder_password")}
                         autoComplete="current-password"
                         disabled={isLoginLoading}
                         groupClassName="h-10"
@@ -313,17 +313,17 @@ function LoginPageContent() {
 
                   <Button type="submit" size="lg" disabled={isLoginLoading} className="w-full">
                     {isLoginLoading && <UiLoadingSpinner className="size-4" role="img" aria-label="loading" />}
-                    {isLoginLoading ? t("button_loading", "登录中...") : t("button", "登录")}
+                    {isLoginLoading ? t("button_loading") : t("button")}
                   </Button>
 
                   {!uiConfig?.sso_configured ? (
                     <Tooltip>
                       <TooltipTrigger render={<span className="block w-full" />}>
                         <Button type="button" variant="outline" size="lg" disabled className="w-full">
-                          {t("button_sso", "使用 SSO 登录")}
+                          {t("button_sso")}
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>{t("tooltip_sso_content", "请先配置 SSO 以使用 SSO 登录。")}</TooltipContent>
+                      <TooltipContent>{t("tooltip_sso_content")}</TooltipContent>
                     </Tooltip>
                   ) : (
                     <Button
@@ -346,7 +346,7 @@ function LoginPageContent() {
                       }}
                       className="w-full"
                     >
-                      {t("button_sso", "使用 SSO 登录")}
+                      {t("button_sso")}
                     </Button>
                   )}
                 </FieldGroup>

@@ -4,6 +4,7 @@ import useIsOrgAdmin from "@/app/(dashboard)/hooks/useIsOrgAdmin";
 import { useHealthReadinessDetails } from "@/app/(dashboard)/hooks/healthReadiness/useHealthReadinessDetails";
 import { useLogout } from "@/app/(dashboard)/hooks/useLogout";
 import { getProxyBaseUrl } from "@/components/networking";
+import LanguageSwitcher from "@/i18n/LanguageSwitcher";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -62,6 +63,7 @@ import {
   Workflow,
 } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/cva.config";
@@ -80,6 +82,13 @@ import SidebarUsageCard from "./SidebarUsageCard";
 import { routeSegmentForPathname, uiHref } from "@/utils/uiHref";
 
 const ICON = { strokeWidth: 1.75 } as const;
+
+// Translated text for labels that are JSX (badge spans); plain string labels are
+// translated at render time in Sidebar_ via labelFor().
+const NavText = ({ translationKey, fallback }: { translationKey: string; fallback: string }) => {
+  const t = useTranslations("navigation");
+  return <>{t.has(translationKey) ? t(translationKey) : fallback}</>;
+};
 
 const LOGO_CLASS_NAME = "h-7 w-auto max-w-[150px] object-contain group-data-[collapsed=true]/sidebar:w-7";
 
@@ -211,7 +220,7 @@ const menuGroups: MenuGroup[] = [
         roles: [...all_admin_roles, ...internalUserRoles],
         label: (
           <span className="flex items-center gap-2">
-            Cost Optimization <BetaBadge />
+            <NavText translationKey="cost-optimization" fallback="Cost Optimization" /> <BetaBadge />
           </span>
         ),
       },
@@ -234,7 +243,7 @@ const menuGroups: MenuGroup[] = [
         page: "projects",
         label: (
           <span className="flex items-center gap-2">
-            Projects <BetaBadge />
+            <NavText translationKey="projects" fallback="Projects" /> <BetaBadge />
           </span>
         ),
         icon: <Folder {...ICON} />,
@@ -396,6 +405,15 @@ const SECTION_DISPLAY: Record<string, string> = {
   SETTINGS: "Settings",
 };
 
+// Maps a menu group's uppercase groupLabel to its navigation message key.
+const GROUP_LABEL_KEYS: Record<string, string> = {
+  "AI GATEWAY": "groupAiGateway",
+  OBSERVABILITY: "groupObservability",
+  "ACCESS CONTROL": "groupAccessControl",
+  "DEVELOPER TOOLS": "groupDeveloperTools",
+  SETTINGS: "groupSettings",
+};
+
 const prettify = (key: string): string =>
   key
     .split(/[-_]/)
@@ -435,6 +453,18 @@ const Sidebar_: React.FC<SidebarProps> = ({
   const [erroredDarkLogo, setErroredDarkLogo] = useState<string | null>(null);
   const { data: healthData } = useHealthReadinessDetails(accessToken);
   const logout = useLogout(accessToken);
+  const t = useTranslations("navigation");
+
+  // Nav labels stay hardcoded English in menuGroups (page_utils.ts consumes the
+  // shape); translation is looked up by item key at render time, falling back to
+  // the hardcoded label for keys without a message.
+  const labelFor = (item: MenuItem): React.ReactNode =>
+    typeof item.label === "string" && t.has(item.key) ? t(item.key) : item.label;
+
+  const groupLabelFor = (groupLabel: string): string => {
+    const key = GROUP_LABEL_KEYS[groupLabel];
+    return key !== undefined && t.has(key) ? t(key) : groupLabel;
+  };
 
   const baseUrl = getProxyBaseUrl();
   const version = healthData?.litellm_version;
@@ -524,7 +554,7 @@ const Sidebar_: React.FC<SidebarProps> = ({
   const renderLeaf = (item: MenuItem, isChild: boolean) => {
     const active = selectedKey === item.key;
     const size = isChild ? "sub" : "default";
-    const label = <span className="flex-1 truncate group-data-[collapsed=true]/sidebar:hidden">{item.label}</span>;
+    const label = <span className="flex-1 truncate group-data-[collapsed=true]/sidebar:hidden">{labelFor(item)}</span>;
 
     if (item.external_url) {
       return (
@@ -575,7 +605,7 @@ const Sidebar_: React.FC<SidebarProps> = ({
           title={collapsed ? labelText(item) : undefined}
         >
           {item.icon}
-          <span className="flex-1 truncate group-data-[collapsed=true]/sidebar:hidden">{item.label}</span>
+          <span className="flex-1 truncate group-data-[collapsed=true]/sidebar:hidden">{labelFor(item)}</span>
           <ChevronRight
             className={cn(
               "size-4 shrink-0 transition-transform group-data-[collapsed=true]/sidebar:hidden",
@@ -642,7 +672,7 @@ const Sidebar_: React.FC<SidebarProps> = ({
           {visibleGroups.map((group, gi) => (
             <SidebarGroup key={group.groupLabel}>
               {gi > 0 && <SidebarSeparator className="hidden group-data-[collapsed=true]/sidebar:block" />}
-              <SidebarGroupLabel>{group.groupLabel}</SidebarGroupLabel>
+              <SidebarGroupLabel>{groupLabelFor(group.groupLabel)}</SidebarGroupLabel>
               <SidebarMenu>{group.items.map((item) => renderItem(item))}</SidebarMenu>
             </SidebarGroup>
           ))}
@@ -658,6 +688,7 @@ const Sidebar_: React.FC<SidebarProps> = ({
           />
         )}
         <SidebarAccountMenu onLogout={logout} collapsed={collapsed} />
+        <LanguageSwitcher collapsed={collapsed} />
       </SidebarFooter>
     </Sidebar>
   );

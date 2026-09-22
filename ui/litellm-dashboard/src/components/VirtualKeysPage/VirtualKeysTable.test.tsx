@@ -204,7 +204,7 @@ it("should render VirtualKeysTable component", () => {
 it("shows the Budget Reset column by default", async () => {
   renderWithProviders(<VirtualKeysTable />);
   await waitFor(() => {
-    expect(screen.getByText("Budget Reset")).toBeInTheDocument();
+    expect(screen.getByText("预算重置")).toBeInTheDocument();
   });
 });
 
@@ -271,7 +271,7 @@ it("shows created_by_user alias over email in the Created By column when it is e
 
   // Created By is hidden by default; turn it on via the Columns menu.
   await user.click(screen.getByRole("button", { name: "Columns" }));
-  await user.click(await screen.findByText("Created By"));
+  await user.click(await screen.findByText("创建人"));
   await user.keyboard("{Escape}");
 
   const row = (await screen.findByText("Test Key Alias")).closest("tr") as HTMLElement;
@@ -319,17 +319,17 @@ it("collapses models beyond the visible limit into a '+N more' badge", () => {
 it("should render the redesigned table headers", () => {
   renderWithProviders(<VirtualKeysTable />);
 
-  expect(screen.getByText("Key")).toBeInTheDocument();
-  expect(screen.getByText("Team")).toBeInTheDocument();
-  expect(screen.getByText("Models")).toBeInTheDocument();
-  expect(screen.getByText("Spend", { selector: "[data-sort-field='spend']" })).toBeInTheDocument();
-  expect(screen.getByText("Budget", { selector: "[data-sort-field='max_budget']" })).toBeInTheDocument();
+  expect(screen.getByText("密钥")).toBeInTheDocument();
+  expect(screen.getByText("团队")).toBeInTheDocument();
+  expect(screen.getByText("模型")).toBeInTheDocument();
+  expect(screen.getByText("消耗", { selector: "[data-sort-field='spend']" })).toBeInTheDocument();
+  expect(screen.getByText("预算", { selector: "[data-sort-field='max_budget']" })).toBeInTheDocument();
 });
 
 it("sorts by the backend key_alias field (not the column label) when the Key header is clicked", async () => {
   renderWithProviders(<VirtualKeysTable />);
 
-  const keyHeader = screen.getByText("Key").closest("button") as HTMLElement;
+  const keyHeader = screen.getByText("密钥").closest("button") as HTMLElement;
   fireEvent.click(keyHeader);
 
   await waitFor(() => {
@@ -341,7 +341,7 @@ it("sorts by the backend max_budget field when 'Budget descending' is chosen fro
   const user = userEvent.setup();
   renderWithProviders(<VirtualKeysTable />);
 
-  await chooseSelectOption(user, screen.getByTestId("sort-trigger-spend"), "Budget descending", "menuitem");
+  await chooseSelectOption(user, screen.getByTestId("sort-trigger-spend"), "预算 descending", "menuitem");
 
   await waitFor(() => {
     expect(mockUseKeys).toHaveBeenLastCalledWith(
@@ -356,19 +356,19 @@ it("emphasizes the active field in the Spend / Budget header so the sorted colum
   const user = userEvent.setup();
   renderWithProviders(<VirtualKeysTable />);
 
-  await chooseSelectOption(user, screen.getByTestId("sort-trigger-spend"), "Budget descending", "menuitem");
+  await chooseSelectOption(user, screen.getByTestId("sort-trigger-spend"), "预算 descending", "menuitem");
 
   await waitFor(() => {
-    expect(screen.getByText("Budget", { selector: "[data-sort-field='max_budget']" })).toHaveClass("font-semibold");
+    expect(screen.getByText("预算", { selector: "[data-sort-field='max_budget']" })).toHaveClass("font-semibold");
   });
-  expect(screen.getByText("Spend", { selector: "[data-sort-field='spend']" })).toHaveClass("text-muted-foreground");
+  expect(screen.getByText("消耗", { selector: "[data-sort-field='spend']" })).toHaveClass("text-muted-foreground");
 });
 
 it("sorts by spend ascending when 'Spend ascending' is chosen from the Spend / Budget menu", async () => {
   const user = userEvent.setup();
   renderWithProviders(<VirtualKeysTable />);
 
-  await chooseSelectOption(user, screen.getByTestId("sort-trigger-spend"), "Spend ascending", "menuitem");
+  await chooseSelectOption(user, screen.getByTestId("sort-trigger-spend"), "消耗 ascending", "menuitem");
 
   await waitFor(() => {
     expect(mockUseKeys).toHaveBeenLastCalledWith(1, 50, expect.objectContaining({ sortBy: "spend", sortOrder: "asc" }));
@@ -491,7 +491,7 @@ describe("entity links out of the key rows", () => {
     await user.keyboard("{Escape}");
   };
 
-  const enableCreatedByColumn = (user: ReturnType<typeof userEvent.setup>) => enableColumn(user, "Created By");
+  const enableCreatedByColumn = (user: ReturnType<typeof userEvent.setup>) => enableColumn(user, "创建人");
 
   it("points the User and Team cells at their detail pages", async () => {
     renderWithProviders(<VirtualKeysTable />);
@@ -508,7 +508,7 @@ describe("entity links out of the key rows", () => {
     mockUseKeys.mockReturnValue(keysResult([{ ...mockKey, org_id: "org-1" }]));
     const user = userEvent.setup();
     renderWithProviders(<VirtualKeysTable />);
-    await enableColumn(user, "Organization");
+    await enableColumn(user, "组织");
 
     const row = await keyRow();
     expect(within(row).getByRole("link", { name: "Test Organization" })).toHaveAttribute(
@@ -805,7 +805,7 @@ describe("table state lives in the URL so it survives leaving and returning to t
     const onUrlUpdate = vi.fn<OnUrlUpdateFunction>();
     renderWithProviders(<VirtualKeysTable />, { onUrlUpdate });
 
-    fireEvent.click(screen.getByRole("button", { name: "Key" }));
+    fireEvent.click(screen.getByRole("button", { name: "密钥" }));
 
     await waitFor(() => {
       expect(lastSearchParam(onUrlUpdate, "sort_by")).toBe("key_alias");
@@ -916,7 +916,7 @@ describe("table state lives in the URL so it survives leaving and returning to t
     const onUrlUpdate = vi.fn<OnUrlUpdateFunction>();
     renderWithProviders(<VirtualKeysTable />, { onUrlUpdate });
 
-    await chooseSelectOption(user, screen.getByTestId("sort-trigger-spend"), "Spend ascending", "menuitem");
+    await chooseSelectOption(user, screen.getByTestId("sort-trigger-spend"), "消耗 ascending", "menuitem");
     await waitFor(() => {
       expect(lastSearchParam(onUrlUpdate, "sort_by")).toBe("spend");
     });

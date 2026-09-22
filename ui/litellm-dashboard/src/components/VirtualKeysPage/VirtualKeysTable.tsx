@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { useDebouncedValue } from "@tanstack/react-pacer/debouncer";
 import { ColumnFiltersState, functionalUpdate, OnChangeFn, PaginationState, SortingState } from "@tanstack/react-table";
 import { KeyRound } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { createParser, parseAsInteger, parseAsString, parseAsStringLiteral, useQueryState, useQueryStates } from "nuqs";
 import React, { useCallback, useMemo, useState } from "react";
 
@@ -30,13 +31,6 @@ interface VirtualKeysTableProps {
 
 const FILTER_COLUMNS = ["team_id", "org_id", "user_id", "key_hash"] as const;
 type FilterColumn = (typeof FILTER_COLUMNS)[number];
-
-const FILTER_LABELS: Record<FilterColumn, string> = {
-  team_id: "Team",
-  org_id: "Organization",
-  user_id: "User ID",
-  key_hash: "Key ID",
-};
 
 const DEFAULT_SORT_BY = "created_at";
 const DEFAULT_SORT_ORDER = "desc";
@@ -96,6 +90,17 @@ export function VirtualKeysTable({ headerActions }: VirtualKeysTableProps) {
     () => ({ pageIndex: tableState.page - 1, pageSize: tableState.page_size }),
     [tableState.page, tableState.page_size],
   );
+  const tKeys = useTranslations("keys");
+  const filterLabels = useMemo<Record<FilterColumn, string>>(
+    () => ({
+      team_id: tKeys("filter_team"),
+      org_id: tKeys("filter_organization"),
+      user_id: tKeys("filter_user_id"),
+      key_hash: tKeys("header_key_id"),
+    }),
+    [tKeys],
+  );
+
   const { filter_team, filter_org, filter_user, filter_key_id } = tableState;
   const appliedFilters = useMemo(
     () => ({
@@ -180,8 +185,14 @@ export function VirtualKeysTable({ headerActions }: VirtualKeysTableProps) {
   );
 
   const columns = useMemo(
-    () => getKeyTableColumns({ allTeams, organizations, onSelectKey: (key) => void setSelectedKeyId(key.token) }),
-    [allTeams, organizations, setSelectedKeyId],
+    () =>
+      getKeyTableColumns({
+        allTeams,
+        organizations,
+        onSelectKey: (key) => void setSelectedKeyId(key.token),
+        t: tKeys,
+      }),
+    [allTeams, organizations, setSelectedKeyId, tKeys],
   );
 
   const selectedKeyFromList = useMemo(
@@ -296,7 +307,7 @@ export function VirtualKeysTable({ headerActions }: VirtualKeysTableProps) {
               onRefresh={() => refetch?.()}
               isRefreshing={isFetching}
               onOpenFilters={() => setFiltersOpen(true)}
-              filterLabels={FILTER_LABELS}
+              filterLabels={filterLabels}
               formatFilterValue={formatFilterValue}
             />
             <DataTableFilterDrawer
