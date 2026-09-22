@@ -141,7 +141,7 @@ describe("GuardrailsPanel", () => {
     expect(modal.getByText("test-guardrail-1")).toBeInTheDocument();
     expect(modal.getByText("Test Provider")).toBeInTheDocument();
 
-    fireEvent.click(modal.getByRole("button", { name: "Delete" }));
+    fireEvent.click(modal.getByRole("button", { name: "删除" }));
 
     await waitFor(() => {
       expect(mockDeleteGuardrailCall).toHaveBeenCalledWith("test-token", "test-guardrail-1");
@@ -178,7 +178,7 @@ describe("GuardrailsPanel", () => {
     fireEvent.click(await screen.findByTestId("delete-button"));
     const modal = within(await screen.findByRole("dialog"));
 
-    fireEvent.click(modal.getByRole("button", { name: "Cancel" }));
+    fireEvent.click(modal.getByRole("button", { name: "取消" }));
 
     expect(mockDeleteGuardrailCall).not.toHaveBeenCalled();
   });

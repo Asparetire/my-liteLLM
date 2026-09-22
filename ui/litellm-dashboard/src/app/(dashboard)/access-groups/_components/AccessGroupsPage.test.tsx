@@ -232,7 +232,7 @@ describe("AccessGroupsPage", () => {
     renderWithProviders(<AccessGroupsPage />);
     await user.click(await openRowMenu(user, "ag-1"));
     const dialog = screen.getByRole("dialog", { name: "Delete Access Group" });
-    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    await user.click(within(dialog).getByRole("button", { name: "取消" }));
     await waitFor(() => {
       expect(screen.queryByRole("dialog", { name: "Delete Access Group" })).not.toBeInTheDocument();
     });
@@ -247,7 +247,7 @@ describe("AccessGroupsPage", () => {
     renderWithProviders(<AccessGroupsPage />);
     await user.click(await openRowMenu(user, "ag-1"));
     const dialog = screen.getByRole("dialog", { name: "Delete Access Group" });
-    await user.click(within(dialog).getByRole("button", { name: /delete/i }));
+    await user.click(within(dialog).getByRole("button", { name: "删除" }));
     expect(mockMutate).toHaveBeenCalledWith("ag-1", expect.any(Object));
   });
 

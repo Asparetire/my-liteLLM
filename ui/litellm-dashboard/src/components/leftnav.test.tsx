@@ -1,7 +1,8 @@
 import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "../../tests/test-utils";
-import Sidebar, { menuGroups, getBreadcrumb } from "./leftnav";
+import zhCNMessages from "../../messages/zh-CN.json";
+import Sidebar, { menuGroups, getBreadcrumb, type NavTranslator } from "./leftnav";
 
 vi.mock("../utils/roles", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../utils/roles")>();
@@ -596,30 +597,41 @@ describe("Sidebar (leftnav)", () => {
 });
 
 describe("getBreadcrumb", () => {
+  // DashboardHeader injects next-intl's navigation translator at runtime; the tests
+  // mirror that with the same zh-CN messages the global next-intl mock resolves to.
+  const navMessages = zhCNMessages.navigation as Record<string, string>;
+  const navT: NavTranslator = Object.assign((key: string) => navMessages[key] ?? key, {
+    has: (key: string) => key in navMessages,
+  });
+
   it("resolves a top-level route to its section + title", () => {
-    expect(getBreadcrumb("/ui/api-keys")).toEqual({ section: "AI Gateway", title: "Virtual Keys" });
-    expect(getBreadcrumb("/ui/logs")).toEqual({ section: "Observability", title: "Logs" });
+    expect(getBreadcrumb("/ui/api-keys", navT)).toEqual({ section: "AI 网关", title: "虚拟密钥" });
+    expect(getBreadcrumb("/ui/logs", navT)).toEqual({ section: "可观测", title: "日志" });
   });
 
   it("resolves routes whose segment differs from the sidebar page id", () => {
-    expect(getBreadcrumb("/ui/models-and-endpoints")).toEqual({ section: "AI Gateway", title: "Models + Endpoints" });
-    expect(getBreadcrumb("/ui/usage")).toEqual({ section: "Observability", title: "Usage" });
-    expect(getBreadcrumb("/ui/old-usage")).toEqual({ section: "Developer Tools", title: "Old Usage" });
+    expect(getBreadcrumb("/ui/models-and-endpoints", navT)).toEqual({ section: "AI 网关", title: "模型与端点" });
+    expect(getBreadcrumb("/ui/usage", navT)).toEqual({ section: "可观测", title: "用量" });
+    expect(getBreadcrumb("/ui/old-usage", navT)).toEqual({ section: "开发者工具", title: "旧版用量" });
   });
 
   it("titles the dashboard root as Virtual Keys", () => {
-    expect(getBreadcrumb("/ui/")).toEqual({ section: "AI Gateway", title: "Virtual Keys" });
+    expect(getBreadcrumb("/ui/", navT)).toEqual({ section: "AI 网关", title: "虚拟密钥" });
   });
 
   it("resolves a nested child route to its parent section", () => {
-    expect(getBreadcrumb("/ui/search-tools/")).toEqual({ section: "AI Gateway", title: "Search Tools" });
+    expect(getBreadcrumb("/ui/search-tools/", navT)).toEqual({ section: "AI 网关", title: "搜索工具" });
   });
 
   it("resolves router-settings under the Settings section", () => {
-    expect(getBreadcrumb("/ui/router-settings")).toEqual({ section: "Settings", title: "Router Settings" });
+    expect(getBreadcrumb("/ui/router-settings", navT)).toEqual({ section: "设置", title: "路由设置" });
   });
 
   it("falls back to a prettified title with no section for unknown routes", () => {
-    expect(getBreadcrumb("/ui/some-unknown-page")).toEqual({ section: null, title: "Some Unknown Page" });
+    expect(getBreadcrumb("/ui/some-unknown-page", navT)).toEqual({ section: null, title: "Some Unknown Page" });
+  });
+
+  it("keeps the hardcoded English labels when no translator is injected", () => {
+    expect(getBreadcrumb("/ui/api-keys")).toEqual({ section: "AI Gateway", title: "Virtual Keys" });
   });
 });

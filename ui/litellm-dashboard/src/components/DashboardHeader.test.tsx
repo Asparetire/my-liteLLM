@@ -39,22 +39,22 @@ describe("DashboardHeader breadcrumb", () => {
     state.pathname = "/ui/models-and-endpoints";
     render(<DashboardHeader />);
 
-    expect(screen.getByText("Models + Endpoints")).toBeInTheDocument();
+    expect(screen.getByText("模型与端点")).toBeInTheDocument();
   });
 
   it("titles the dashboard root as Virtual Keys", () => {
     state.pathname = "/ui/";
     render(<DashboardHeader />);
 
-    expect(screen.getByText("Virtual Keys")).toBeInTheDocument();
+    expect(screen.getByText("虚拟密钥")).toBeInTheDocument();
   });
 
   it("roots the breadcrumb in the AI Gateway selector (with a Chat option) and drops the static section crumb when the selector is available", async () => {
     state.enableChatUI = true;
     render(<DashboardHeader />);
 
-    expect(screen.getByText("Logs")).toBeInTheDocument();
-    expect(screen.queryByText("Observability")).not.toBeInTheDocument();
+    expect(screen.getByText("日志")).toBeInTheDocument();
+    expect(screen.queryByText("可观测")).not.toBeInTheDocument();
 
     const selector = screen.getByRole("button", { name: /AI Gateway/i });
     act(() => {
@@ -67,8 +67,8 @@ describe("DashboardHeader breadcrumb", () => {
     render(<DashboardHeader />);
 
     expect(screen.getByRole("button", { name: /AI Gateway/i })).toBeInTheDocument();
-    expect(screen.getByText("Logs")).toBeInTheDocument();
-    expect(screen.queryByText("Observability")).not.toBeInTheDocument();
+    expect(screen.getByText("日志")).toBeInTheDocument();
+    expect(screen.queryByText("可观测")).not.toBeInTheDocument();
   });
 
   it("styles Docs with the shared product-link class instead of a muted toolbar button", () => {

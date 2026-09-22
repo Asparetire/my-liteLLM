@@ -45,10 +45,10 @@ vi.mock("../../../common_components/DeleteResourceModal", () => ({
           </div>
         ))}
         <button onClick={onCancel} disabled={confirmLoading}>
-          Cancel
+          取消
         </button>
         <button onClick={onOk} disabled={confirmLoading}>
-          Delete
+          删除
         </button>
       </div>
     );
@@ -211,7 +211,7 @@ describe("Fallbacks", () => {
       expect(screen.getByTestId("delete-modal")).toBeInTheDocument();
     });
 
-    const confirmButton = screen.getByRole("button", { name: /delete/i });
+    const confirmButton = screen.getByRole("button", { name: "删除" });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -239,7 +239,7 @@ describe("Fallbacks", () => {
       expect(screen.getByTestId("delete-modal")).toBeInTheDocument();
     });
 
-    const cancelButton = screen.getByRole("button", { name: /cancel/i });
+    const cancelButton = screen.getByRole("button", { name: "取消" });
     await user.click(cancelButton);
 
     await waitFor(() => {
@@ -266,7 +266,7 @@ describe("Fallbacks", () => {
       expect(screen.getByTestId("delete-modal")).toBeInTheDocument();
     });
 
-    const confirmButton = screen.getByRole("button", { name: /delete/i });
+    const confirmButton = screen.getByRole("button", { name: "删除" });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -293,7 +293,7 @@ describe("Fallbacks", () => {
       expect(screen.getByTestId("delete-modal")).toBeInTheDocument();
     });
 
-    const confirmButton = screen.getByRole("button", { name: /delete/i });
+    const confirmButton = screen.getByRole("button", { name: "删除" });
     await user.click(confirmButton);
 
     await waitFor(() => {

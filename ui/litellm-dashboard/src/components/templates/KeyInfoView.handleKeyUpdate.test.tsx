@@ -273,8 +273,8 @@ describe("KeyInfoView handleKeyUpdate guardrails guard", () => {
       />,
     );
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       guardrails: ["gr-1", "gr-2"],
@@ -298,8 +298,8 @@ describe("KeyInfoView handleKeyUpdate guardrails guard", () => {
   it("should preserve guardrails & prompts for non-premium users with write access role (e.g. Admin)", async () => {
     renderView(false); // premiumUser = false, userRole = "Admin"
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       guardrails: ["gr-1"],
@@ -322,8 +322,8 @@ describe("KeyInfoView handleKeyUpdate guardrails guard", () => {
   it("should preserve guardrails & prompts for premium users and includes metadata.guardrails", async () => {
     renderView(true); // premiumUser = true
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       guardrails: ["gr-1"],
@@ -348,8 +348,8 @@ describe("KeyInfoView handleKeyUpdate mcp_toolsets", () => {
   it("should forward the toolsets the edit form supplies into object_permission", async () => {
     renderView(true);
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       max_budget: 40000,
@@ -370,8 +370,8 @@ describe("KeyInfoView handleKeyUpdate skills", () => {
   it("should forward the skills the edit form supplies into object_permission and drop the form key", async () => {
     renderView(true);
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       skills: ["private-skill"],
@@ -389,8 +389,8 @@ describe("KeyInfoView handleKeyUpdate skills", () => {
   it("should send an explicit empty skills list when the form clears every skill", async () => {
     renderView(true);
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       skills: [],
@@ -409,8 +409,8 @@ describe("KeyInfoView handleKeyUpdate budget_duration", () => {
   it("should send a canonical budget_duration through unchanged", async () => {
     renderView(true);
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       budget_duration: "30d",
@@ -427,8 +427,8 @@ describe("KeyInfoView handleKeyUpdate budget_duration", () => {
   it("should heal a legacy word-form budget_duration to canonical", async () => {
     renderView(true);
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       budget_duration: "monthly",
@@ -445,8 +445,8 @@ describe("KeyInfoView handleKeyUpdate budget_duration", () => {
   it("should forward a cleared budget_duration as an explicit null the JSON body keeps", async () => {
     renderView(true);
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       budget_duration: null,
@@ -488,10 +488,10 @@ describe("KeyInfoView handleKeyUpdate budget_duration", () => {
       />,
     );
 
-    fireEvent.click(screen.getByText("Settings"));
-    expect(screen.getByTestId("budget-reset-value")).toHaveTextContent("Every 30d");
+    fireEvent.click(screen.getByText("设置"));
+    expect(screen.getByTestId("budget-reset-value")).toHaveTextContent("每 30d");
 
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       budget_duration: null,
@@ -500,7 +500,7 @@ describe("KeyInfoView handleKeyUpdate budget_duration", () => {
     fireEvent.click(screen.getByText("Mock Submit"));
 
     await waitFor(() => {
-      expect(screen.getByTestId("budget-reset-value")).toHaveTextContent("Never");
+      expect(screen.getByTestId("budget-reset-value")).toHaveTextContent("从未");
     });
   });
 });
@@ -510,8 +510,8 @@ describe("KeyInfoView handleKeyUpdate empty strings", () => {
     it(`maps empty strings to null for ${limit}`, async () => {
       renderView(true); // premiumUser = true
 
-      fireEvent.click(screen.getByText("Settings"));
-      fireEvent.click(screen.getByText("Edit Settings"));
+      fireEvent.click(screen.getByText("设置"));
+      fireEvent.click(screen.getByText("编辑设置"));
       (globalThis as any).__TEST_FORM_VALUES = {
         token: "tok_123",
         [limit]: "",
@@ -559,8 +559,8 @@ describe("KeyInfoView handleKeyUpdate soft_budget", () => {
   it("should send a changed soft_budget as a number", async () => {
     renderWithSoftBudget(null);
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       soft_budget: "25",
@@ -577,8 +577,8 @@ describe("KeyInfoView handleKeyUpdate soft_budget", () => {
   it("should omit an unchanged soft_budget so unrelated edits skip the budget gate", async () => {
     renderWithSoftBudget(25);
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       soft_budget: 25,
@@ -596,8 +596,8 @@ describe("KeyInfoView handleKeyUpdate soft_budget", () => {
   it("should forward a cleared soft_budget as an explicit null the JSON body keeps", async () => {
     renderWithSoftBudget(25);
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       soft_budget: "",
@@ -615,8 +615,8 @@ describe("KeyInfoView handleKeyUpdate soft_budget", () => {
   it("should reject an overflowing soft_budget instead of silently clearing it", async () => {
     renderWithSoftBudget(25);
 
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Edit Settings"));
+    fireEvent.click(screen.getByText("设置"));
+    fireEvent.click(screen.getByText("编辑设置"));
     (globalThis as any).__TEST_FORM_VALUES = {
       token: "tok_123",
       soft_budget: "1e309",

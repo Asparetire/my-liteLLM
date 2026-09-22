@@ -396,12 +396,12 @@ it("renders KeyInfoView when the URL has ?key= for a key on the current page, wi
   renderWithProviders(<VirtualKeysTable />, { searchParams: { key: mockKey.token }, onUrlUpdate });
 
   await waitFor(() => {
-    expect(screen.getByText("Back to Keys")).toBeInTheDocument();
+    expect(screen.getByText("返回密钥列表")).toBeInTheDocument();
   });
   expect(screen.queryByTestId("pagination-range")).not.toBeInTheDocument();
   expect(mockUseKeyInfo).toHaveBeenLastCalledWith(mockKey.token, { enabled: false });
 
-  fireEvent.click(screen.getByText("Back to Keys"));
+  fireEvent.click(screen.getByText("返回密钥列表"));
 
   await waitFor(() => {
     expect(lastKeyParam(onUrlUpdate)).toBeNull();
@@ -419,7 +419,7 @@ it("repoints ?key= to the rotated hash once the regenerate dialog is dismissed",
   const onUrlUpdate = vi.fn<OnUrlUpdateFunction>();
   renderWithProviders(<VirtualKeysTable />, { searchParams: { key: mockKey.token }, onUrlUpdate });
 
-  await user.click(await screen.findByRole("button", { name: /regenerate key/i }));
+  await user.click(await screen.findByRole("button", { name: /重新生成密钥/ }));
   await user.click(await screen.findByRole("button", { name: /^Regenerate$/ }));
   expect(await screen.findAllByText("sk-rotated-plaintext")).not.toHaveLength(0);
   expect(lastKeyParam(onUrlUpdate)).toBeUndefined();
@@ -440,7 +440,7 @@ it("fetches the key by id when the URL has ?key= for a key not in the loaded pag
   renderWithProviders(<VirtualKeysTable />, { searchParams: { key: "other-key-hash" } });
 
   await waitFor(() => {
-    expect(screen.getByText("Back to Keys")).toBeInTheDocument();
+    expect(screen.getByText("返回密钥列表")).toBeInTheDocument();
   });
   expect(mockUseKeyInfo).toHaveBeenLastCalledWith("other-key-hash", { enabled: true });
   expect(screen.getAllByText("Fetched Key Alias").length).toBeGreaterThan(0);
@@ -459,7 +459,7 @@ it("shows 'Key not found' when the deep-linked key fails to load", async () => {
   renderWithProviders(<VirtualKeysTable />, { searchParams: { key: "missing-key-hash" } });
 
   await waitFor(() => {
-    expect(screen.getByText("Key not found")).toBeInTheDocument();
+    expect(screen.getByText("未找到密钥")).toBeInTheDocument();
   });
 });
 

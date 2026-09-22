@@ -267,7 +267,7 @@ describe("UserInfoView", () => {
 
     // The DeleteResourceModal's OK button has text "Delete" - find it within the modal
     const modal = screen.getByRole("dialog", { name: "Remove from Team" });
-    const deleteConfirmButton = within(modal).getByRole("button", { name: /delete/i });
+    const deleteConfirmButton = within(modal).getByRole("button", { name: "删除" });
     await user.click(deleteConfirmButton);
 
     await waitFor(() => {

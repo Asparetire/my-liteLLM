@@ -42,7 +42,7 @@ describe("PageHeader", () => {
       />,
     );
 
-    const controls = screen.getByRole("group", { name: "Page controls" });
+    const controls = screen.getByRole("group", { name: "页面控件" });
     expect(controls).toHaveClass("mt-5", "h-9");
     expect(within(controls).getByRole("separator")).toHaveClass("mx-4", "h-6");
     expect(controls).toHaveTextContent("Create TeamYour TeamsRefresh");

@@ -422,15 +422,33 @@ const prettify = (key: string): string =>
 
 const labelText = (item: MenuItem): string => (typeof item.label === "string" ? item.label : prettify(item.key));
 
+// Shape of next-intl's translator; injected by callers because these helpers are
+// pure functions outside React. Without one, the hardcoded English labels are used.
+export interface NavTranslator {
+  (key: string): string;
+  has: (key: string) => boolean;
+}
+
 // Breadcrumb ("Section" / "Page") for the top bar, derived from the same nav config.
-export const getBreadcrumb = (pathname: string): { section: string | null; title: string } => {
+export const getBreadcrumb = (pathname: string, t?: NavTranslator): { section: string | null; title: string } => {
   const route = routeForPathname(pathname);
+  const sectionOf = (groupLabel: string): string => {
+    if (t) {
+      const key = GROUP_LABEL_KEYS[groupLabel];
+      if (key !== undefined && t.has(key)) return t(key);
+    }
+    return SECTION_DISPLAY[groupLabel] ?? groupLabel;
+  };
+  const titleOf = (item: MenuItem): string => {
+    if (t && typeof item.label === "string" && t.has(item.key)) return t(item.key);
+    return labelText(item);
+  };
   for (const group of menuGroups) {
     for (const item of group.items) {
-      const section = SECTION_DISPLAY[group.groupLabel] ?? group.groupLabel;
-      if (routeOf(item) === route) return { section, title: labelText(item) };
+      const section = sectionOf(group.groupLabel);
+      if (routeOf(item) === route) return { section, title: titleOf(item) };
       const child = item.children?.find((c) => routeOf(c) === route);
-      if (child) return { section, title: labelText(child) };
+      if (child) return { section, title: titleOf(child) };
     }
   }
   return { section: null, title: prettify(route) };
@@ -465,6 +483,11 @@ const Sidebar_: React.FC<SidebarProps> = ({
     const key = GROUP_LABEL_KEYS[groupLabel];
     return key !== undefined && t.has(key) ? t(key) : groupLabel;
   };
+
+  // Collapsed-rail tooltip: same lookup as labelFor but always yields a string
+  // (JSX-labelled items fall back to prettify, which has no message key).
+  const titleFor = (item: MenuItem): string =>
+    typeof item.label === "string" && t.has(item.key) ? t(item.key) : labelText(item);
 
   const baseUrl = getProxyBaseUrl();
   const version = healthData?.litellm_version;
@@ -563,7 +586,7 @@ const Sidebar_: React.FC<SidebarProps> = ({
           href={item.external_url}
           target="_blank"
           rel="noopener noreferrer"
-          title={collapsed ? labelText(item) : undefined}
+          title={collapsed ? titleFor(item) : undefined}
           data-active={active || undefined}
           className={cn(sidebarMenuButtonVariants({ isActive: active, size }))}
         >
@@ -578,7 +601,7 @@ const Sidebar_: React.FC<SidebarProps> = ({
       <Link
         key={item.key}
         href={uiHref(routeOf(item))}
-        title={collapsed ? labelText(item) : undefined}
+        title={collapsed ? titleFor(item) : undefined}
         data-active={active || undefined}
         className={cn(sidebarMenuButtonVariants({ isActive: active, size }))}
       >
@@ -602,7 +625,7 @@ const Sidebar_: React.FC<SidebarProps> = ({
           isActive={active}
           aria-expanded={open}
           onClick={() => toggleGroup(item.key)}
-          title={collapsed ? labelText(item) : undefined}
+          title={collapsed ? titleFor(item) : undefined}
         >
           {item.icon}
           <span className="flex-1 truncate group-data-[collapsed=true]/sidebar:hidden">{labelFor(item)}</span>

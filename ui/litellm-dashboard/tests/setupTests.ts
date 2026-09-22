@@ -132,23 +132,37 @@ vi.mock("next-intl", async (importOriginal) => {
     return typeof current === "string" ? current : undefined;
   };
 
+  type MessageParams = Record<string, unknown>;
+
+  const interpolate = (template: string, params?: MessageParams): string =>
+    params
+      ? template.replace(/\{(\w+)\}/g, (match, name: string) =>
+          params[name] !== undefined ? String(params[name]) : match,
+        )
+      : template;
+
   const createTranslator = (namespace: string) => {
-    const resolve = (key: string): string => {
+    const resolve = (key: string, params?: MessageParams): string => {
       const fullKey = namespace ? `${namespace}.${key}` : key;
-      return resolveMessage(zhCN, fullKey) ?? resolveMessage(en, fullKey) ?? fullKey;
+      const template = resolveMessage(zhCN, fullKey) ?? resolveMessage(en, fullKey) ?? fullKey;
+      return interpolate(template, params);
     };
-    const translator = ((key: string) => resolve(key)) as ((key: string) => string) & {
+    const translator = ((key: string, params?: MessageParams) => resolve(key, params)) as ((
+      key: string,
+      params?: MessageParams,
+    ) => string) & {
       has: (key: string) => boolean;
-      rich: (key: string) => string;
-      markup: (key: string) => string;
+      rich: (key: string, params?: MessageParams) => string;
+      markup: (key: string, params?: MessageParams) => string;
     };
     translator.has = (key: string) => {
       const fullKey = namespace ? `${namespace}.${key}` : key;
       return resolveMessage(zhCN, fullKey) !== undefined || resolveMessage(en, fullKey) !== undefined;
     };
-    // Test suites only assert plain strings; rich/markup drop their tag chunks.
-    translator.rich = (key: string) => resolve(key);
-    translator.markup = (key: string) => resolve(key);
+    // Test suites assert plain strings: interpolation applies {params} and rich/markup
+    // strip their <tag> wrappers while keeping the chunk text between them.
+    translator.rich = (key: string, params?: MessageParams) => resolve(key, params).replace(/<\/?[a-zA-Z][^>]*>/g, "");
+    translator.markup = (key: string, params?: MessageParams) => resolve(key, params).replace(/<\/?[a-zA-Z][^>]*>/g, "");
     return translator;
   };
 

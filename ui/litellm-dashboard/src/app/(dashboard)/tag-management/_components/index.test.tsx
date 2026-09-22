@@ -84,7 +84,7 @@ describe("TagManagement delete flow", () => {
     expect(await screen.findByText("Tag Information")).toBeInTheDocument();
     expect(screen.getByText("test-tag")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /delete/i }));
+    await user.click(screen.getByRole("button", { name: "删除" }));
 
     expect(mockTagDeleteCall).toHaveBeenCalledWith("sk-test", "test-tag");
   });
@@ -97,7 +97,7 @@ describe("TagManagement delete flow", () => {
     await user.click(screen.getByTestId("mock-delete-trigger"));
     await screen.findByText("Tag Information");
 
-    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await user.click(screen.getByRole("button", { name: "取消" }));
 
     expect(mockTagDeleteCall).not.toHaveBeenCalled();
   });

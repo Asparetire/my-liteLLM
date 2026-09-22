@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 
 import { ToolbarSeparator } from "./ToolbarSeparator";
 
@@ -19,6 +20,7 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ title, subtitle, icon, primaryAction, tabs, utilities }: PageHeaderProps) {
+  const t = useTranslations("common");
   const leadingControls =
     primaryAction == null ? null : (
       <div className="flex h-9 items-center">
@@ -46,7 +48,7 @@ export function PageHeader({ title, subtitle, icon, primaryAction, tabs, utiliti
         <div className="mt-5">{tabs({ leadingControls, utilities: utilityControls })}</div>
       ) : (
         hasControlRow && (
-          <div className="mt-5 flex h-9 items-center" role="group" aria-label="Page controls">
+          <div className="mt-5 flex h-9 items-center" role="group" aria-label={t("pageControls")}>
             {leadingControls}
             {tabs}
             {utilityControls != null && <div className="ml-auto">{utilityControls}</div>}

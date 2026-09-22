@@ -174,7 +174,7 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
     // Budgets are token counts now, so a fractional budget renders as the
     // rounded whole-token count followed by "tokens".
     await waitFor(() => {
-      expect(screen.getByText(/of 0 tokens/)).toBeInTheDocument();
+      expect(screen.getByText(/共 0 tokens/)).toBeInTheDocument();
     });
     expect(screen.queryByText(/of \$/)).not.toBeInTheDocument();
   });
@@ -190,7 +190,7 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByText(/of 100 tokens/)).toBeInTheDocument();
+      expect(screen.getByText(/共 100 tokens/)).toBeInTheDocument();
     });
   });
 
@@ -239,7 +239,7 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByText(/of Unlimited/)).toBeInTheDocument();
+      expect(screen.getByText(/共 Unlimited/)).toBeInTheDocument();
     });
   });
 
@@ -258,9 +258,9 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByText(/of Unlimited/)).toBeInTheDocument();
+      expect(screen.getByText(/共 Unlimited/)).toBeInTheDocument();
     });
-    expect(screen.queryByText(/of 1,200 tokens/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/共 1,200 tokens/)).not.toBeInTheDocument();
     expect(screen.queryByText(/\(Team: Test Budget/)).not.toBeInTheDocument();
     await userEvent.setup().hover(screen.getByLabelText("question-circle"));
     expect(screen.getByTestId("inherited-budget-hint")).toHaveTextContent("Team Test Budget: 1,200 tokens / 30d");
@@ -282,7 +282,7 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByText(/of Unlimited/)).toBeInTheDocument();
+      expect(screen.getByText(/共 Unlimited/)).toBeInTheDocument();
     });
     await userEvent.setup().hover(screen.getByLabelText("question-circle"));
     expect(screen.getByTestId("inherited-budget-hint")).toHaveTextContent("Organization Acme Org: 5,000 tokens");
@@ -304,7 +304,7 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByText(/of Unlimited/)).toBeInTheDocument();
+      expect(screen.getByText(/共 Unlimited/)).toBeInTheDocument();
     });
     expect(screen.queryByLabelText("question-circle")).not.toBeInTheDocument();
   });
@@ -324,7 +324,7 @@ describe("KeyInfoView overview budget display (LIT-2845)", () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByText(/of 25 tokens/)).toBeInTheDocument();
+      expect(screen.getByText(/共 25 tokens/)).toBeInTheDocument();
     });
     expect(screen.queryByLabelText("question-circle")).not.toBeInTheDocument();
   });
@@ -355,7 +355,7 @@ describe("KeyInfoView budget reset visibility", () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByText(/^Resets Jul 22, 2026/)).toBeInTheDocument();
+      expect(screen.getByText(/^2026年7月22日/)).toBeInTheDocument();
     });
   });
 
@@ -370,9 +370,9 @@ describe("KeyInfoView budget reset visibility", () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByText(/of 0 tokens/)).toBeInTheDocument();
+      expect(screen.getByText(/共 0 tokens/)).toBeInTheDocument();
     });
-    expect(screen.queryByText(/^Resets /)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^2026年7月22日/)).not.toBeInTheDocument();
   });
 
   it("shows the duration and next reset in the Settings tab", async () => {
@@ -386,13 +386,13 @@ describe("KeyInfoView budget reset visibility", () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "Settings" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "设置" })).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByRole("tab", { name: "Settings" }));
+    fireEvent.click(screen.getByRole("tab", { name: "设置" }));
     await waitFor(() => {
-      expect(screen.getByText("Budget Reset")).toBeInTheDocument();
+      expect(screen.getByText("预算重置")).toBeInTheDocument();
     });
-    expect(screen.getByText(/Every 1d, next Jul 22, 2026/)).toBeInTheDocument();
+    expect(screen.getByText(/每 1d，下次 2026年7月22日/)).toBeInTheDocument();
   });
 
   it("shows 'Never' in the Settings tab when no reset is scheduled", async () => {
@@ -406,12 +406,12 @@ describe("KeyInfoView budget reset visibility", () => {
       />,
     );
     await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "Settings" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "设置" })).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByRole("tab", { name: "Settings" }));
+    fireEvent.click(screen.getByRole("tab", { name: "设置" }));
     await waitFor(() => {
-      expect(screen.getByText("Budget Reset")).toBeInTheDocument();
+      expect(screen.getByText("预算重置")).toBeInTheDocument();
     });
-    expect(screen.getByTestId("budget-reset-value")).toHaveTextContent("Never");
+    expect(screen.getByTestId("budget-reset-value")).toHaveTextContent("从未");
   });
 });

@@ -84,7 +84,7 @@ describe("DeleteResourceModal", () => {
   it("should call onCancel when cancel button is clicked", async () => {
     const user = userEvent.setup();
     renderWithProviders(<DeleteResourceModal {...defaultProps} />);
-    const cancelButton = screen.getByRole("button", { name: "Cancel" });
+    const cancelButton = screen.getByRole("button", { name: "取消" });
     await user.click(cancelButton);
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
@@ -92,14 +92,14 @@ describe("DeleteResourceModal", () => {
   it("should call onOk when delete button is clicked", async () => {
     const user = userEvent.setup();
     renderWithProviders(<DeleteResourceModal {...defaultProps} />);
-    const deleteButton = screen.getByRole("button", { name: /delete/i });
+    const deleteButton = screen.getByRole("button", { name: "删除" });
     await user.click(deleteButton);
     expect(mockOnOk).toHaveBeenCalledTimes(1);
   });
 
   it("should disable delete button when requiredConfirmation is not entered", () => {
     renderWithProviders(<DeleteResourceModal {...defaultProps} requiredConfirmation="DELETE" />);
-    const deleteButton = screen.getByRole("button", { name: /delete/i });
+    const deleteButton = screen.getByRole("button", { name: "删除" });
     expect(deleteButton).toBeDisabled();
   });
 
@@ -108,7 +108,7 @@ describe("DeleteResourceModal", () => {
     renderWithProviders(<DeleteResourceModal {...defaultProps} requiredConfirmation="DELETE" />);
     const input = screen.getByPlaceholderText("DELETE");
     fireEvent.change(input, { target: { value: "DELET" } });
-    const deleteButton = screen.getByRole("button", { name: /delete/i });
+    const deleteButton = screen.getByRole("button", { name: "删除" });
     expect(deleteButton).toBeDisabled();
   });
 
@@ -117,7 +117,7 @@ describe("DeleteResourceModal", () => {
     renderWithProviders(<DeleteResourceModal {...defaultProps} requiredConfirmation="DELETE" />);
     const input = screen.getByPlaceholderText("DELETE");
     fireEvent.change(input, { target: { value: "DELETE" } });
-    const deleteButton = screen.getByRole("button", { name: /delete/i });
+    const deleteButton = screen.getByRole("button", { name: "删除" });
     expect(deleteButton).toBeEnabled();
   });
 
@@ -137,25 +137,25 @@ describe("DeleteResourceModal", () => {
 
   it("should display deleting text on delete button when confirmLoading is true", () => {
     renderWithProviders(<DeleteResourceModal {...defaultProps} confirmLoading={true} />);
-    expect(screen.getByText("Deleting...")).toBeInTheDocument();
+    expect(screen.getByText("删除中...")).toBeInTheDocument();
   });
 
   it("should display delete text on delete button when confirmLoading is false", () => {
     renderWithProviders(<DeleteResourceModal {...defaultProps} confirmLoading={false} />);
-    const deleteButton = screen.getByRole("button", { name: /delete/i });
+    const deleteButton = screen.getByRole("button", { name: "删除" });
     expect(deleteButton).toBeInTheDocument();
-    expect(screen.queryByText("Deleting...")).not.toBeInTheDocument();
+    expect(screen.queryByText("删除中...")).not.toBeInTheDocument();
   });
 
   it("should disable delete button when confirmLoading is true", () => {
     renderWithProviders(<DeleteResourceModal {...defaultProps} confirmLoading={true} />);
-    const deleteButton = screen.getByText("Deleting...").closest("button");
+    const deleteButton = screen.getByText("删除中...").closest("button");
     expect(deleteButton).toBeDisabled();
   });
 
   it("should disable cancel button when confirmLoading is true", () => {
     renderWithProviders(<DeleteResourceModal {...defaultProps} confirmLoading={true} />);
-    const cancelButton = screen.getByRole("button", { name: "Cancel" });
+    const cancelButton = screen.getByRole("button", { name: "取消" });
     expect(cancelButton).toBeDisabled();
   });
 
@@ -178,15 +178,17 @@ describe("DeleteResourceModal", () => {
     renderWithProviders(<DeleteResourceModal {...defaultProps} confirmLoading={true} requiredConfirmation="DELETE" />);
     const input = screen.getByPlaceholderText("DELETE");
     fireEvent.change(input, { target: { value: "DELETE" } });
-    const deleteButton = screen.getByText("Deleting...").closest("button");
+    const deleteButton = screen.getByText("删除中...").closest("button");
     expect(deleteButton).toBeDisabled();
   });
 
   it("should render required confirmation prompt with correct text", () => {
     renderWithProviders(<DeleteResourceModal {...defaultProps} requiredConfirmation="DELETE" />);
-    expect(screen.getByText(/Type/i)).toBeInTheDocument();
-    expect(screen.getByText("DELETE")).toBeInTheDocument();
-    expect(screen.getByText(/to confirm deletion/i)).toBeInTheDocument();
+    // The rich-text message interpolates the confirmation word between its prefix and suffix,
+    // so the sentence is asserted as the paragraph's full text content.
+    expect(
+      screen.getByText((_, element) => element?.tagName === "P" && element.textContent === "输入 DELETE 以确认删除："),
+    ).toBeInTheDocument();
   });
 
   it("should not render required confirmation section when not provided", () => {
