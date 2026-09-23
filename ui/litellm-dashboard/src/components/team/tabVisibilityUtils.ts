@@ -12,15 +12,6 @@ export const TEAM_INFO_TAB_KEYS = {
   SETTINGS: "settings",
 } as const;
 
-export const TEAM_INFO_TAB_LABELS: Record<string, string> = {
-  [TEAM_INFO_TAB_KEYS.OVERVIEW]: "Overview",
-  [TEAM_INFO_TAB_KEYS.MY_USER]: "My User",
-  [TEAM_INFO_TAB_KEYS.VIRTUAL_KEYS]: "Virtual Keys",
-  [TEAM_INFO_TAB_KEYS.MEMBERS]: "Members",
-  [TEAM_INFO_TAB_KEYS.MEMBER_PERMISSIONS]: "Member Permissions",
-  [TEAM_INFO_TAB_KEYS.SETTINGS]: "Settings",
-};
-
 /**
  * teamInfo namespace keys for each tab label. Components resolve these
  * through useTranslations("teamInfo") to render the active locale.
