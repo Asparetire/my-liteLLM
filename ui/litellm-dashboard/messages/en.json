@@ -601,6 +601,19 @@
     "narrowDownKeys": "Narrow down keys for {team}",
     "thisTeam": "this team",
     "filterByUserId": "Filter by user ID…",
-    "enterKeyId": "Enter Key ID…"
+    "enterKeyId": "Enter Key ID…",
+    "colTeamName": "Team Name",
+    "colMembers": "Members",
+    "membersCount": "{count} members",
+    "noDescription": "No description available",
+    "colActions": "Actions",
+    "joinTeam": "Join team",
+    "openTeamActions": "Open team actions",
+    "noAvailableTeams": "No available teams to join",
+    "availableTeamsHint": "See how to set available teams ",
+    "docsLink": "here",
+    "loadingAvailableTeams": "Loading available teams…",
+    "joinSuccess": "Successfully joined team",
+    "joinError": "Failed to join team"
   }
 }

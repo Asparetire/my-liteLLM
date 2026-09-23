@@ -31,9 +31,9 @@ describe("AvailableTeamsPanel", () => {
     renderWithProviders(<AvailableTeamsPanel accessToken="token-123" userID="user-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText("Team Name")).toBeInTheDocument();
+      expect(screen.getByText("团队名称")).toBeInTheDocument();
     });
-    expect(screen.getByText("Models")).toBeInTheDocument();
+    expect(screen.getByText("模型")).toBeInTheDocument();
   });
 
   it("should display teams when available", async () => {
@@ -58,9 +58,9 @@ describe("AvailableTeamsPanel", () => {
     renderWithProviders(<AvailableTeamsPanel accessToken="token-123" userID="user-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText(/No available teams to join/i)).toBeInTheDocument();
+      expect(screen.getByText(/没有可加入的团队/)).toBeInTheDocument();
     });
-    expect(screen.getByText(/See how to set available teams/i)).toBeInTheDocument();
+    expect(screen.getByText(/了解如何设置可用团队/)).toBeInTheDocument();
   });
 
   it("should call teamMemberAddCall when the Join team menu item is clicked", async () => {
@@ -106,7 +106,7 @@ describe("AvailableTeamsPanel", () => {
     renderWithProviders(<AvailableTeamsPanel accessToken={null} userID="user-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText(/No available teams to join/i)).toBeInTheDocument();
+      expect(screen.getByText(/没有可加入的团队/)).toBeInTheDocument();
     });
     expect(networking.availableTeamListCall).not.toHaveBeenCalled();
   });
@@ -120,14 +120,14 @@ describe("AvailableTeamsPanel", () => {
 
     renderWithProviders(<AvailableTeamsPanel accessToken="token-123" userID="user-123" />);
 
-    expect(screen.queryByText(/No available teams to join/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/没有可加入的团队/)).not.toBeInTheDocument();
 
     await act(async () => {
       resolveFetch([]);
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/No available teams to join/i)).toBeInTheDocument();
+      expect(screen.getByText(/没有可加入的团队/)).toBeInTheDocument();
     });
   });
 });

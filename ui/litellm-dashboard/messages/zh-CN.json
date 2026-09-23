@@ -601,6 +601,19 @@
     "narrowDownKeys": "筛选 {team} 的密钥",
     "thisTeam": "该团队",
     "filterByUserId": "按用户 ID 筛选…",
-    "enterKeyId": "输入密钥 ID…"
+    "enterKeyId": "输入密钥 ID…",
+    "colTeamName": "团队名称",
+    "colMembers": "成员",
+    "membersCount": "{count} 名成员",
+    "noDescription": "暂无描述",
+    "colActions": "操作",
+    "joinTeam": "加入团队",
+    "openTeamActions": "打开团队操作菜单",
+    "noAvailableTeams": "没有可加入的团队",
+    "availableTeamsHint": "了解如何设置可用团队，参见",
+    "docsLink": "此处",
+    "loadingAvailableTeams": "正在加载可用团队…",
+    "joinSuccess": "成功加入团队",
+    "joinError": "加入团队失败"
   }
 }

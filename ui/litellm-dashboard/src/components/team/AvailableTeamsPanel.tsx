@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { availableTeamListCall, teamMemberAddCall } from "@/components/networking";
+import { useTranslations } from "next-intl";
 import { toast } from "@/lib/toast";
 
 import AvailableTeamsTable from "./AvailableTeamsTable";
@@ -12,6 +13,7 @@ interface AvailableTeamsProps {
 }
 
 const AvailableTeamsPanel: React.FC<AvailableTeamsProps> = ({ accessToken, userID }) => {
+  const t = useTranslations("teamInfo");
   const [availableTeams, setAvailableTeams] = useState<AvailableTeam[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -54,11 +56,11 @@ const AvailableTeamsPanel: React.FC<AvailableTeamsProps> = ({ accessToken, userI
         role: "user",
       });
 
-      toast.success("Successfully joined team");
+      toast.success(t("joinSuccess"));
       setAvailableTeams((teams) => teams.filter((team) => team.team_id !== teamId));
     } catch (error) {
       console.error("Error joining team:", error);
-      toast.fromError("Failed to join team");
+      toast.fromError(t("joinError"));
     }
   };
 
