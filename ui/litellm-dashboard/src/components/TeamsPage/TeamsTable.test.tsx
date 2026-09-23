@@ -119,22 +119,22 @@ it("renders a team row with alias, organization, and spend/budget", async () => 
 it("renders the Resources cell with member, model, and key counts", () => {
   renderTable();
 
-  expect(screen.getByTitle("2 members")).toBeInTheDocument();
-  expect(screen.getByTitle("4 models")).toBeInTheDocument();
-  expect(screen.getByTitle("3 keys")).toBeInTheDocument();
+  expect(screen.getByTitle("2 名成员")).toBeInTheDocument();
+  expect(screen.getByTitle("4 个模型")).toBeInTheDocument();
+  expect(screen.getByTitle("3 个密钥")).toBeInTheDocument();
 });
 
 it("shows 'No teams found' when the list is empty", () => {
   mockUseTeamsTable.mockReturnValue(teamsResult([]));
   renderTable();
-  expect(screen.getByText("No teams found")).toBeInTheDocument();
+  expect(screen.getByText("未找到团队")).toBeInTheDocument();
 });
 
 it("shows a loading state on initial load and hides the data", () => {
   mockUseTeamsTable.mockReturnValue(teamsResult([], {}, { data: null, isPending: true, isFetching: true }));
   renderTable();
 
-  expect(screen.getByText("Loading teams...")).toBeInTheDocument();
+  expect(screen.getByText("正在加载团队...")).toBeInTheDocument();
   expect(screen.queryByText("Acme Team")).not.toBeInTheDocument();
 });
 
@@ -142,7 +142,7 @@ it("replaces the previous rows with the loading state while a new search is pend
   mockUseTeamsTable.mockReturnValue(teamsResult([mockTeam], {}, { isPlaceholderData: true, isFetching: true }));
   renderTable();
 
-  expect(screen.getByText("Loading teams...")).toBeInTheDocument();
+  expect(screen.getByText("正在加载团队...")).toBeInTheDocument();
   expect(screen.queryByText("Acme Team")).not.toBeInTheDocument();
 });
 
@@ -154,7 +154,7 @@ describe("sort contract – only backend-sortable columns are sortable", () => {
 
   it("sorts by the backend team_alias field (not the label) when the Team header is clicked", async () => {
     renderTable();
-    fireEvent.click(screen.getByText("Team").closest("button") as HTMLElement);
+    fireEvent.click(screen.getByText("团队").closest("button") as HTMLElement);
 
     await waitFor(() => {
       expect(mockUseTeamsTable).toHaveBeenLastCalledWith(1, 50, expect.objectContaining({ sortBy: "team_alias" }));
@@ -163,10 +163,10 @@ describe("sort contract – only backend-sortable columns are sortable", () => {
 
   it("does not make Spend / Budget sortable (the backend rejects sort_by=spend)", () => {
     renderTable();
-    expect(screen.queryByText("Spend / Budget").closest("button")).toBeNull();
+    expect(screen.queryByText("消费 / 预算").closest("button")).toBeNull();
     // Team and Created are the only sortable headers.
-    expect(screen.getByText("Team").closest("button")).not.toBeNull();
-    expect(screen.getByText("Created").closest("button")).not.toBeNull();
+    expect(screen.getByText("团队").closest("button")).not.toBeNull();
+    expect(screen.getByText("创建时间").closest("button")).not.toBeNull();
   });
 });
 
@@ -180,7 +180,7 @@ describe("server-side filtering maps controls to the right query params", () => 
     renderTable();
     openFilters();
 
-    fireEvent.change(await screen.findByPlaceholderText(/Enter team alias/), { target: { value: "acme" } });
+    fireEvent.change(await screen.findByPlaceholderText(/输入团队别名/), { target: { value: "acme" } });
     fireEvent.click(screen.getByTestId("filter-drawer-apply"));
 
     await waitFor(() => {
@@ -192,7 +192,7 @@ describe("server-side filtering maps controls to the right query params", () => 
     renderTable();
     openFilters();
 
-    fireEvent.change(await screen.findByPlaceholderText(/Enter team ID/), { target: { value: "team-xyz" } });
+    fireEvent.change(await screen.findByPlaceholderText(/输入团队 ID/), { target: { value: "team-xyz" } });
     fireEvent.click(screen.getByTestId("filter-drawer-apply"));
 
     await waitFor(() => {
@@ -252,10 +252,10 @@ describe("row actions", () => {
 
     await user.click(screen.getByTestId("team-actions-team-1"));
 
-    await user.click(await screen.findByText("Edit team"));
+    await user.click(await screen.findByText("编辑团队"));
     expect(onEditTeam).toHaveBeenCalledWith(expect.objectContaining({ team_id: "team-1" }));
 
-    await chooseSelectOption(user, screen.getByTestId("team-actions-team-1"), "Delete team", "menuitem");
+    await chooseSelectOption(user, screen.getByTestId("team-actions-team-1"), "删除团队", "menuitem");
     expect(onDeleteTeam).toHaveBeenCalledWith(expect.objectContaining({ team_id: "team-1" }));
   });
 
@@ -265,9 +265,9 @@ describe("row actions", () => {
 
     await user.click(screen.getByTestId("team-actions-team-1"));
 
-    expect(await screen.findByText("Copy team ID")).toBeInTheDocument();
-    expect(screen.queryByText("Edit team")).not.toBeInTheDocument();
-    expect(screen.queryByText("Delete team")).not.toBeInTheDocument();
+    expect(await screen.findByText("复制团队 ID")).toBeInTheDocument();
+    expect(screen.queryByText("编辑团队")).not.toBeInTheDocument();
+    expect(screen.queryByText("删除团队")).not.toBeInTheDocument();
   });
 });
 
@@ -341,7 +341,7 @@ describe("column rendering details", () => {
     mockUseTeamsTable.mockReturnValue(teamsResult([{ ...mockTeam, organization_id: null as unknown as string }]));
     renderTable();
     expect(screen.getByText("—")).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /organization/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /组织/ })).not.toBeInTheDocument();
   });
 
   it("falls back to keys.length when keys_count is absent", () => {
@@ -355,7 +355,7 @@ describe("column rendering details", () => {
       ]),
     );
     renderTable();
-    expect(screen.getByTitle("2 keys")).toBeInTheDocument();
+    expect(screen.getByTitle("2 个密钥")).toBeInTheDocument();
   });
 });
 
@@ -364,11 +364,11 @@ describe("hidden-by-default columns", () => {
     const user = userEvent.setup();
     renderTable();
 
-    expect(screen.queryByText("Rate Limits")).not.toBeInTheDocument();
+    expect(screen.queryByText("速率限制")).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Columns" }));
     const menu = await screen.findByRole("menu");
-    expect(within(menu).getByText("Rate Limits")).toBeInTheDocument();
-    expect(within(menu).getByText("Updated")).toBeInTheDocument();
+    expect(within(menu).getByText("速率限制")).toBeInTheDocument();
+    expect(within(menu).getByText("更新时间")).toBeInTheDocument();
   });
 });
