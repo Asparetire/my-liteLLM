@@ -62,19 +62,19 @@ describe("BulkEditUserModal", () => {
   it("should render without crashing", () => {
     renderWithProviders(<BulkEditUserModal {...defaultProps} />);
 
-    expect(screen.getByText(`Bulk Edit ${defaultProps.selectedUsers.length} User(s)`)).toBeInTheDocument();
+    expect(screen.getByText(`批量编辑 ${defaultProps.selectedUsers.length} 个用户`)).toBeInTheDocument();
   });
 
   it("should display modal title with correct user count", () => {
     renderWithProviders(<BulkEditUserModal {...defaultProps} />);
 
-    expect(screen.getByText("Bulk Edit 2 User(s)")).toBeInTheDocument();
+    expect(screen.getByText("批量编辑 2 个用户")).toBeInTheDocument();
   });
 
   it("should display selected users table when modal is open", () => {
     renderWithProviders(<BulkEditUserModal {...defaultProps} />);
 
-    expect(screen.getByText("Selected Users (2):")).toBeInTheDocument();
+    expect(screen.getByText("已选用户（2）：")).toBeInTheDocument();
     expect(screen.getByText("user1")).toBeInTheDocument();
     expect(screen.getByText("user2")).toBeInTheDocument();
     expect(screen.getByText("user1@example.com")).toBeInTheDocument();
@@ -109,66 +109,66 @@ describe("BulkEditUserModal", () => {
   it("should show update all users checkbox when allowAllUsers is true", () => {
     renderWithProviders(<BulkEditUserModal {...defaultProps} allowAllUsers={true} />);
 
-    expect(screen.getByRole("checkbox", { name: /update all users/i })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: /更新系统中的所有用户/ })).toBeInTheDocument();
   });
 
   it("should not show update all users checkbox when allowAllUsers is false", () => {
     renderWithProviders(<BulkEditUserModal {...defaultProps} allowAllUsers={false} />);
 
-    expect(screen.queryByRole("checkbox", { name: /update all users/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("checkbox", { name: /更新系统中的所有用户/ })).not.toBeInTheDocument();
   });
 
   it("should toggle update all users mode", async () => {
     const user = userEvent.setup();
     renderWithProviders(<BulkEditUserModal {...defaultProps} allowAllUsers={true} />);
 
-    const checkbox = screen.getByRole("checkbox", { name: /update all users/i });
+    const checkbox = screen.getByRole("checkbox", { name: /更新系统中的所有用户/ });
     expect(checkbox).not.toBeChecked();
 
     await user.click(checkbox);
 
     expect(checkbox).toBeChecked();
-    expect(screen.getByText("Bulk Edit All Users")).toBeInTheDocument();
+    expect(screen.getByText("批量编辑全部用户")).toBeInTheDocument();
   });
 
   it("should show warning message when update all users is enabled", async () => {
     const user = userEvent.setup();
     renderWithProviders(<BulkEditUserModal {...defaultProps} allowAllUsers={true} />);
 
-    const checkbox = screen.getByRole("checkbox", { name: /update all users/i });
+    const checkbox = screen.getByRole("checkbox", { name: /更新系统中的所有用户/ });
     await user.click(checkbox);
 
-    expect(screen.getByText(/this will apply changes to all users/i)).toBeInTheDocument();
+    expect(screen.getByText(/此操作将对系统中的所有用户生效/)).toBeInTheDocument();
   });
 
   it("should hide selected users table when update all users is enabled", async () => {
     const user = userEvent.setup();
     renderWithProviders(<BulkEditUserModal {...defaultProps} allowAllUsers={true} />);
 
-    expect(screen.getByText("Selected Users (2):")).toBeInTheDocument();
+    expect(screen.getByText("已选用户（2）：")).toBeInTheDocument();
 
-    const checkbox = screen.getByRole("checkbox", { name: /update all users/i });
+    const checkbox = screen.getByRole("checkbox", { name: /更新系统中的所有用户/ });
     await user.click(checkbox);
 
-    expect(screen.queryByText("Selected Users (2):")).not.toBeInTheDocument();
+    expect(screen.queryByText("已选用户（2）：")).not.toBeInTheDocument();
   });
 
   it("should display team management section", () => {
     renderWithProviders(<BulkEditUserModal {...defaultProps} />);
 
-    expect(screen.getByText("Team Management")).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: /add selected users to teams/i })).toBeInTheDocument();
+    expect(screen.getByText("团队管理")).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: /将选中的用户添加到团队/ })).toBeInTheDocument();
   });
 
   it("should show team budget input when add to teams is checked", async () => {
     const user = userEvent.setup();
     renderWithProviders(<BulkEditUserModal {...defaultProps} />);
 
-    const addToTeamsCheckbox = screen.getByRole("checkbox", { name: /add selected users to teams/i });
+    const addToTeamsCheckbox = screen.getByRole("checkbox", { name: /将选中的用户添加到团队/ });
     await user.click(addToTeamsCheckbox);
 
-    expect(screen.getByText("Team Budget (Optional):")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Max budget per user in team")).toBeInTheDocument();
+    expect(screen.getByText("团队预算（可选）：")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("团队内每个用户的最大预算")).toBeInTheDocument();
   });
 
   it("should render UserEditView component", () => {
@@ -185,7 +185,7 @@ describe("BulkEditUserModal", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(toast.fromError).toHaveBeenCalledWith("Access token not found");
+      expect(toast.fromError).toHaveBeenCalledWith("未找到访问令牌");
     });
   });
 
@@ -208,7 +208,7 @@ describe("BulkEditUserModal", () => {
     const user = userEvent.setup();
     renderWithProviders(<BulkEditUserModal {...defaultProps} allowAllUsers={true} />);
 
-    const updateAllCheckbox = screen.getByRole("checkbox", { name: /update all users/i });
+    const updateAllCheckbox = screen.getByRole("checkbox", { name: /更新系统中的所有用户/ });
     await user.click(updateAllCheckbox);
 
     const submitButton = screen.getByRole("button", { name: "Submit" });
@@ -239,7 +239,7 @@ describe("BulkEditUserModal", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(toast.success).toHaveBeenCalledWith("Updated 2 user(s)");
+      expect(toast.success).toHaveBeenCalledWith("已更新 2 个用户");
     });
   });
 
@@ -254,14 +254,14 @@ describe("BulkEditUserModal", () => {
 
     renderWithProviders(<BulkEditUserModal {...defaultProps} allowAllUsers={true} />);
 
-    const updateAllCheckbox = screen.getByRole("checkbox", { name: /update all users/i });
+    const updateAllCheckbox = screen.getByRole("checkbox", { name: /更新系统中的所有用户/ });
     await user.click(updateAllCheckbox);
 
     const submitButton = screen.getByRole("button", { name: "Submit" });
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(toast.success).toHaveBeenCalledWith("Updated all users (100 total)");
+      expect(toast.success).toHaveBeenCalledWith("已更新全部用户（共 100 个）");
     });
   });
 
@@ -275,7 +275,7 @@ describe("BulkEditUserModal", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(toast.fromError).toHaveBeenCalledWith("Failed to perform bulk operations");
+      expect(toast.fromError).toHaveBeenCalledWith("执行批量操作失败");
     });
   });
 
@@ -315,7 +315,7 @@ describe("BulkEditUserModal", () => {
 
     renderWithProviders(<BulkEditUserModal {...propsWithoutEmail} />);
 
-    expect(screen.getByText("No email")).toBeInTheDocument();
+    expect(screen.getByText("无邮箱")).toBeInTheDocument();
   });
 
   it("should display role label from possibleUIRoles when available", () => {

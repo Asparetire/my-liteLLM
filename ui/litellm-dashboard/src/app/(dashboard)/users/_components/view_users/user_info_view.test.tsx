@@ -112,7 +112,7 @@ describe("UserInfoView", () => {
   it("should render the loading state", () => {
     render(<UserInfoView {...defaultProps} />);
 
-    expect(screen.getByText("Loading user data...")).toBeInTheDocument();
+    expect(screen.getByText("正在加载用户数据...")).toBeInTheDocument();
   });
 
   it("should render the user email after loading", async () => {
@@ -120,7 +120,7 @@ describe("UserInfoView", () => {
 
     const emails = await screen.findAllByText("test@example.com");
     expect(emails.length).toBeGreaterThan(0);
-    expect(screen.queryByText("Loading user data...")).not.toBeInTheDocument();
+    expect(screen.queryByText("正在加载用户数据...")).not.toBeInTheDocument();
   });
 
   it("should render the user alias after loading", async () => {
@@ -140,7 +140,7 @@ describe("UserInfoView", () => {
     render(<UserInfoView {...defaultProps} />);
 
     expect(await screen.findByText("99 tokens")).toBeInTheDocument();
-    expect(screen.getByText("of 3,000,000 tokens")).toBeInTheDocument();
+    expect(screen.getByText("共 3,000,000 tokens")).toBeInTheDocument();
   });
 
   it("should render teams in a table with team names", async () => {
@@ -172,7 +172,7 @@ describe("UserInfoView", () => {
     render(<UserInfoView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText("No teams")).toBeInTheDocument();
+      expect(screen.getByText("无团队")).toBeInTheDocument();
     });
   });
 
@@ -180,7 +180,7 @@ describe("UserInfoView", () => {
     render(<UserInfoView {...defaultProps} userRole="proxy_admin" />);
 
     await waitFor(() => {
-      expect(screen.getByText("Add Team")).toBeInTheDocument();
+      expect(screen.getByText("添加团队")).toBeInTheDocument();
     });
   });
 
@@ -190,7 +190,7 @@ describe("UserInfoView", () => {
     await waitFor(() => {
       expect(screen.getByText("Alpha Team")).toBeInTheDocument();
     });
-    expect(screen.queryByText("Add Team")).not.toBeInTheDocument();
+    expect(screen.queryByText("添加团队")).not.toBeInTheDocument();
   });
 
   it("should show delete buttons for proxy admins", async () => {
@@ -200,7 +200,7 @@ describe("UserInfoView", () => {
       expect(screen.getByText("Alpha Team")).toBeInTheDocument();
     });
     // Should have the Actions column header
-    expect(screen.getByText("Actions")).toBeInTheDocument();
+    expect(screen.getByText("操作")).toBeInTheDocument();
   });
 
   it("should not show delete buttons for non-proxy-admins", async () => {
@@ -209,7 +209,7 @@ describe("UserInfoView", () => {
     await waitFor(() => {
       expect(screen.getByText("Alpha Team")).toBeInTheDocument();
     });
-    expect(screen.queryByText("Actions")).not.toBeInTheDocument();
+    expect(screen.queryByText("操作")).not.toBeInTheDocument();
   });
 
   it("should open the add team modal when Add Team is clicked", async () => {
@@ -217,13 +217,13 @@ describe("UserInfoView", () => {
     render(<UserInfoView {...defaultProps} userRole="proxy_admin" />);
 
     await waitFor(() => {
-      expect(screen.getByText("Add Team")).toBeInTheDocument();
+      expect(screen.getByText("添加团队")).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText("Add Team"));
+    await user.click(screen.getByText("添加团队"));
 
     await waitFor(() => {
-      expect(screen.getByText("Add User to Team")).toBeInTheDocument();
+      expect(screen.getByText("添加用户到团队")).toBeInTheDocument();
     });
     expect(mockTeamListCall).toHaveBeenCalledWith("test-token", null);
   });
@@ -242,8 +242,8 @@ describe("UserInfoView", () => {
     await user.click(deleteButton);
 
     await waitFor(() => {
-      expect(screen.getByText("Remove from Team")).toBeInTheDocument();
-      expect(screen.getByText(/Removing this user from the team will also delete any keys/)).toBeInTheDocument();
+      expect(screen.getByText("从团队移除")).toBeInTheDocument();
+      expect(screen.getByText(/将该用户从团队移除的同时，会删除其为该团队创建的所有密钥/)).toBeInTheDocument();
     });
   });
 
@@ -262,11 +262,11 @@ describe("UserInfoView", () => {
 
     // Confirm deletion
     await waitFor(() => {
-      expect(screen.getByText("Remove from Team")).toBeInTheDocument();
+      expect(screen.getByText("从团队移除")).toBeInTheDocument();
     });
 
     // The DeleteResourceModal's OK button has text "Delete" - find it within the modal
-    const modal = screen.getByRole("dialog", { name: "Remove from Team" });
+    const modal = screen.getByRole("dialog", { name: "从团队移除" });
     const deleteConfirmButton = within(modal).getByRole("button", { name: "删除" });
     await user.click(deleteConfirmButton);
 
@@ -285,9 +285,9 @@ describe("UserInfoView", () => {
     await user.click(await screen.findByText("GitHub MCP (srv-1)"));
     expect(await screen.findByText("list_issues")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("tab", { name: "Overview" }));
-    expect(await screen.findByText(/of 100 tokens/)).toBeVisible();
-    await user.click(screen.getByRole("tab", { name: "Details" }));
+    await user.click(screen.getByRole("tab", { name: "总览" }));
+    expect(await screen.findByText(/共 100 tokens/)).toBeVisible();
+    await user.click(screen.getByRole("tab", { name: "详情" }));
 
     expect(screen.getByText("list_issues")).toBeVisible();
   });
@@ -298,7 +298,7 @@ describe("UserInfoView", () => {
       render(<UserInfoView {...defaultProps} userRole="proxy_admin" initialTab={1} />);
 
       await waitFor(() => {
-        expect(screen.getByText("MCP Permissions")).toBeInTheDocument();
+        expect(screen.getByText("MCP 权限")).toBeInTheDocument();
       });
 
       const grantedServer = await screen.findByText("GitHub MCP (srv-1)");
@@ -314,7 +314,7 @@ describe("UserInfoView", () => {
       const user = userEvent.setup();
       render(<UserInfoView {...defaultProps} userRole="proxy_admin" initialTab={1} startInEditMode />);
 
-      const saveButton = await screen.findByText("Save Changes");
+      const saveButton = await screen.findByText("保存更改");
       await user.click(saveButton);
 
       await waitFor(() => {
@@ -341,7 +341,7 @@ describe("UserInfoView", () => {
       const user = userEvent.setup();
       render(<UserInfoView {...defaultProps} userRole="proxy_admin" initialTab={1} startInEditMode />);
 
-      await screen.findByText("Save Changes");
+      await screen.findByText("保存更改");
       await waitFor(() => {
         expect(mockListMCPTools).toHaveBeenCalledWith("test-token", "srv-1");
       });
@@ -350,7 +350,7 @@ describe("UserInfoView", () => {
       });
 
       await user.click(screen.getByRole("button", { name: "Deselect All" }));
-      await user.click(screen.getByText("Save Changes"));
+      await user.click(screen.getByText("保存更改"));
 
       await waitFor(() => {
         expect(mockUserUpdateUserCall).toHaveBeenCalledTimes(1);
@@ -372,7 +372,7 @@ describe("UserInfoView", () => {
       });
       render(<UserInfoView {...defaultProps} userRole="proxy_admin" initialTab={1} startInEditMode />);
 
-      const saveButton = await screen.findByText("Save Changes");
+      const saveButton = await screen.findByText("保存更改");
       await user.click(saveButton);
 
       await waitFor(() => {
@@ -390,7 +390,7 @@ describe("UserInfoView", () => {
       const user = userEvent.setup();
       render(<UserInfoView {...defaultProps} userRole="Internal User" initialTab={1} startInEditMode />);
 
-      const saveButton = await screen.findByText("Save Changes");
+      const saveButton = await screen.findByText("保存更改");
       await user.click(saveButton);
 
       await waitFor(() => {

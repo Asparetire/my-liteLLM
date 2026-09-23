@@ -110,13 +110,13 @@ describe("UserInfoView add-to-team form", () => {
   const openAddTeam = async (user: ReturnType<typeof userEvent.setup>, anchorTeam = "Alpha Team") => {
     render(<UserInfoView {...defaultProps} />);
     await screen.findByText(anchorTeam);
-    await user.click(screen.getByText("Add Team"));
-    await screen.findByText("Add User to Team");
+    await user.click(screen.getByText("添加团队"));
+    await screen.findByText("添加用户到团队");
   };
 
   const teamField = () => screen.getAllByRole("combobox")[0];
   const roleField = () => screen.getAllByRole("combobox")[1];
-  const submitButton = () => screen.getByRole("button", { name: /Add to Team|Adding\.\.\./i });
+  const submitButton = () => screen.getByRole("button", { name: /添加到团队|正在添加\.\.\./ });
 
   const chooseTeam = async (user: ReturnType<typeof userEvent.setup>, alias: string) => {
     await user.click(teamField());
@@ -135,7 +135,7 @@ describe("UserInfoView add-to-team form", () => {
     };
 
     const openEditor = async (user: ReturnType<typeof userEvent.setup>) => {
-      await user.click(await screen.findByRole("button", { name: /edit settings/i }));
+      await user.click(await screen.findByRole("button", { name: /编辑设置/ }));
       return screen.findByPlaceholderText("Max spend (tokens)");
     };
 
@@ -152,7 +152,7 @@ describe("UserInfoView add-to-team form", () => {
       render(<UserInfoView {...budgetProps} />);
 
       fireEvent.change(await openEditor(user), { target: { value: "42" } });
-      await user.click(screen.getByRole("button", { name: /save changes/i }));
+      await user.click(screen.getByRole("button", { name: /保存更改/ }));
 
       await waitFor(() => {
         expect(mockUserUpdateUserCall).toHaveBeenCalled();
@@ -169,13 +169,13 @@ describe("UserInfoView add-to-team form", () => {
       render(<UserInfoView {...budgetProps} />);
 
       await openEditor(user);
-      await user.click(screen.getByRole("checkbox", { name: "Unlimited Budget" }));
-      await user.click(screen.getByRole("button", { name: /save changes/i }));
+      await user.click(screen.getByRole("checkbox", { name: "预算不限" }));
+      await user.click(screen.getByRole("button", { name: /保存更改/ }));
 
       await waitFor(() => expect(mockUserUpdateUserCall).toHaveBeenCalled());
       expect(mockUserUpdateUserCall.mock.calls[0][1]).toMatchObject({ max_budget: null });
       await openEditor(user);
-      expect(screen.getByRole("checkbox", { name: "Unlimited Budget" })).toBeChecked();
+      expect(screen.getByRole("checkbox", { name: "预算不限" })).toBeChecked();
     });
 
     it("should keep a cleared reset period after saving and reopening the user", async () => {
@@ -183,14 +183,14 @@ describe("UserInfoView add-to-team form", () => {
       render(<UserInfoView {...budgetProps} />);
 
       await openEditor(user);
-      await user.click(screen.getByRole("combobox", { name: "Reset Budget" }));
+      await user.click(screen.getByRole("combobox", { name: "预算重置" }));
       await user.click(await screen.findByRole("option", { name: "n/a" }));
-      await user.click(screen.getByRole("button", { name: /save changes/i }));
+      await user.click(screen.getByRole("button", { name: /保存更改/ }));
 
       await waitFor(() => expect(mockUserUpdateUserCall).toHaveBeenCalled());
       expect(mockUserUpdateUserCall.mock.calls[0][1]).toMatchObject({ budget_duration: null });
       await openEditor(user);
-      expect(screen.getByRole("combobox", { name: "Reset Budget" })).toHaveTextContent("n/a");
+      expect(screen.getByRole("combobox", { name: "预算重置" })).toHaveTextContent("n/a");
     });
   });
 
@@ -266,9 +266,9 @@ describe("UserInfoView add-to-team form", () => {
     mockUserGetInfoV2.mockResolvedValue(MOCK_USER_DATA_NO_TEAMS);
     const user = setup();
     render(<UserInfoView {...defaultProps} />);
-    await screen.findByText("Add Team");
-    await user.click(screen.getByText("Add Team"));
-    await screen.findByText("Add User to Team");
+    await screen.findByText("添加团队");
+    await user.click(screen.getByText("添加团队"));
+    await screen.findByText("添加用户到团队");
 
     await user.click(teamField());
     await screen.findByTitle("Alpha Team");
@@ -288,6 +288,6 @@ describe("UserInfoView add-to-team form", () => {
     await user.click(submitButton());
 
     await waitFor(() => expect(mockTeamMemberAddCall).toHaveBeenCalledTimes(1));
-    expect(screen.getByText("Add User to Team")).toBeInTheDocument();
+    expect(screen.getByText("添加用户到团队")).toBeInTheDocument();
   });
 });

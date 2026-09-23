@@ -76,7 +76,7 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /save changes/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /保存更改/ })).toBeInTheDocument();
     });
   });
 
@@ -84,10 +84,10 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText("User ID")).toBeInTheDocument();
+      expect(screen.getByLabelText("用户 ID")).toBeInTheDocument();
     });
 
-    const userIdInput = screen.getByLabelText("User ID");
+    const userIdInput = screen.getByLabelText("用户 ID");
     expect(userIdInput).toBeDisabled();
     expect(userIdInput).toHaveValue("user-123");
   });
@@ -96,20 +96,20 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} isBulkEdit={true} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /save changes/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /保存更改/ })).toBeInTheDocument();
     });
 
-    expect(screen.queryByLabelText("User ID")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("用户 ID")).not.toBeInTheDocument();
   });
 
   it("should display email field when not in bulk edit mode", async () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Email")).toBeInTheDocument();
+      expect(screen.getByLabelText("邮箱")).toBeInTheDocument();
     });
 
-    const emailInput = screen.getByLabelText("Email");
+    const emailInput = screen.getByLabelText("邮箱");
     expect(emailInput).toHaveValue("test@example.com");
   });
 
@@ -117,20 +117,20 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} isBulkEdit={true} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /save changes/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /保存更改/ })).toBeInTheDocument();
     });
 
-    expect(screen.queryByLabelText("Email")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("邮箱")).not.toBeInTheDocument();
   });
 
   it("should display user alias field with initial value", async () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText("User Alias")).toBeInTheDocument();
+      expect(screen.getByLabelText("用户别名")).toBeInTheDocument();
     });
 
-    const aliasInput = screen.getByLabelText("User Alias");
+    const aliasInput = screen.getByLabelText("用户别名");
     expect(aliasInput).toHaveValue("Test User");
   });
 
@@ -138,10 +138,10 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Personal Models")).toBeInTheDocument();
+      expect(screen.getByText("个人模型")).toBeInTheDocument();
     });
 
-    const modelsSelect = screen.getByRole("combobox", { name: /select models/i });
+    const modelsSelect = screen.getByRole("combobox", { name: /选择模型/ });
     expect(modelsSelect).toBeInTheDocument();
   });
 
@@ -149,7 +149,7 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} userRole="user" />);
 
     await waitFor(() => {
-      const modelsSelect = screen.getByRole("combobox", { name: /select models/i });
+      const modelsSelect = screen.getByRole("combobox", { name: /选择模型/ });
       expect(modelsSelect).toBeDisabled();
     });
   });
@@ -158,7 +158,7 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} userRole="Admin" />);
 
     await waitFor(() => {
-      const modelsSelect = screen.getByRole("combobox", { name: /select models/i });
+      const modelsSelect = screen.getByRole("combobox", { name: /选择模型/ });
       expect(modelsSelect).toBeEnabled();
     });
   });
@@ -167,7 +167,7 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Max Budget (tokens)")).toBeInTheDocument();
+      expect(screen.getByText("最大预算（tokens）")).toBeInTheDocument();
     });
   });
 
@@ -175,7 +175,7 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("checkbox", { name: "Unlimited Budget" })).toBeInTheDocument();
+      expect(screen.getByRole("checkbox", { name: "预算不限" })).toBeInTheDocument();
     });
   });
 
@@ -183,15 +183,15 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("spinbutton", { name: /max budget/i })).toBeEnabled();
+      expect(screen.getByRole("spinbutton", { name: /最大预算/ })).toBeEnabled();
     });
 
-    await userEvent.click(screen.getByText("Unlimited Budget"));
+    await userEvent.click(screen.getByText("预算不限"));
 
     await waitFor(() => {
-      expect(screen.getByRole("checkbox", { name: "Unlimited Budget" })).toBeChecked();
+      expect(screen.getByRole("checkbox", { name: "预算不限" })).toBeChecked();
     });
-    expect(screen.getByRole("spinbutton", { name: /max budget/i })).toBeDisabled();
+    expect(screen.getByRole("spinbutton", { name: /最大预算/ })).toBeDisabled();
   });
 
   it("should set unlimited budget checkbox when max_budget is null", async () => {
@@ -206,7 +206,7 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} userData={userDataWithNullBudget} />);
 
     await waitFor(() => {
-      const checkbox = screen.getByRole("checkbox", { name: "Unlimited Budget" });
+      const checkbox = screen.getByRole("checkbox", { name: "预算不限" });
       expect(checkbox).toBeChecked();
     });
   });
@@ -223,7 +223,7 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} userData={userDataWithNullBudget} />);
 
     await waitFor(() => {
-      const budgetInput = screen.getByRole("spinbutton", { name: /max budget/i });
+      const budgetInput = screen.getByRole("spinbutton", { name: /最大预算/ });
       expect(budgetInput).toBeDisabled();
     });
   });
@@ -232,7 +232,7 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      const budgetInput = screen.getByRole("spinbutton", { name: /max budget/i });
+      const budgetInput = screen.getByRole("spinbutton", { name: /最大预算/ });
       expect(budgetInput).toBeEnabled();
     });
   });
@@ -241,14 +241,14 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("checkbox", { name: "Unlimited Budget" })).toBeInTheDocument();
+      expect(screen.getByRole("checkbox", { name: "预算不限" })).toBeInTheDocument();
     });
 
-    const checkbox = screen.getByRole("checkbox", { name: "Unlimited Budget" });
+    const checkbox = screen.getByRole("checkbox", { name: "预算不限" });
     await userEvent.click(checkbox);
 
     await waitFor(() => {
-      const budgetInput = screen.getByRole("spinbutton", { name: /max budget/i });
+      const budgetInput = screen.getByRole("spinbutton", { name: /最大预算/ });
       expect(budgetInput).toHaveValue(null);
     });
   });
@@ -257,10 +257,10 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Metadata")).toBeInTheDocument();
+      expect(screen.getByLabelText("元数据")).toBeInTheDocument();
     });
 
-    const metadataTextarea = screen.getByLabelText("Metadata");
+    const metadataTextarea = screen.getByLabelText("元数据");
     const expectedJson = JSON.stringify(MOCK_USER_DATA.user_info.metadata, null, 2);
     expect(metadataTextarea).toHaveValue(expectedJson);
   });
@@ -277,7 +277,7 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} userData={userDataWithoutMetadata} />);
 
     await waitFor(() => {
-      const metadataTextarea = screen.getByLabelText("Metadata");
+      const metadataTextarea = screen.getByLabelText("元数据");
       expect(metadataTextarea).toHaveValue("");
     });
   });
@@ -287,10 +287,10 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} onCancel={onCancelMock} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /取消/ })).toBeInTheDocument();
     });
 
-    const cancelButton = screen.getByRole("button", { name: /cancel/i });
+    const cancelButton = screen.getByRole("button", { name: /取消/ });
     await userEvent.click(cancelButton);
 
     expect(onCancelMock).toHaveBeenCalledTimes(1);
@@ -301,10 +301,10 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} onSubmit={onSubmitMock} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /save changes/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /保存更改/ })).toBeInTheDocument();
     });
 
-    const submitButton = screen.getByRole("button", { name: /save changes/i });
+    const submitButton = screen.getByRole("button", { name: /保存更改/ });
     await userEvent.click(submitButton);
 
     await waitFor(() => {
@@ -335,10 +335,10 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} userData={userDataWithNullBudget} onSubmit={onSubmitMock} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /save changes/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /保存更改/ })).toBeInTheDocument();
     });
 
-    const submitButton = screen.getByRole("button", { name: /save changes/i });
+    const submitButton = screen.getByRole("button", { name: /保存更改/ });
     await userEvent.click(submitButton);
 
     await waitFor(() => {
@@ -353,20 +353,20 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Max Budget (tokens)")).toBeInTheDocument();
+      expect(screen.getByText("最大预算（tokens）")).toBeInTheDocument();
     });
 
-    const budgetInput = screen.getByRole("spinbutton", { name: /max budget/i });
+    const budgetInput = screen.getByRole("spinbutton", { name: /最大预算/ });
     await userEvent.clear(budgetInput);
 
-    const checkbox = screen.getByRole("checkbox", { name: "Unlimited Budget" });
+    const checkbox = screen.getByRole("checkbox", { name: "预算不限" });
     expect(checkbox).not.toBeChecked();
 
-    const submitButton = screen.getByRole("button", { name: /save changes/i });
+    const submitButton = screen.getByRole("button", { name: /保存更改/ });
     await userEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText("Please enter a budget or select Unlimited Budget")).toBeInTheDocument();
+      expect(screen.getByText(`请输入预算或勾选"预算不限"`)).toBeInTheDocument();
     });
   });
 
@@ -375,17 +375,17 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} onSubmit={onSubmitMock} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("checkbox", { name: "Unlimited Budget" })).toBeInTheDocument();
+      expect(screen.getByRole("checkbox", { name: "预算不限" })).toBeInTheDocument();
     });
 
-    const checkbox = screen.getByRole("checkbox", { name: "Unlimited Budget" });
+    const checkbox = screen.getByRole("checkbox", { name: "预算不限" });
     await userEvent.click(checkbox);
 
     await waitFor(() => {
       expect(checkbox).toBeChecked();
     });
 
-    const submitButton = screen.getByRole("button", { name: /save changes/i });
+    const submitButton = screen.getByRole("button", { name: /保存更改/ });
     await userEvent.click(submitButton);
 
     await waitFor(() => {
@@ -397,7 +397,7 @@ describe("UserEditView", () => {
     const { rerender } = renderWithProviders(<UserEditView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText("User Alias")).toHaveValue("Test User");
+      expect(screen.getByLabelText("用户别名")).toHaveValue("Test User");
     });
 
     const updatedUserData = {
@@ -411,7 +411,7 @@ describe("UserEditView", () => {
     rerender(<UserEditView {...defaultProps} userData={updatedUserData} />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText("User Alias")).toHaveValue("Updated Alias");
+      expect(screen.getByLabelText("用户别名")).toHaveValue("Updated Alias");
     });
   });
 
@@ -427,10 +427,10 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} userData={userDataWithEmptyModels} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /save changes/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /保存更改/ })).toBeInTheDocument();
     });
 
-    const submitButton = screen.getByRole("button", { name: /save changes/i });
+    const submitButton = screen.getByRole("button", { name: /保存更改/ });
     await userEvent.click(submitButton);
 
     await waitFor(() => {
@@ -453,7 +453,7 @@ describe("UserEditView", () => {
     renderWithProviders(<UserEditView {...defaultProps} userData={userDataWithUndefinedBudget} />);
 
     await waitFor(() => {
-      const checkbox = screen.getByRole("checkbox", { name: "Unlimited Budget" });
+      const checkbox = screen.getByRole("checkbox", { name: "预算不限" });
       expect(checkbox).toBeChecked();
     });
   });
@@ -461,7 +461,7 @@ describe("UserEditView", () => {
     const submittedPayload = async (props: Partial<Parameters<typeof UserEditView>[0]> = {}) => {
       const onSubmit = vi.fn();
       renderWithProviders(<UserEditView {...defaultProps} {...props} onSubmit={onSubmit} />);
-      await userEvent.click(await screen.findByRole("button", { name: /save changes/i }));
+      await userEvent.click(await screen.findByRole("button", { name: /保存更改/ }));
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalled();
       });
@@ -530,10 +530,10 @@ describe("UserEditView", () => {
       const onSubmit = vi.fn();
       renderWithProviders(<UserEditView {...defaultProps} onSubmit={onSubmit} />);
 
-      const budgetInput = await screen.findByRole("spinbutton", { name: /max budget/i });
+      const budgetInput = await screen.findByRole("spinbutton", { name: /最大预算/ });
       await userEvent.clear(budgetInput);
       await userEvent.type(budgetInput, "42.57");
-      await userEvent.click(screen.getByRole("button", { name: /save changes/i }));
+      await userEvent.click(screen.getByRole("button", { name: /保存更改/ }));
 
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalled();
@@ -562,7 +562,7 @@ describe("UserEditView", () => {
         />,
       );
 
-      await userEvent.click(await screen.findByRole("button", { name: /save changes/i }));
+      await userEvent.click(await screen.findByRole("button", { name: /保存更改/ }));
 
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalled();
@@ -580,7 +580,7 @@ describe("UserEditView", () => {
     it("should keep the budget input's native step constraint armed", async () => {
       renderWithProviders(<UserEditView {...defaultProps} />);
 
-      const budgetInput = await screen.findByRole("spinbutton", { name: /max budget/i });
+      const budgetInput = await screen.findByRole("spinbutton", { name: /最大预算/ });
       expect(budgetInput).toHaveAttribute("step", "1");
       expect(budgetInput).not.toHaveAttribute("min");
       expect(budgetInput.closest("form")).not.toHaveAttribute("novalidate");
@@ -646,13 +646,13 @@ describe("UserEditView", () => {
       const onSubmit = vi.fn();
       renderWithProviders(<UserEditView {...defaultProps} onSubmit={onSubmit} />);
 
-      const metadata = await screen.findByLabelText("Metadata");
+      const metadata = await screen.findByLabelText("元数据");
       await userEvent.clear(metadata);
       await userEvent.type(metadata, "not json");
-      await userEvent.click(screen.getByRole("button", { name: /save changes/i }));
+      await userEvent.click(screen.getByRole("button", { name: /保存更改/ }));
 
       await waitFor(() => {
-        expect(screen.getByLabelText("Metadata")).toHaveValue("not json");
+        expect(screen.getByLabelText("元数据")).toHaveValue("not json");
       });
       expect(onSubmit).not.toHaveBeenCalled();
     });
@@ -704,7 +704,7 @@ describe("UserEditView", () => {
         expect(aliasRow).toHaveValue(5);
 
         fireEvent.change(canonicalRow, { target: { value: "3" } });
-        await userEvent.click(screen.getByRole("button", { name: /save changes/i }));
+        await userEvent.click(screen.getByRole("button", { name: /保存更改/ }));
 
         await waitFor(() => {
           expect(onSubmit).toHaveBeenCalled();
@@ -759,7 +759,7 @@ describe("UserEditView", () => {
           />,
         );
 
-        await screen.findByRole("button", { name: /save changes/i });
+        await screen.findByRole("button", { name: /保存更改/ });
         expect(screen.queryByPlaceholderText("Max spend (tokens)")).not.toBeInTheDocument();
       });
 
@@ -780,8 +780,8 @@ describe("UserEditView", () => {
       const onSubmit = vi.fn();
       renderWithProviders(<UserEditView {...defaultProps} onSubmit={onSubmit} />);
 
-      await userEvent.clear(await screen.findByLabelText("Metadata"));
-      await userEvent.click(screen.getByRole("button", { name: /save changes/i }));
+      await userEvent.clear(await screen.findByLabelText("元数据"));
+      await userEvent.click(screen.getByRole("button", { name: /保存更改/ }));
 
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalled();

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -71,8 +72,8 @@ interface TeamOption {
 }
 
 const MEMBER_ROLE_OPTIONS = [
-  { value: "user", hint: "Can view team info, but not manage it" },
-  { value: "admin", hint: "Can create team keys, add members, and manage settings" },
+  { value: "user", hintKey: "roleUserHint" },
+  { value: "admin", hintKey: "roleAdminHint" },
 ] as const;
 
 export default function UserInfoView({
@@ -86,6 +87,7 @@ export default function UserInfoView({
   startInEditMode = false,
 }: UserInfoViewProps) {
   const { premiumUser } = useAuthorized();
+  const t = useTranslations("users");
   const [userData, setUserData] = useState<UserInfoV2Response | null>(null);
   const [teamDetails, setTeamDetails] = useState<TeamDisplayInfo[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -150,7 +152,7 @@ export default function UserInfoView({
         setUserModels(availableModels);
       } catch (error) {
         console.error("Error fetching user data:", error);
-        toast.fromError("Failed to fetch user data");
+        toast.fromError(t("fetchUserDataFailed"));
       } finally {
         setIsLoading(false);
       }
@@ -195,7 +197,7 @@ export default function UserInfoView({
         user_id: userId,
       };
       await teamMemberAddCall(accessToken, selectedTeamId, member);
-      toast.success("User added to team successfully");
+      toast.success(t("addToTeamSuccess"));
       setIsAddTeamModalOpen(false);
       // Re-fetch user data to refresh teams
       const data = await userGetInfoV2(accessToken, userId);
@@ -215,7 +217,7 @@ export default function UserInfoView({
       }
     } catch (error: any) {
       console.error("Error adding user to team:", error);
-      toast.fromError(error?.message || "Failed to add user to team");
+      toast.fromError(error?.message || t("addToTeamFailed"));
     } finally {
       setIsAddingTeam(false);
     }
@@ -235,7 +237,7 @@ export default function UserInfoView({
         user_id: userId,
       };
       await teamMemberDeleteCall(accessToken, teamToRemove.team_id, member);
-      toast.success("User removed from team successfully");
+      toast.success(t("removeFromTeamSuccess"));
       setIsRemoveTeamModalOpen(false);
       setTeamToRemove(null);
       // Re-fetch user data to refresh teams
@@ -256,7 +258,7 @@ export default function UserInfoView({
       }
     } catch (error: any) {
       console.error("Error removing user from team:", error);
-      toast.fromError(error?.message || "Failed to remove user from team");
+      toast.fromError(error?.message || t("removeFromTeamFailed"));
     } finally {
       setIsRemovingTeam(false);
     }
@@ -273,16 +275,16 @@ export default function UserInfoView({
 
   const handleResetPassword = async () => {
     if (!accessToken) {
-      toast.fromError("Access token not found");
+      toast.fromError(t("accessTokenMissing"));
       return;
     }
     try {
-      toast.success("Generating password reset link...");
+      toast.success(t("generatingResetLink"));
       const data = await invitationCreateCall(accessToken, userId);
       setInvitationLinkData(data);
       setIsInvitationLinkModalVisible(true);
     } catch (error) {
-      toast.fromError("Failed to generate password reset link");
+      toast.fromError(t("resetLinkFailed"));
     }
   };
 
@@ -291,14 +293,14 @@ export default function UserInfoView({
       if (!accessToken) return;
       setIsDeletingUser(true);
       await userDeleteCall(accessToken, [userId]);
-      toast.success("User deleted successfully");
+      toast.success(t("userDeleted"));
       if (onDelete) {
         onDelete();
       }
       onClose();
     } catch (error) {
       console.error("Error deleting user:", error);
-      toast.fromError("Failed to delete user");
+      toast.fromError(t("deleteUserFailed"));
     } finally {
       setIsDeleteModalOpen(false);
       setIsDeletingUser(false);
@@ -342,11 +344,11 @@ export default function UserInfoView({
           : userData.object_permission,
       });
 
-      toast.success("User updated successfully");
+      toast.success(t("userUpdated"));
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating user:", error);
-      toast.fromError("Failed to update user");
+      toast.fromError(t("updateUserFailed"));
     }
   };
 
@@ -355,9 +357,9 @@ export default function UserInfoView({
       <div className="p-4">
         <Button variant="ghost" onClick={onClose} className="mb-4">
           <ArrowLeft />
-          Back to Users
+          {t("backToUsers")}
         </Button>
-        <p className="text-sm">Loading user data...</p>
+        <p className="text-sm">{t("loadingUser")}</p>
       </div>
     );
   }
@@ -367,9 +369,9 @@ export default function UserInfoView({
       <div className="p-4">
         <Button variant="ghost" onClick={onClose} className="mb-4">
           <ArrowLeft />
-          Back to Users
+          {t("backToUsers")}
         </Button>
-        <p className="text-sm">User not found</p>
+        <p className="text-sm">{t("userNotFound")}</p>
       </div>
     );
   }
@@ -408,9 +410,9 @@ export default function UserInfoView({
         <div>
           <Button variant="ghost" onClick={onClose} className="mb-4">
             <ArrowLeft />
-            Back to Users
+            {t("backToUsers")}
           </Button>
-          <h2 className="text-xl font-semibold">{userData.user_email || "User"}</h2>
+          <h2 className="text-xl font-semibold">{userData.user_email || t("userFallback")}</h2>
           <div className="flex items-center cursor-pointer">
             <span className="text-sm text-muted-foreground font-mono">{userData.user_id}</span>
             <Button
@@ -431,7 +433,7 @@ export default function UserInfoView({
           <div className="flex items-center space-x-2">
             <Button variant="secondary" onClick={handleResetPassword} className="flex items-center">
               <RefreshCw />
-              Reset Password
+              {t("resetPasswordBtn")}
             </Button>
             <Button
               variant="secondary"
@@ -439,7 +441,7 @@ export default function UserInfoView({
               className="flex items-center text-destructive border-destructive hover:bg-destructive/10"
             >
               <Trash2 />
-              Delete User
+              {t("deleteUserBtn")}
             </Button>
           </div>
         )}
@@ -447,18 +449,18 @@ export default function UserInfoView({
 
       <DeleteResourceModal
         isOpen={isDeleteModalOpen}
-        title="Delete User?"
-        message="Are you sure you want to delete this user? This action cannot be undone."
-        resourceInformationTitle="User Information"
+        title={t("deleteTitle")}
+        message={t("deleteMessage")}
+        resourceInformationTitle={t("userInfoTitle")}
         resourceInformation={[
-          { label: "Email", value: userData.user_email },
-          { label: "User ID", value: userData.user_id, code: true },
+          { label: t("labelEmail"), value: userData.user_email },
+          { label: t("labelUserId"), value: userData.user_id, code: true },
           {
-            label: "Global Proxy Role",
+            label: t("labelGlobalRole"),
             value: (userData.user_role && possibleUIRoles?.[userData.user_role]?.ui_label) || userData.user_role || "-",
           },
           {
-            label: "Total Spend (tokens)",
+            label: t("labelTotalSpend"),
             value:
               userData.spend !== null && userData.spend !== undefined && userData.spend > 0
                 ? getSpendString(userData.spend)
@@ -473,10 +475,10 @@ export default function UserInfoView({
       <Tabs value={activeTab} onValueChange={(v: unknown) => setActiveTab(String(v))} className="gap-0">
         <TabsList variant="line" className="mb-4">
           <TabsTrigger value="overview" className="flex-none data-active:text-primary after:bg-primary">
-            Overview
+            {t("tabOverview")}
           </TabsTrigger>
           <TabsTrigger value="details" className="flex-none data-active:text-primary after:bg-primary">
-            Details
+            {t("tabDetails")}
           </TabsTrigger>
         </TabsList>
 
@@ -484,25 +486,27 @@ export default function UserInfoView({
         <TabsContent value="overview" keepMounted>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="block p-6">
-              <p>Spend</p>
+              <p>{t("spendCard")}</p>
               <div className="mt-2">
                 <h3 className="text-lg font-medium">{getSpendString(userData.spend)}</h3>
                 <p>
-                  of{" "}
-                  {userData.max_budget !== null
-                    ? `${formatNumberWithCommas(userData.max_budget, 0)} tokens`
-                    : "Unlimited"}
+                  {t("ofBudget", {
+                    tokens:
+                      userData.max_budget !== null
+                        ? `${formatNumberWithCommas(userData.max_budget, 0)} tokens`
+                        : "Unlimited",
+                  })}
                 </p>
               </div>
             </Card>
 
             <Card className="block p-6">
               <div className="flex justify-between items-center mb-2">
-                <p>Teams</p>
+                <p>{t("teamsCard")}</p>
                 {isProxyAdmin && (
                   <Button variant="ghost" size="sm" onClick={handleOpenAddTeamModal}>
                     <Plus />
-                    Add Team
+                    {t("addTeamBtn")}
                   </Button>
                 )}
               </div>
@@ -512,8 +516,8 @@ export default function UserInfoView({
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Team Name</TableHead>
-                          {isProxyAdmin && <TableHead className="text-right">Actions</TableHead>}
+                          <TableHead>{t("colTeamName")}</TableHead>
+                          {isProxyAdmin && <TableHead className="text-right">{t("colActions")}</TableHead>}
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -529,7 +533,7 @@ export default function UserInfoView({
                                 <Button
                                   variant="ghost"
                                   size="icon-sm"
-                                  aria-label={`Remove from ${team.team_alias || team.team_id}`}
+                                  aria-label={t("removeFromTeamAria", { name: team.team_alias || team.team_id })}
                                   onClick={() => handleOpenRemoveTeamModal(team)}
                                   className="text-destructive"
                                 >
@@ -543,28 +547,28 @@ export default function UserInfoView({
                     </Table>
                   </div>
                 ) : (
-                  <p>No teams</p>
+                  <p>{t("noTeams")}</p>
                 )}
                 {!isTeamsExpanded && teamDetails.length > 20 && (
                   <Button variant="ghost" size="sm" className="mt-2" onClick={() => setIsTeamsExpanded(true)}>
-                    +{teamDetails.length - 20} more
+                    {t("moreTeams", { count: teamDetails.length - 20 })}
                   </Button>
                 )}
                 {isTeamsExpanded && teamDetails.length > 20 && (
                   <Button variant="ghost" size="sm" className="mt-2" onClick={() => setIsTeamsExpanded(false)}>
-                    Show Less
+                    {t("showLess")}
                   </Button>
                 )}
               </div>
             </Card>
 
             <Card className="block p-6">
-              <p>Personal Models</p>
+              <p>{t("personalModels")}</p>
               <div className="mt-2">
                 {userData.models?.length && userData.models?.length > 0 ? (
                   userData.models?.map((model, index) => <p key={index}>{model}</p>)
                 ) : (
-                  <p>All proxy models</p>
+                  <p>{t("allProxyModels")}</p>
                 )}
               </div>
             </Card>
@@ -575,9 +579,9 @@ export default function UserInfoView({
         <TabsContent value="details" keepMounted>
           <Card className="block p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium">User Settings</h3>
+              <h3 className="text-lg font-medium">{t("userSettingsTitle")}</h3>
               {!isEditing && userRole && rolesWithWriteAccess.includes(userRole) && (
-                <Button onClick={() => setIsEditing(true)}>Edit Settings</Button>
+                <Button onClick={() => setIsEditing(true)}>{t("editSettings")}</Button>
               )}
             </div>
 
@@ -598,7 +602,7 @@ export default function UserInfoView({
             ) : (
               <div className="space-y-4">
                 <div>
-                  <p className="font-medium">User ID</p>
+                  <p className="font-medium">{t("labelUserId")}</p>
                   <div className="flex items-center cursor-pointer">
                     <span className="font-mono">{userData.user_id}</span>
                     <Button
@@ -617,32 +621,32 @@ export default function UserInfoView({
                 </div>
 
                 <div>
-                  <p className="font-medium">Email</p>
-                  <p>{userData.user_email || "Not Set"}</p>
+                  <p className="font-medium">{t("labelEmail")}</p>
+                  <p>{userData.user_email || t("notSet")}</p>
                 </div>
 
                 <div>
-                  <p className="font-medium">User Alias</p>
-                  <p>{userData.user_alias || "Not Set"}</p>
+                  <p className="font-medium">{t("labelUserAlias")}</p>
+                  <p>{userData.user_alias || t("notSet")}</p>
                 </div>
 
                 <div>
-                  <p className="font-medium">Global Proxy Role</p>
-                  <p>{userData.user_role || "Not Set"}</p>
+                  <p className="font-medium">{t("labelGlobalRole")}</p>
+                  <p>{userData.user_role || t("notSet")}</p>
                 </div>
 
                 <div>
-                  <p className="font-medium">Created</p>
-                  <p>{userData.created_at ? new Date(userData.created_at).toLocaleString() : "Unknown"}</p>
+                  <p className="font-medium">{t("labelCreated")}</p>
+                  <p>{userData.created_at ? new Date(userData.created_at).toLocaleString() : t("unknown")}</p>
                 </div>
 
                 <div>
-                  <p className="font-medium">Last Updated</p>
-                  <p>{userData.updated_at ? new Date(userData.updated_at).toLocaleString() : "Unknown"}</p>
+                  <p className="font-medium">{t("labelUpdated")}</p>
+                  <p>{userData.updated_at ? new Date(userData.updated_at).toLocaleString() : t("unknown")}</p>
                 </div>
 
                 <div>
-                  <p className="font-medium">Personal Models</p>
+                  <p className="font-medium">{t("personalModels")}</p>
                   <div className="flex flex-wrap gap-2 mt-1">
                     {userData.models?.length && userData.models?.length > 0 ? (
                       userData.models?.map((model, index) => (
@@ -651,13 +655,13 @@ export default function UserInfoView({
                         </span>
                       ))
                     ) : (
-                      <p>All proxy models</p>
+                      <p>{t("allProxyModels")}</p>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <p className="font-medium">Max Budget</p>
+                  <p className="font-medium">{t("labelMaxBudget")}</p>
                   <p>
                     {userData.max_budget !== null && userData.max_budget !== undefined
                       ? `${formatNumberWithCommas(userData.max_budget, 0)} tokens`
@@ -666,19 +670,19 @@ export default function UserInfoView({
                 </div>
 
                 <div>
-                  <p className="font-medium">Budget Reset</p>
+                  <p className="font-medium">{t("labelBudgetReset")}</p>
                   <p>{getBudgetDurationLabel(userData.budget_duration ?? null)}</p>
                 </div>
 
                 <div>
-                  <p className="font-medium">Metadata</p>
+                  <p className="font-medium">{t("labelMetadata")}</p>
                   <pre className="bg-muted p-2 rounded-sm text-xs overflow-auto mt-1">
                     {JSON.stringify(userData.metadata || {}, null, 2)}
                   </pre>
                 </div>
 
                 <div>
-                  <p className="font-medium mb-2">MCP Permissions</p>
+                  <p className="font-medium mb-2">{t("mcpPermissions")}</p>
                   <MCPServerPermissions
                     mcpServers={userData.object_permission?.mcp_servers || []}
                     mcpAccessGroups={userData.object_permission?.mcp_access_groups || []}
@@ -703,14 +707,14 @@ export default function UserInfoView({
       {/* Delete Team Member Modal */}
       <DeleteResourceModal
         isOpen={isRemoveTeamModalOpen}
-        title="Remove from Team"
-        alertMessage="Removing this user from the team will also delete any keys the user created for this team."
-        message="Are you sure you want to remove this user from the team? This action cannot be undone."
-        resourceInformationTitle="Team Membership"
+        title={t("removeTeamTitle")}
+        alertMessage={t("removeTeamAlert")}
+        message={t("removeTeamMessage")}
+        resourceInformationTitle={t("removeTeamInfoTitle")}
         resourceInformation={[
-          { label: "Team", value: teamToRemove?.team_alias || teamToRemove?.team_id },
-          { label: "User ID", value: userData?.user_id, code: true },
-          { label: "Email", value: userData?.user_email },
+          { label: t("labelTeam"), value: teamToRemove?.team_alias || teamToRemove?.team_id },
+          { label: t("labelUserId"), value: userData?.user_id, code: true },
+          { label: t("labelEmail"), value: userData?.user_email },
         ]}
         onCancel={handleRemoveTeamCancel}
         onOk={handleRemoveTeamConfirm}
@@ -725,7 +729,7 @@ export default function UserInfoView({
       >
         <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Add User to Team</DialogTitle>
+            <DialogTitle>{t("addTeamModalTitle")}</DialogTitle>
           </DialogHeader>
           <form
             onSubmit={(event) => {
@@ -735,7 +739,7 @@ export default function UserInfoView({
           >
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor={ADD_TEAM_FIELD_ID}>Team</FieldLabel>
+                <FieldLabel htmlFor={ADD_TEAM_FIELD_ID}>{t("teamFieldLabel")}</FieldLabel>
                 <Combobox
                   items={availableTeamsForAdd}
                   value={selectedTeamOption}
@@ -743,9 +747,9 @@ export default function UserInfoView({
                   itemToStringLabel={(team: TeamOption) => team.team_alias}
                   isItemEqualToValue={(team: TeamOption, value: TeamOption) => team.team_id === value.team_id}
                 >
-                  <ComboboxInput id={ADD_TEAM_FIELD_ID} placeholder="Select a team" className="w-full" />
+                  <ComboboxInput id={ADD_TEAM_FIELD_ID} placeholder={t("selectTeamPlaceholder")} className="w-full" />
                   <ComboboxContent>
-                    <ComboboxEmpty>No teams found</ComboboxEmpty>
+                    <ComboboxEmpty>{t("noTeamsFound")}</ComboboxEmpty>
                     <ComboboxList>
                       {(team: TeamOption) => (
                         <ComboboxItem key={team.team_id} value={team} title={team.team_alias}>
@@ -758,7 +762,7 @@ export default function UserInfoView({
               </Field>
 
               <Field>
-                <FieldLabel htmlFor={ADD_TEAM_ROLE_FIELD_ID}>Member Role</FieldLabel>
+                <FieldLabel htmlFor={ADD_TEAM_ROLE_FIELD_ID}>{t("memberRoleLabel")}</FieldLabel>
                 <Select value={selectedRole} onValueChange={(value) => value !== null && setSelectedRole(value)}>
                   <SelectTrigger id={ADD_TEAM_ROLE_FIELD_ID} className="w-full">
                     <SelectValue />
@@ -766,9 +770,9 @@ export default function UserInfoView({
                   <SelectContent>
                     {MEMBER_ROLE_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value} title={option.value}>
-                        <SimpleTooltip content={option.hint}>
+                        <SimpleTooltip content={t(option.hintKey)}>
                           <span className="font-medium">{option.value}</span>
-                          <span className="ml-2 text-muted-foreground text-sm">- {option.hint}</span>
+                          <span className="ml-2 text-muted-foreground text-sm">- {t(option.hintKey)}</span>
                         </SimpleTooltip>
                       </SelectItem>
                     ))}
@@ -779,7 +783,7 @@ export default function UserInfoView({
 
             <div className="text-right mt-4">
               <Button type="submit" disabled={isAddingTeam || !selectedTeamId} aria-busy={isAddingTeam}>
-                {isAddingTeam ? "Adding..." : "Add to Team"}
+                {isAddingTeam ? t("addingBtn") : t("addToTeamBtn")}
               </Button>
             </div>
           </form>
