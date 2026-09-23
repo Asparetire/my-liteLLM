@@ -454,5 +454,21 @@
     "modelsTitle": "{count} models",
     "keysTitle": "{count} keys",
     "updatedNever": "Never"
+  },
+  "deletedTeams": {
+    "enterpriseTitle": "Coming soon to Enterprise",
+    "enterpriseDescription": "Deleted team auditing is graduating from beta into our Enterprise audit & compliance suite.",
+    "loadingDeletedTeams": "Loading deleted teams…",
+    "noDeletedTeams": "No deleted teams found",
+    "noDeletedTeamsHint": "Teams deleted from this proxy will show up here.",
+    "colTeamName": "Team Name",
+    "colTeamId": "Team ID",
+    "colCreated": "Created",
+    "colSpend": "Spend (tokens)",
+    "colBudget": "Budget (tokens)",
+    "colModels": "Models",
+    "colOrganization": "Organization",
+    "colDeletedAt": "Deleted At",
+    "colDeletedBy": "Deleted By"
   }
 }

@@ -7,6 +7,8 @@ import { DateCell, IdCell, IdentityCell, ModelsCell, MoneyCell } from "@/compone
 import { DeletedTeam } from "@/app/(dashboard)/hooks/teams/useTeams";
 import { orgDetailHref, userDetailHref } from "@/utils/entityLinks";
 
+type Translator = (key: string, values?: Record<string, string | number>) => string;
+
 function EntityCell({ value, href }: { value: string | null | undefined; href: string | undefined }) {
   if (!value) {
     return <span className="text-muted-foreground">-</span>;
@@ -18,12 +20,12 @@ function EntityCell({ value, href }: { value: string | null | undefined; href: s
   );
 }
 
-export const getDeletedTeamsTableColumns = (): ColumnDef<DeletedTeam>[] => [
+export const getDeletedTeamsTableColumns = (t: Translator): ColumnDef<DeletedTeam>[] => [
   {
     id: "team_alias",
     accessorKey: "team_alias",
-    meta: { title: "Team Name" },
-    header: "Team Name",
+    meta: { title: t("colTeamName") },
+    header: t("colTeamName"),
     size: 150,
     enableSorting: false,
     cell: ({ row }) => {
@@ -41,8 +43,8 @@ export const getDeletedTeamsTableColumns = (): ColumnDef<DeletedTeam>[] => [
   {
     id: "team_id",
     accessorKey: "team_id",
-    meta: { title: "Team ID" },
-    header: "Team ID",
+    meta: { title: t("colTeamId") },
+    header: t("colTeamId"),
     size: 150,
     enableSorting: false,
     cell: ({ row }) => <IdCell value={row.original.team_id} variant="plain" />,
@@ -50,8 +52,8 @@ export const getDeletedTeamsTableColumns = (): ColumnDef<DeletedTeam>[] => [
   {
     id: "created_at",
     accessorKey: "created_at",
-    meta: { title: "Created" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Created" />,
+    meta: { title: t("colCreated") },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colCreated")} />,
     size: 120,
     enableSorting: true,
     cell: ({ row }) => <DateCell value={row.original.created_at} precision="date" />,
@@ -59,8 +61,8 @@ export const getDeletedTeamsTableColumns = (): ColumnDef<DeletedTeam>[] => [
   {
     id: "spend",
     accessorKey: "spend",
-    meta: { title: "Spend (tokens)", numeric: true },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Spend (tokens)" />,
+    meta: { title: t("colSpend"), numeric: true },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colSpend")} />,
     size: 100,
     enableSorting: true,
     cell: ({ row }) => <MoneyCell value={row.original.spend} decimals={4} />,
@@ -68,8 +70,8 @@ export const getDeletedTeamsTableColumns = (): ColumnDef<DeletedTeam>[] => [
   {
     id: "max_budget",
     accessorKey: "max_budget",
-    meta: { title: "Budget (tokens)", numeric: true },
-    header: "Budget (tokens)",
+    meta: { title: t("colBudget"), numeric: true },
+    header: t("colBudget"),
     size: 110,
     enableSorting: false,
     cell: ({ row }) => <MoneyCell value={row.original.max_budget} decimals={0} emptyText="Unlimited" showZero />,
@@ -77,8 +79,8 @@ export const getDeletedTeamsTableColumns = (): ColumnDef<DeletedTeam>[] => [
   {
     id: "models",
     accessorKey: "models",
-    meta: { title: "Models", skeleton: "chips" },
-    header: "Models",
+    meta: { title: t("colModels"), skeleton: "chips" },
+    header: t("colModels"),
     size: 200,
     enableSorting: false,
     cell: ({ row }) => <ModelsCell models={row.original.models} />,
@@ -86,8 +88,8 @@ export const getDeletedTeamsTableColumns = (): ColumnDef<DeletedTeam>[] => [
   {
     id: "organization_id",
     accessorKey: "organization_id",
-    meta: { title: "Organization" },
-    header: "Organization",
+    meta: { title: t("colOrganization") },
+    header: t("colOrganization"),
     size: 150,
     enableSorting: false,
     cell: ({ row }) => {
@@ -98,8 +100,8 @@ export const getDeletedTeamsTableColumns = (): ColumnDef<DeletedTeam>[] => [
   {
     id: "deleted_at",
     accessorKey: "deleted_at",
-    meta: { title: "Deleted At" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Deleted At" />,
+    meta: { title: t("colDeletedAt") },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colDeletedAt")} />,
     size: 120,
     enableSorting: true,
     cell: ({ row }) => <DateCell value={row.original.deleted_at} precision="date" />,
@@ -107,8 +109,8 @@ export const getDeletedTeamsTableColumns = (): ColumnDef<DeletedTeam>[] => [
   {
     id: "deleted_by",
     accessorKey: "deleted_by",
-    meta: { title: "Deleted By" },
-    header: "Deleted By",
+    meta: { title: t("colDeletedBy") },
+    header: t("colDeletedBy"),
     size: 120,
     enableSorting: false,
     cell: ({ row }) => {

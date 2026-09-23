@@ -454,5 +454,21 @@
     "modelsTitle": "{count} 个模型",
     "keysTitle": "{count} 个密钥",
     "updatedNever": "从未"
+  },
+  "deletedTeams": {
+    "enterpriseTitle": "企业版即将推出",
+    "enterpriseDescription": "已删除团队审计即将从测试版升级至企业版审计与合规套件",
+    "loadingDeletedTeams": "正在加载已删除团队…",
+    "noDeletedTeams": "未找到已删除团队",
+    "noDeletedTeamsHint": "从此代理删除的团队将显示在这里",
+    "colTeamName": "团队名称",
+    "colTeamId": "团队 ID",
+    "colCreated": "创建时间",
+    "colSpend": "消费（tokens）",
+    "colBudget": "预算（tokens）",
+    "colModels": "模型",
+    "colOrganization": "组织",
+    "colDeletedAt": "删除时间",
+    "colDeletedBy": "删除人"
   }
 }

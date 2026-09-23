@@ -64,7 +64,7 @@ it("should show skeleton rows when loading", () => {
 it("should show the empty state when there are no deleted teams", () => {
   renderWithProviders(<DeletedTeamsTable teams={[]} isLoading={false} rowCount={0} {...paginationProps} />);
 
-  expect(screen.getByText("No deleted teams found")).toBeInTheDocument();
+  expect(screen.getByText("未找到已删除团队")).toBeInTheDocument();
 });
 
 it("renders the shared pagination footer with the server row count", () => {
