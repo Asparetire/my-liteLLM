@@ -26,7 +26,7 @@ describe("MemberPermissions", () => {
     renderWithProviders(<MemberPermissions teamId="team-123" accessToken="token-123" canEditTeam={true} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Member Permissions")).toBeInTheDocument();
+      expect(screen.getByText("成员权限")).toBeInTheDocument();
     });
   });
 
@@ -39,10 +39,10 @@ describe("MemberPermissions", () => {
     renderWithProviders(<MemberPermissions teamId="team-123" accessToken="token-123" canEditTeam={true} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Method")).toBeInTheDocument();
-      expect(screen.getByText("Endpoint")).toBeInTheDocument();
-      expect(screen.getByText("Description")).toBeInTheDocument();
-      expect(screen.getByText("Allow Access")).toBeInTheDocument();
+      expect(screen.getByText("方法")).toBeInTheDocument();
+      expect(screen.getByText("端点")).toBeInTheDocument();
+      expect(screen.getByText("描述")).toBeInTheDocument();
+      expect(screen.getByText("允许访问")).toBeInTheDocument();
     });
   });
 
@@ -55,7 +55,7 @@ describe("MemberPermissions", () => {
     renderWithProviders(<MemberPermissions teamId="team-123" accessToken="token-123" canEditTeam={true} />);
 
     await waitFor(() => {
-      expect(screen.getByText("No permissions available")).toBeInTheDocument();
+      expect(screen.getByText("无可用权限")).toBeInTheDocument();
     });
   });
 
@@ -69,7 +69,7 @@ describe("MemberPermissions", () => {
     renderWithProviders(<MemberPermissions teamId="team-123" accessToken="token-123" canEditTeam={true} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Member Permissions")).toBeInTheDocument();
+      expect(screen.getByText("成员权限")).toBeInTheDocument();
     });
 
     expect(checkboxFor("/key/generate")).toBeChecked();
@@ -81,7 +81,7 @@ describe("MemberPermissions", () => {
 
     expect(checkboxFor("/key/list")).toBeChecked();
 
-    const saveButton = await screen.findByRole("button", { name: /save changes/i });
+    const saveButton = await screen.findByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButton);
     });
@@ -105,7 +105,7 @@ describe("MemberPermissions", () => {
 
     await waitFor(() => {
       expect(screen.getByText("/team/daily/activity")).toBeInTheDocument();
-      expect(screen.getByText("Member can view all team usage data (not just their own)")).toBeInTheDocument();
+      expect(screen.getByText("成员可查看该团队的全部用量数据（不仅是自己的）")).toBeInTheDocument();
     });
   });
 
@@ -118,7 +118,7 @@ describe("MemberPermissions", () => {
     renderWithProviders(<MemberPermissions teamId="team-123" accessToken="token-123" canEditTeam={false} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Member Permissions")).toBeInTheDocument();
+      expect(screen.getByText("成员权限")).toBeInTheDocument();
     });
 
     expect(checkboxFor("/key/list")).not.toBeChecked();
@@ -128,7 +128,7 @@ describe("MemberPermissions", () => {
     });
 
     expect(checkboxFor("/key/list")).not.toBeChecked();
-    expect(screen.queryByRole("button", { name: /save changes/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "保存更改" })).not.toBeInTheDocument();
   });
 
   it("should handle reset button click", async () => {
@@ -140,7 +140,7 @@ describe("MemberPermissions", () => {
     renderWithProviders(<MemberPermissions teamId="team-123" accessToken="token-123" canEditTeam={true} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Member Permissions")).toBeInTheDocument();
+      expect(screen.getByText("成员权限")).toBeInTheDocument();
     });
 
     await act(async () => {
@@ -154,7 +154,7 @@ describe("MemberPermissions", () => {
       team_member_permissions: ["/key/generate"],
     });
 
-    const resetButton = await screen.findByRole("button", { name: /reset/i });
+    const resetButton = await screen.findByRole("button", { name: "重置" });
     await act(async () => {
       fireEvent.click(resetButton);
     });
@@ -164,6 +164,6 @@ describe("MemberPermissions", () => {
     });
 
     expect(checkboxFor("/key/list")).not.toBeChecked();
-    expect(screen.queryByRole("button", { name: /save changes/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "保存更改" })).not.toBeInTheDocument();
   });
 });

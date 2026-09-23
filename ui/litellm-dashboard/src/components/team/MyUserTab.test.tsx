@@ -17,7 +17,7 @@ describe("MyUserTab", () => {
 
     renderWithProviders(<MyUserTab teamId="team-1" />);
 
-    expect(screen.getByText("Loading your membership info…")).toBeInTheDocument();
+    expect(screen.getByText("正在加载您的成员信息…")).toBeInTheDocument();
   });
 
   it("should display the current member budget and model scope", () => {
@@ -44,6 +44,6 @@ describe("MyUserTab", () => {
 
     expect(screen.getByText("member@example.com")).toBeInTheDocument();
     expect(screen.getByText("model-one")).toBeInTheDocument();
-    expect(screen.getByText("TPM: 1,000")).toBeInTheDocument();
+    expect(screen.getByText("TPM：1,000")).toBeInTheDocument();
   });
 });

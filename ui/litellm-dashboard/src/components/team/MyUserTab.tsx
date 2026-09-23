@@ -4,6 +4,7 @@ import { SimpleTooltip } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { CircleHelp } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { useMyTeamMember } from "./useMyTeamMember";
 
@@ -11,27 +12,29 @@ interface MyUserTabProps {
   teamId: string;
 }
 
-const labelWithTooltip = (label: string, tooltip: string) => (
-  <span className="flex items-center gap-1 text-muted-foreground">
-    {label}
-    <SimpleTooltip content={tooltip}>
-      <CircleHelp className="size-4" aria-label={`${label} information`} />
-    </SimpleTooltip>
-  </span>
-);
-
 const formatRateLimit = (value: number | null | undefined): string => {
   if (value === null || value === undefined) return "Unlimited";
   return formatNumberWithCommas(value, 0);
 };
 
 export default function MyUserTab({ teamId }: MyUserTabProps) {
+  const t = useTranslations("teamInfo");
+
+  const labelWithTooltip = (label: string, tooltip: string) => (
+    <span className="flex items-center gap-1 text-muted-foreground">
+      {label}
+      <SimpleTooltip content={tooltip}>
+        <CircleHelp className="size-4" aria-label={t("infoAriaLabel", { label })} />
+      </SimpleTooltip>
+    </span>
+  );
+
   const { data, isLoading, error } = useMyTeamMember(teamId);
 
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="text-muted-foreground">Loading your membership info…</CardContent>
+        <CardContent className="text-muted-foreground">{t("loadingMembership")}</CardContent>
       </Card>
     );
   }
@@ -40,7 +43,7 @@ export default function MyUserTab({ teamId }: MyUserTabProps) {
     return (
       <Card>
         <CardContent className="text-destructive">
-          {error instanceof Error ? error.message : "Failed to load your membership info for this team."}
+          {error instanceof Error ? error.message : t("membershipLoadError")}
         </CardContent>
       </Card>
     );
@@ -49,9 +52,7 @@ export default function MyUserTab({ teamId }: MyUserTabProps) {
   if (!data) {
     return (
       <Card>
-        <CardContent className="text-muted-foreground">
-          No membership info available for the current user in this team.
-        </CardContent>
+        <CardContent className="text-muted-foreground">{t("noMembership")}</CardContent>
       </Card>
     );
   }
@@ -71,12 +72,12 @@ export default function MyUserTab({ teamId }: MyUserTabProps) {
         <CardContent>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             <div>
-              <span className="text-muted-foreground">User</span>
+              <span className="text-muted-foreground">{t("user")}</span>
               <div className="mt-1 font-semibold">{data.user_email || data.user_id}</div>
               <span className="font-mono text-xs text-muted-foreground">{data.user_id}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">Team Role</span>
+              <span className="text-muted-foreground">{t("teamRole")}</span>
               <div className="mt-1">
                 <Badge variant={data.role === "admin" ? "default" : "secondary"}>{data.role || "user"}</Badge>
               </div>
@@ -88,41 +89,40 @@ export default function MyUserTab({ teamId }: MyUserTabProps) {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Card>
           <CardContent>
-            {labelWithTooltip(
-              "Current Cycle Spend (tokens)",
-              "Spend for the current budget cycle. Resets to 0 when the budget window rolls over.",
-            )}
+            {labelWithTooltip(t("currentCycleSpend"), t("currentCycleSpendTooltip"))}
             <div className="mt-2">
               <h3 className="text-2xl font-semibold">{getSpendString(spend)}</h3>
               <span className="text-muted-foreground">
-                of {maxBudget === null ? "Unlimited" : `${formatNumberWithCommas(maxBudget, 0)} tokens`}
+                {t("ofBudget", {
+                  value: maxBudget === null ? "Unlimited" : `${formatNumberWithCommas(maxBudget, 0)} tokens`,
+                })}
               </span>
             </div>
-            {budgetReset && <div className="mt-1 text-muted-foreground">Resets {budgetReset}</div>}
+            {budgetReset && <div className="mt-1 text-muted-foreground">{t("resetsAt", { date: budgetReset })}</div>}
           </CardContent>
         </Card>
 
         <Card>
           <CardContent>
-            {labelWithTooltip("Rate Limits", "Your per-member rate limits within this team.")}
+            {labelWithTooltip(t("rateLimits"), t("rateLimitsTooltip"))}
             <div className="mt-2">
-              <span>TPM: {formatRateLimit(tpmLimit)}</span>
+              <span>{t("tpmLine", { value: formatRateLimit(tpmLimit) })}</span>
               <br />
-              <span>RPM: {formatRateLimit(rpmLimit)}</span>
+              <span>{t("rpmLine", { value: formatRateLimit(rpmLimit) })}</span>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent>
-            {labelWithTooltip("Total Spend (tokens)", "Cumulative spend across all budget cycles within this team.")}
+            {labelWithTooltip(t("totalSpend"), t("totalSpendTooltip"))}
             <h4 className="mt-2 text-xl font-semibold">{getSpendString(totalSpend)}</h4>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent>
-            {labelWithTooltip("Model Scope", "Models you can access within this team.")}
+            {labelWithTooltip(t("modelScope"), t("modelScopeTooltip"))}
             <div className="mt-2">
               {allowedModels && allowedModels.length > 0 ? (
                 <div className="flex flex-wrap gap-1">
@@ -133,7 +133,7 @@ export default function MyUserTab({ teamId }: MyUserTabProps) {
                   ))}
                 </div>
               ) : (
-                <span>All Team Models</span>
+                <span>{t("allTeamModels")}</span>
               )}
             </div>
           </CardContent>
