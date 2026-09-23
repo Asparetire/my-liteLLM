@@ -19,7 +19,9 @@ ssh "$HOST" "cd ~/litellm-src && \
   grep -n 'ui_cn\|LITELLM_UI_PATH' docker-compose.cn.yml"
 
 echo "== 4/4 重建容器 =="
-ssh "$HOST" "cd ~/litellm-src && docker compose -f docker-compose.cn.yml -p litellm-cn up -d"
+# 必须 --force-recreate：第 1 步 rm + mkdir 换了 ui_cn 的 inode，普通 up -d 不会重建容器，
+# bind mount 仍指向旧 inode，/ui/ 会 404（2026-09-22 第二批部署事故根因）
+ssh "$HOST" "cd ~/litellm-src && docker compose -f docker-compose.cn.yml -p litellm-cn up -d --force-recreate"
 
 echo "== 等待 30 秒后验证 =="
 sleep 30
