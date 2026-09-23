@@ -64,10 +64,10 @@ describe("LoggingSettings", () => {
     renderWithProviders(<LoggingSettings value={initialValue} onChange={vi.fn()} />);
 
     // Check for the "Number" badge
-    expect(screen.getByText("Number")).toBeInTheDocument();
+    expect(screen.getByText("数值")).toBeInTheDocument();
 
     // Check for the validation hint
-    expect(screen.getByText("Value must be between 0 and 1")).toBeInTheDocument();
+    expect(screen.getByText("取值必须在 0 到 1 之间")).toBeInTheDocument();
 
     // Check that the input has the correct step attribute
     const numericalInput = screen.getByPlaceholderText("os.environ/LANGSMITH_SAMPLING_RATE");
@@ -135,11 +135,11 @@ describe("LoggingSettings", () => {
     const apiKeyInput = screen.getByPlaceholderText("os.environ/LANGSMITH_API_KEY");
     expect(apiKeyInput).toHaveAttribute("type", "password");
 
-    await user.click(screen.getByRole("button", { name: "Show password" }));
+    await user.click(screen.getByRole("button", { name: "显示密码" }));
     expect(apiKeyInput).toHaveAttribute("type", "text");
     expect(apiKeyInput).toHaveValue("sk-secret-value");
 
-    await user.click(screen.getByRole("button", { name: "Hide password" }));
+    await user.click(screen.getByRole("button", { name: "隐藏密码" }));
     expect(apiKeyInput).toHaveAttribute("type", "password");
   });
 
@@ -168,7 +168,7 @@ describe("LoggingSettings", () => {
 
     renderWithProviders(<LoggingSettings value={initialValue} onChange={vi.fn()} />);
 
-    expect(screen.getByText("Custom Callback API Configuration")).toBeInTheDocument();
+    expect(screen.getByText("Custom Callback API 配置")).toBeInTheDocument();
     expect(screen.queryByAltText("Custom Callback API logo")).not.toBeInTheDocument();
     expect(screen.getByText("C")).toBeInTheDocument();
   });
@@ -192,7 +192,7 @@ describe("LoggingSettings", () => {
 
     renderWithProviders(<LoggingSettings value={initialValue} onChange={vi.fn()} />);
 
-    const remove = screen.getByRole("button", { name: "Remove" });
+    const remove = screen.getByRole("button", { name: "移除" });
     expect(remove).toHaveClass("hover:text-destructive/80");
     expect(remove).not.toHaveClass("hover:text-foreground");
   });
@@ -210,8 +210,8 @@ describe("LoggingSettings", () => {
 
     renderWithProviders(<LoggingSettings value={initialValue} onChange={mockOnChange} />);
 
-    await user.click(screen.getByRole("combobox", { name: "Event Type" }));
-    await user.click(await screen.findByRole("option", { name: "Failure Only" }));
+    await user.click(screen.getByRole("combobox", { name: "事件类型" }));
+    await user.click(await screen.findByRole("option", { name: "仅失败" }));
 
     expect(mockOnChange).toHaveBeenCalledWith([expect.objectContaining({ callback_type: "failure" })]);
   });
