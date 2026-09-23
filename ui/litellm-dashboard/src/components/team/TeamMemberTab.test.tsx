@@ -144,7 +144,7 @@ describe("TeamMembersComponent", () => {
 
     expect(screen.getByRole("columnheader", { name: /user email/i })).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: /user id/i })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: /team role/i })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: /团队角色/ })).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: /actions/i })).toBeInTheDocument();
   });
 
@@ -317,7 +317,7 @@ describe("TeamMembersComponent", () => {
       />,
     );
 
-    expect(screen.getByText("No Limits")).toBeInTheDocument();
+    expect(screen.getByText("无限制")).toBeInTheDocument();
   });
 
   it("should call setIsEditMemberModalVisible and setSelectedEditMember when edit button is clicked", async () => {
@@ -372,7 +372,7 @@ describe("TeamMembersComponent", () => {
 
     const memberRow = screen.getByRole("row", { name: /user1@test\.com/ });
     expect(within(memberRow).getByText("0 RPM / 0 TPM")).toBeInTheDocument();
-    expect(within(memberRow).queryByText("No Limits")).not.toBeInTheDocument();
+    expect(within(memberRow).queryByText("无限制")).not.toBeInTheDocument();
 
     await user.click(within(memberRow).getByTestId("edit-member"));
 

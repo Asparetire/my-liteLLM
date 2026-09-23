@@ -535,6 +535,18 @@
     "guardrailsEmpty": "未找到护栏",
     "guardrailGroupGlobal": "全局",
     "guardrailGroupOther": "其他",
-    "globalGuardrailAria": "全局护栏"
+    "globalGuardrailAria": "全局护栏",
+    "allTeamModelsHint": "（全部团队模型）",
+    "memberModelScopeTooltip": "该成员可访问的模型。为空表示继承团队全部模型。",
+    "moreModels": "还有 {count} 个",
+    "memberCurrentCycleSpendTooltip": "当前预算周期内的消费。成员预算窗口滚动时重置为 0，也是与成员预算比对的实际值。",
+    "memberTotalSpendTooltip": "该成员在此团队内跨所有预算周期的累计消费。自 2026-04-21 起开始统计，不含此前的消费。",
+    "memberBudgetColumn": "团队成员预算（tokens）",
+    "budgetResetColumn": "预算重置",
+    "memberRateLimitsColumn": "团队成员速率限制",
+    "memberRateLimitsTooltip": "该成员在此团队内使用的速率限制。",
+    "noLimits": "无限制",
+    "teamRoleColumn": "团队角色",
+    "teamRoleTooltip": "此角色仅适用于该团队，与用户在代理层的全局角色无关。"
   }
 }

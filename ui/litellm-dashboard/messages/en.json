@@ -535,6 +535,18 @@
     "guardrailsEmpty": "No guardrails found",
     "guardrailGroupGlobal": "Global",
     "guardrailGroupOther": "Other",
-    "globalGuardrailAria": "Global guardrail"
+    "globalGuardrailAria": "Global guardrail",
+    "allTeamModelsHint": "(all team models)",
+    "memberModelScopeTooltip": "Models this member can access. Empty means they inherit all team models.",
+    "moreModels": "+{count} more",
+    "memberCurrentCycleSpendTooltip": "Spend for the current budget cycle. Resets to 0 when the member's budget window rolls over. This is the value checked against the member's budget.",
+    "memberTotalSpendTooltip": "Cumulative spend by this member within this team, across all budget cycles. Tracking began 2026-04-21; spend from before that date is not included.",
+    "memberBudgetColumn": "Team Member Budget (tokens)",
+    "budgetResetColumn": "Budget Reset",
+    "memberRateLimitsColumn": "Team Member Rate Limits",
+    "memberRateLimitsTooltip": "Rate limits for this member's usage within this team.",
+    "noLimits": "No Limits",
+    "teamRoleColumn": "Team Role",
+    "teamRoleTooltip": "This role applies only to this team and is independent from the user's proxy-level role."
   }
 }
