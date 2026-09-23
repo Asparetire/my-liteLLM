@@ -343,7 +343,7 @@ describe("Teams - handleCreate organization handling", () => {
       mockTeamsTableProps.onDeleteTeam(baseTableTeam);
     });
 
-    expect(screen.getByText("Delete Team?")).toBeInTheDocument();
+    expect(screen.getByText("删除团队？")).toBeInTheDocument();
   });
 });
 
@@ -551,7 +551,7 @@ describe("Teams - Create Team CTA is grouped with the tabs on the left", () => {
 
     const tabNav = screen.getByRole("tablist");
     const createButton = within(tabNav).getByTestId("create-team-button");
-    const firstTab = within(tabNav).getByRole("tab", { name: "Your Teams" });
+    const firstTab = within(tabNav).getByRole("tab", { name: "我的团队" });
 
     expect(screen.getByRole("main")).toHaveClass("p-8");
     expect(within(tabNav).getByRole("separator")).toBeInTheDocument();
@@ -572,22 +572,22 @@ describe("Teams - Default Team Settings tab visibility", () => {
 
   it("should show Default Team Settings tab for Admin role", () => {
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="Admin" />);
-    expect(screen.getByRole("tab", { name: "Default Team Settings" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "团队默认设置" })).toBeInTheDocument();
   });
 
   it("should show Default Team Settings tab for proxy_admin role", () => {
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="proxy_admin" />);
-    expect(screen.getByRole("tab", { name: "Default Team Settings" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "团队默认设置" })).toBeInTheDocument();
   });
 
   it("should not show Default Team Settings tab for proxy_admin_viewer role", () => {
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="proxy_admin_viewer" />);
-    expect(screen.queryByRole("tab", { name: "Default Team Settings" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "团队默认设置" })).not.toBeInTheDocument();
   });
 
   it("should not show Default Team Settings tab for Admin Viewer role", () => {
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="Admin Viewer" />);
-    expect(screen.queryByRole("tab", { name: "Default Team Settings" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "团队默认设置" })).not.toBeInTheDocument();
   });
 });
 
@@ -615,19 +615,19 @@ describe("Teams - access_group_ids in team create", () => {
   it("should pass access_group_ids to teamCreateCall when creating team", async () => {
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="Admin" />);
 
-    const createButton = screen.getAllByRole("button", { name: /create team/i })[0];
+    const createButton = screen.getAllByRole("button", { name: /创建团队/ })[0];
     act(() => {
       fireEvent.click(createButton);
     });
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/team name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/团队名称/)).toBeInTheDocument();
     });
 
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "Test Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "Test Team" } });
     fireEvent.change(screen.getByTestId("create-team-models-select"), { target: { value: "gpt-4" } });
 
-    fireEvent.click(screen.getByText("Additional Settings"));
+    fireEvent.click(screen.getByText("更多设置"));
 
     await waitFor(() => {
       expect(screen.getByTestId("access-group-selector")).toBeInTheDocument();
@@ -635,7 +635,7 @@ describe("Teams - access_group_ids in team create", () => {
 
     fireEvent.change(screen.getByTestId("access-group-selector"), { target: { value: "ag-1,ag-2" } });
 
-    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /create team/i });
+    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(createTeamSubmitButtons[createTeamSubmitButtons.length - 1]);
 
     await waitFor(() => {
@@ -653,18 +653,18 @@ describe("Teams - access_group_ids in team create", () => {
   it("creates a team with no models selected, sending the no-default-models sentinel instead of an empty list", async () => {
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="Admin" />);
 
-    const createButton = screen.getAllByRole("button", { name: /create team/i })[0];
+    const createButton = screen.getAllByRole("button", { name: /创建团队/ })[0];
     act(() => {
       fireEvent.click(createButton);
     });
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/team name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/团队名称/)).toBeInTheDocument();
     });
 
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "Group Only Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "Group Only Team" } });
 
-    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /create team/i });
+    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(createTeamSubmitButtons[createTeamSubmitButtons.length - 1]);
 
     await waitFor(() => {
@@ -702,22 +702,22 @@ describe("Teams - Reset Budget in team create", () => {
   const openCreateModal = async () => {
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="Admin" />);
 
-    const createButton = screen.getAllByRole("button", { name: /create team/i })[0];
+    const createButton = screen.getAllByRole("button", { name: /创建团队/ })[0];
     act(() => {
       fireEvent.click(createButton);
     });
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/team name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/团队名称/)).toBeInTheDocument();
     });
   };
 
-  const resetBudgetSelect = () => screen.getByLabelText("Reset Budget");
+  const resetBudgetSelect = () => screen.getByLabelText("预算重置");
 
   const submitCreateModal = async () => {
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "Test Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "Test Team" } });
 
-    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /create team/i });
+    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(createTeamSubmitButtons[createTeamSubmitButtons.length - 1]);
 
     await waitFor(() => {
@@ -763,7 +763,7 @@ describe("Teams - Reset Budget in team create", () => {
     await openCreateModal();
 
     await waitFor(() => {
-      expect(screen.getByText("Default: monthly (30d)")).toBeInTheDocument();
+      expect(screen.getByText("默认：monthly（30d）")).toBeInTheDocument();
     });
   });
 
@@ -773,7 +773,7 @@ describe("Teams - Reset Budget in team create", () => {
     await openCreateModal();
 
     await waitFor(() => {
-      expect(screen.getByText("n/a")).toBeInTheDocument();
+      expect(screen.getByText("无")).toBeInTheDocument();
     });
   });
 });
@@ -802,13 +802,13 @@ describe("Teams - metadata key-value pairs in team create", () => {
   const openCreateModal = async () => {
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="Admin" />);
 
-    const createButton = screen.getAllByRole("button", { name: /create team/i })[0];
+    const createButton = screen.getAllByRole("button", { name: /创建团队/ })[0];
     act(() => {
       fireEvent.click(createButton);
     });
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/team name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/团队名称/)).toBeInTheDocument();
     });
   };
 
@@ -821,7 +821,7 @@ describe("Teams - metadata key-value pairs in team create", () => {
   it("submits metadata built from key-value pairs as a typed JSON object", async () => {
     await openCreateModal();
 
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "Test Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "Test Team" } });
     fireEvent.change(screen.getByTestId("create-team-models-select"), { target: { value: "gpt-4" } });
 
     fireEvent.click(screen.getByRole("button", { name: /add key-value pair/i }));
@@ -838,7 +838,7 @@ describe("Teams - metadata key-value pairs in team create", () => {
     fireEvent.change(screen.getAllByPlaceholderText("Key")[1], { target: { value: "tier" } });
     fireEvent.change(screen.getAllByPlaceholderText("Value")[1], { target: { value: "3" } });
 
-    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /create team/i });
+    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(createTeamSubmitButtons[createTeamSubmitButtons.length - 1]);
 
     await waitFor(() => {
@@ -852,10 +852,10 @@ describe("Teams - metadata key-value pairs in team create", () => {
   it("omits metadata entirely when no pairs are added", async () => {
     await openCreateModal();
 
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "Test Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "Test Team" } });
     fireEvent.change(screen.getByTestId("create-team-models-select"), { target: { value: "gpt-4" } });
 
-    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /create team/i });
+    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(createTeamSubmitButtons[createTeamSubmitButtons.length - 1]);
 
     await waitFor(() => {
@@ -892,20 +892,20 @@ describe("Teams - schema-declared metadata fields in team create", () => {
   const openCreateModal = async () => {
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="Admin" />);
 
-    const createButton = screen.getAllByRole("button", { name: /create team/i })[0];
+    const createButton = screen.getAllByRole("button", { name: /创建团队/ })[0];
     act(() => {
       fireEvent.click(createButton);
     });
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/team name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/团队名称/)).toBeInTheDocument();
     });
   };
 
   it("should prepopulate the declared key as an ordinary pair row and submit its value", async () => {
     await openCreateModal();
 
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "Test Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "Test Team" } });
     fireEvent.change(screen.getByTestId("create-team-models-select"), { target: { value: "gpt-4" } });
 
     await waitFor(() => {
@@ -913,7 +913,7 @@ describe("Teams - schema-declared metadata fields in team create", () => {
     });
     fireEvent.change(screen.getByPlaceholderText("Value"), { target: { value: "CC-1001" } });
 
-    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /create team/i });
+    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(createTeamSubmitButtons[createTeamSubmitButtons.length - 1]);
 
     await waitFor(() => {
@@ -930,19 +930,19 @@ describe("Teams - schema-declared metadata fields in team create", () => {
     );
     await openCreateModal();
 
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "Test Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "Test Team" } });
     fireEvent.change(screen.getByTestId("create-team-models-select"), { target: { value: "gpt-4" } });
     await waitFor(() => {
       expect((screen.getByPlaceholderText("Key") as HTMLInputElement).value).toBe("cost_center");
     });
     fireEvent.change(screen.getByPlaceholderText("Value"), { target: { value: "CC-9999" } });
 
-    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /create team/i });
+    const createTeamSubmitButtons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(createTeamSubmitButtons[createTeamSubmitButtons.length - 1]);
 
     await waitFor(() => {
       expect(toast.fromError).toHaveBeenCalledWith(
-        "Error creating the team: Cost center CC-9999 is not recognized. Contact the FinOps team.",
+        "创建团队出错：Cost center CC-9999 is not recognized. Contact the FinOps team.",
       );
     });
   });
@@ -968,10 +968,10 @@ describe("Teams - schema-declared metadata fields in team create", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /^close$/i }));
     await waitFor(() => {
-      expect(screen.queryByLabelText(/team name/i)).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/团队名称/)).not.toBeInTheDocument();
     });
 
-    const createButton = screen.getAllByRole("button", { name: /create team/i })[0];
+    const createButton = screen.getAllByRole("button", { name: /创建团队/ })[0];
     act(() => {
       fireEvent.click(createButton);
     });
@@ -996,13 +996,13 @@ describe("Teams - models dropdown options", () => {
       expect(fetchAvailableModelsForTeamOrKey).toHaveBeenCalled();
     });
 
-    const createButton = screen.getAllByRole("button", { name: /create team/i })[0];
+    const createButton = screen.getAllByRole("button", { name: /创建团队/ })[0];
     act(() => {
       fireEvent.click(createButton);
     });
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/models/i)).toBeInTheDocument();
+      expect(screen.getByLabelText("模型")).toBeInTheDocument();
     });
     expect(screen.queryByText("All Proxy Models")).not.toBeInTheDocument();
   });
@@ -1020,26 +1020,26 @@ describe("Teams - delete team warning copy", () => {
     await act(async () => {
       mockTeamsTableProps.onDeleteTeam(team);
     });
-    expect(screen.getByText("Delete Team?")).toBeInTheDocument();
+    expect(screen.getByText("删除团队？")).toBeInTheDocument();
   };
 
   it("warns that the team's models are deleted when the team has keys", async () => {
     await openDeleteModal({ ...baseTableTeam, keys: [], keys_count: 5 });
 
-    expect(screen.getByText(/Warning: This team has 5 keys associated with it/i)).toHaveTextContent(
-      /along with any models created for this team/i,
+    expect(screen.getByText(/警告：该团队关联了 5 个密钥/)).toHaveTextContent(
+      /为该团队创建的模型/,
     );
-    expect(screen.getByText(/Are you sure you want to delete this team/i)).toHaveTextContent(
-      /any models created for it/i,
+    expect(screen.getByText(/确定要删除该团队/)).toHaveTextContent(
+      /为其创建的模型/,
     );
   });
 
   it("still warns about model deletion in the confirmation message when the team has no keys", async () => {
     await openDeleteModal({ ...baseTableTeam, keys: [], keys_count: 0 });
 
-    expect(screen.queryByText(/Warning: This team has/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/Are you sure you want to delete this team/i)).toHaveTextContent(
-      /any models created for it/i,
+    expect(screen.queryByText(/警告：该团队关联了/)).not.toBeInTheDocument();
+    expect(screen.getByText(/确定要删除该团队/)).toHaveTextContent(
+      /为其创建的模型/,
     );
   });
 });
@@ -1068,19 +1068,19 @@ describe("Teams - LIT-2530 organization stays optional for proxy admin with a si
   it("creates a team with no organization when exactly one organization exists", async () => {
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="Admin" />);
 
-    const createButton = screen.getAllByRole("button", { name: /create team/i })[0];
+    const createButton = screen.getAllByRole("button", { name: /创建团队/ })[0];
     act(() => {
       fireEvent.click(createButton);
     });
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/team name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/团队名称/)).toBeInTheDocument();
     });
 
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "No Org Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "No Org Team" } });
     fireEvent.change(screen.getByTestId("create-team-models-select"), { target: { value: "gpt-4" } });
 
-    const submitButtons = screen.getAllByRole("button", { name: /create team/i });
+    const submitButtons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(submitButtons[submitButtons.length - 1]);
 
     await waitFor(() => {
@@ -1107,14 +1107,14 @@ describe("Teams - policies field is gated on the viewPolicies capability", () =>
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="Admin" />);
 
     act(() => {
-      fireEvent.click(screen.getAllByRole("button", { name: /create team/i })[0]);
+      fireEvent.click(screen.getAllByRole("button", { name: /创建团队/ })[0]);
     });
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/team name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/团队名称/)).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText("Additional Settings"));
+    fireEvent.click(screen.getByText("更多设置"));
 
     await waitFor(() => {
       expect(screen.getByTestId("access-group-selector")).toBeInTheDocument();
@@ -1126,7 +1126,7 @@ describe("Teams - policies field is gated on the viewPolicies capability", () =>
 
     expect(can).toHaveBeenCalledWith("viewPolicies");
     expect(getPoliciesList).toHaveBeenCalledWith("test-token");
-    expect(screen.getByText("Policies")).toBeInTheDocument();
+    expect(screen.getByText("策略")).toBeInTheDocument();
   });
 
   it("should omit the policies field and skip the admin-only list without the capability", async () => {
@@ -1135,7 +1135,7 @@ describe("Teams - policies field is gated on the viewPolicies capability", () =>
     await openAdditionalSettings();
 
     expect(getPoliciesList).not.toHaveBeenCalled();
-    expect(screen.queryByText("Policies")).not.toBeInTheDocument();
+    expect(screen.queryByText("策略")).not.toBeInTheDocument();
   });
 });
 
@@ -1155,15 +1155,15 @@ describe("Teams - which fields reach the create payload depends on the open sect
   const openCreateModal = async () => {
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="Admin" />);
     act(() => {
-      fireEvent.click(screen.getAllByRole("button", { name: /create team/i })[0]);
+      fireEvent.click(screen.getAllByRole("button", { name: /创建团队/ })[0]);
     });
     await waitFor(() => {
-      expect(screen.getByLabelText(/team name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/团队名称/)).toBeInTheDocument();
     });
   };
 
   const submit = async () => {
-    const buttons = screen.getAllByRole("button", { name: /create team/i });
+    const buttons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(buttons[buttons.length - 1]);
     await waitFor(() => {
       expect(teamCreateCall).toHaveBeenCalled();
@@ -1171,11 +1171,11 @@ describe("Teams - which fields reach the create payload depends on the open sect
     return vi.mocked(teamCreateCall).mock.calls[0][1] as Record<string, unknown>;
   };
 
-  const toggleAdditionalSettings = () => fireEvent.click(screen.getByText("Additional Settings"));
+  const toggleAdditionalSettings = () => fireEvent.click(screen.getByText("更多设置"));
 
   it("sends only the always-visible fields when every section is left closed", async () => {
     await openCreateModal();
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "Closed Sections Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "Closed Sections Team" } });
 
     const payload = await submit();
 
@@ -1194,14 +1194,14 @@ describe("Teams - which fields reach the create payload depends on the open sect
 
   it("adds the Additional Settings fields to the payload once that section is opened", async () => {
     await openCreateModal();
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "Open Section Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "Open Section Team" } });
 
     toggleAdditionalSettings();
     await waitFor(() => {
-      expect(screen.getByLabelText("Team ID")).toBeInTheDocument();
+      expect(screen.getByLabelText("团队 ID")).toBeInTheDocument();
     });
-    fireEvent.change(screen.getByLabelText("Team ID"), { target: { value: "tid-open" } });
-    fireEvent.change(screen.getByLabelText("Team Member Budget (tokens)"), { target: { value: "12.5" } });
+    fireEvent.change(screen.getByLabelText("团队 ID"), { target: { value: "tid-open" } });
+    fireEvent.change(screen.getByLabelText("团队成员预算（tokens）"), { target: { value: "12.5" } });
 
     const payload = await submit();
 
@@ -1214,16 +1214,16 @@ describe("Teams - which fields reach the create payload depends on the open sect
 
   it("drops a value typed in Additional Settings when that section is closed again before saving", async () => {
     await openCreateModal();
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "Reclosed Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "Reclosed Team" } });
 
     toggleAdditionalSettings();
     await waitFor(() => {
-      expect(screen.getByLabelText("Team ID")).toBeInTheDocument();
+      expect(screen.getByLabelText("团队 ID")).toBeInTheDocument();
     });
-    fireEvent.change(screen.getByLabelText("Team ID"), { target: { value: "tid-dropped" } });
+    fireEvent.change(screen.getByLabelText("团队 ID"), { target: { value: "tid-dropped" } });
     toggleAdditionalSettings();
     await waitFor(() => {
-      expect(screen.queryByLabelText("Team ID")).not.toBeInTheDocument();
+      expect(screen.queryByLabelText("团队 ID")).not.toBeInTheDocument();
     });
 
     const payload = await submit();
@@ -1233,23 +1233,23 @@ describe("Teams - which fields reach the create payload depends on the open sect
 
   it("restores and sends the typed value when Additional Settings is reopened before saving", async () => {
     await openCreateModal();
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "Reopened Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "Reopened Team" } });
 
     toggleAdditionalSettings();
     await waitFor(() => {
-      expect(screen.getByLabelText("Team ID")).toBeInTheDocument();
+      expect(screen.getByLabelText("团队 ID")).toBeInTheDocument();
     });
-    fireEvent.change(screen.getByLabelText("Team ID"), { target: { value: "tid-kept" } });
+    fireEvent.change(screen.getByLabelText("团队 ID"), { target: { value: "tid-kept" } });
     toggleAdditionalSettings();
     await waitFor(() => {
-      expect(screen.queryByLabelText("Team ID")).not.toBeInTheDocument();
+      expect(screen.queryByLabelText("团队 ID")).not.toBeInTheDocument();
     });
     toggleAdditionalSettings();
     await waitFor(() => {
-      expect(screen.getByLabelText("Team ID")).toBeInTheDocument();
+      expect(screen.getByLabelText("团队 ID")).toBeInTheDocument();
     });
 
-    expect(screen.getByLabelText("Team ID")).toHaveValue("tid-kept");
+    expect(screen.getByLabelText("团队 ID")).toHaveValue("tid-kept");
     const payload = await submit();
 
     expect(payload.team_id).toBe("tid-kept");
@@ -1275,16 +1275,16 @@ describe("Teams - the exact bytes the create call sends", () => {
       <Teams accessToken="test-token" userID="user-123" userRole="Admin" premiumUser={options?.premiumUser ?? false} />,
     );
     act(() => {
-      fireEvent.click(screen.getAllByRole("button", { name: /create team/i })[0]);
+      fireEvent.click(screen.getAllByRole("button", { name: /创建团队/ })[0]);
     });
     await waitFor(() => {
-      expect(screen.getByLabelText(/team name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/团队名称/)).toBeInTheDocument();
     });
-    fireEvent.change(screen.getByLabelText(/team name/i), { target: { value: "Byte Contract Team" } });
+    fireEvent.change(screen.getByLabelText(/团队名称/), { target: { value: "Byte Contract Team" } });
   };
 
   const submit = async () => {
-    const buttons = screen.getAllByRole("button", { name: /create team/i });
+    const buttons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(buttons[buttons.length - 1]);
     await waitFor(() => {
       expect(teamCreateCall).toHaveBeenCalled();
@@ -1326,10 +1326,10 @@ describe("Teams - the exact bytes the create call sends", () => {
   it("keeps every newly mounted but untouched field out of the request body", async () => {
     await openCreateModal();
 
-    await openSection("Additional Settings", /Team Member Key Duration/);
-    await openSection("MCP Settings", /Allowed MCP Servers/);
-    await openSection("Agent Settings", /Allowed Agents/);
-    await openSection("Search Tool Settings", /Allowed Search Tools/);
+    await openSection("更多设置", /团队成员密钥有效期/);
+    await openSection("MCP 设置", /允许的 MCP 服务器/);
+    await openSection("智能体设置", /允许的智能体/);
+    await openSection("搜索工具设置", /允许的搜索工具/);
 
     const payload = await submit();
 
@@ -1369,7 +1369,7 @@ describe("Teams - the exact bytes the create call sends", () => {
 
   it("puts the selected skills into object_permission.skills and drops the form key", async () => {
     await openCreateModal();
-    await openSection("Skill Settings", /Allowed Skills/);
+    await openSection("技能设置", /允许的技能/);
     fireEvent.click(screen.getByTestId("select-private-skill"));
 
     const payload = await submit();
@@ -1380,7 +1380,7 @@ describe("Teams - the exact bytes the create call sends", () => {
 
   it("sends no object_permission when Skill Settings is opened but nothing is selected", async () => {
     await openCreateModal();
-    await openSection("Skill Settings", /Allowed Skills/);
+    await openSection("技能设置", /允许的技能/);
 
     const payload = await submit();
 
@@ -1390,7 +1390,7 @@ describe("Teams - the exact bytes the create call sends", () => {
 
   it("includes selected MCP toolsets in the create object permission", async () => {
     await openCreateModal();
-    await openSection("MCP Settings", /Allowed MCP Servers/);
+    await openSection("MCP 设置", /允许的 MCP 服务器/);
     fireEvent.click(screen.getByTestId("select-mcp-toolset"));
 
     const payload = await submit();
@@ -1399,9 +1399,9 @@ describe("Teams - the exact bytes the create call sends", () => {
   });
 
   it.each([
-    ["MCP Settings", /Allowed MCP Servers/, ["allowed_mcp_servers_and_groups", "mcp_tool_permissions"]],
-    ["Agent Settings", /Allowed Agents/, ["allowed_agents_and_groups"]],
-    ["Search Tool Settings", /Allowed Search Tools/, ["object_permission_search_tools"]],
+    ["MCP 设置", /允许的 MCP 服务器/, ["allowed_mcp_servers_and_groups", "mcp_tool_permissions"]],
+    ["智能体设置", /允许的智能体/, ["allowed_agents_and_groups"]],
+    ["搜索工具设置", /允许的搜索工具/, ["object_permission_search_tools"]],
   ])("registers %s fields only while that one section is open", async (title, probe, keys) => {
     await openCreateModal();
 
@@ -1414,18 +1414,18 @@ describe("Teams - the exact bytes the create call sends", () => {
   it("carries every typed value to the payload at the type antd sends today", async () => {
     await openCreateModal();
 
-    fireEvent.change(screen.getByLabelText("Max Budget (tokens)"), { target: { value: "150.75" } });
-    fireEvent.change(screen.getByLabelText("Tokens per minute Limit (TPM)"), { target: { value: "900" } });
-    fireEvent.change(screen.getByLabelText("Requests per minute Limit (RPM)"), { target: { value: "800" } });
+    fireEvent.change(screen.getByLabelText("最大预算（tokens）"), { target: { value: "150.75" } });
+    fireEvent.change(screen.getByLabelText("每分钟 Token 数限制（TPM）"), { target: { value: "900" } });
+    fireEvent.change(screen.getByLabelText("每分钟请求数限制（RPM）"), { target: { value: "800" } });
 
-    await openSection("Additional Settings", /Team Member Key Duration/);
+    await openSection("更多设置", /团队成员密钥有效期/);
 
-    fireEvent.change(screen.getByLabelText("Team ID"), { target: { value: "tid-1" } });
-    fireEvent.change(screen.getByLabelText("Team Member Budget (tokens)"), { target: { value: "12.5" } });
-    fireEvent.change(screen.getByLabelText(/Team Member Key Duration/), { target: { value: "30d" } });
-    fireEvent.change(screen.getByLabelText("Team Member RPM Limit"), { target: { value: "7" } });
-    fireEvent.change(screen.getByLabelText("Team Member TPM Limit"), { target: { value: "8" } });
-    fireEvent.change(screen.getByLabelText("Secret Manager Settings"), {
+    fireEvent.change(screen.getByLabelText("团队 ID"), { target: { value: "tid-1" } });
+    fireEvent.change(screen.getByLabelText("团队成员预算（tokens）"), { target: { value: "12.5" } });
+    fireEvent.change(screen.getByLabelText(/团队成员密钥有效期/), { target: { value: "30d" } });
+    fireEvent.change(screen.getByLabelText("团队成员 RPM 限制"), { target: { value: "7" } });
+    fireEvent.change(screen.getByLabelText("团队成员 TPM 限制"), { target: { value: "8" } });
+    fireEvent.change(screen.getByLabelText("密钥管理器设置"), {
       target: { value: '{"namespace":"admin"}' },
     });
 
@@ -1444,15 +1444,15 @@ describe("Teams - the exact bytes the create call sends", () => {
 
   it("blocks the create on an invalid secret manager config, with the rule message suppressed by help", async () => {
     await openCreateModal();
-    await openSection("Additional Settings", /Team Member Key Duration/);
+    await openSection("更多设置", /团队成员密钥有效期/);
 
-    fireEvent.change(screen.getByLabelText("Secret Manager Settings"), { target: { value: "   " } });
+    fireEvent.change(screen.getByLabelText("密钥管理器设置"), { target: { value: "   " } });
 
-    const buttons = screen.getAllByRole("button", { name: /create team/i });
+    const buttons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(buttons[buttons.length - 1]);
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Secret Manager Settings")).toHaveAttribute("aria-invalid", "true");
+      expect(screen.getByLabelText("密钥管理器设置")).toHaveAttribute("aria-invalid", "true");
     });
     expect(teamCreateCall).not.toHaveBeenCalled();
     expect(screen.queryByText("Please enter valid JSON")).not.toBeInTheDocument();
@@ -1460,7 +1460,7 @@ describe("Teams - the exact bytes the create call sends", () => {
 
   it("turns the disable-global-guardrails switch into a boolean for a premium user", async () => {
     await openCreateModal({ premiumUser: true });
-    await openSection("Additional Settings", /Team Member Key Duration/);
+    await openSection("更多设置", /团队成员密钥有效期/);
 
     const switches = screen.getAllByRole("switch");
     fireEvent.click(switches[switches.length - 1]);
@@ -1472,7 +1472,7 @@ describe("Teams - the exact bytes the create call sends", () => {
 
   it("leaves the disable-global-guardrails switch inert for a non-premium user", async () => {
     await openCreateModal();
-    await openSection("Additional Settings", /Team Member Key Duration/);
+    await openSection("更多设置", /团队成员密钥有效期/);
 
     const switches = screen.getAllByRole("switch");
     fireEvent.click(switches[switches.length - 1]);
@@ -1483,9 +1483,9 @@ describe("Teams - the exact bytes the create call sends", () => {
   });
 
   it.each([
-    ["MCP Settings", /Allowed MCP Servers/, ["allowed_mcp_servers_and_groups", "mcp_tool_permissions"]],
-    ["Agent Settings", /Allowed Agents/, ["allowed_agents_and_groups"]],
-    ["Search Tool Settings", /Allowed Search Tools/, ["object_permission_search_tools"]],
+    ["MCP 设置", /允许的 MCP 服务器/, ["allowed_mcp_servers_and_groups", "mcp_tool_permissions"]],
+    ["智能体设置", /允许的智能体/, ["allowed_agents_and_groups"]],
+    ["搜索工具设置", /允许的搜索工具/, ["object_permission_search_tools"]],
   ])("adds the %s keys as soon as that one section is opened", async (title, probe, keys) => {
     await openCreateModal();
 
@@ -1501,7 +1501,7 @@ describe("Teams - the exact bytes the create call sends", () => {
     can.mockReturnValue(false);
 
     await openCreateModal();
-    await openSection("Additional Settings", /Team Member Key Duration/);
+    await openSection("更多设置", /团队成员密钥有效期/);
 
     const payload = await submit();
 
@@ -1531,16 +1531,16 @@ describe("Teams - the exact bytes the create call sends", () => {
   it("blocks the create on an empty team name and names the rule", async () => {
     renderWithQueryClient(<Teams accessToken="test-token" userID="user-123" userRole="Admin" />);
     act(() => {
-      fireEvent.click(screen.getAllByRole("button", { name: /create team/i })[0]);
+      fireEvent.click(screen.getAllByRole("button", { name: /创建团队/ })[0]);
     });
     await waitFor(() => {
-      expect(screen.getByLabelText(/team name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/团队名称/)).toBeInTheDocument();
     });
 
-    const buttons = screen.getAllByRole("button", { name: /create team/i });
+    const buttons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(buttons[buttons.length - 1]);
 
-    expect(await screen.findByText("Please input a team name")).toBeInTheDocument();
+    expect(await screen.findByText("请输入团队名称")).toBeInTheDocument();
     expect(teamCreateCall).not.toHaveBeenCalled();
   });
 });
@@ -1551,14 +1551,14 @@ describe("Teams - the create form keeps the organization and models picks while 
     { organization_id: "org-2", organization_alias: "Org 2", models: [], members: [] },
   ];
 
-  const orgField = () => screen.getByRole("combobox", { name: /organization/i });
+  const orgField = () => screen.getByRole("combobox", { name: /组织/ });
   const modelsField = () => screen.getByTestId("create-team-models-select");
 
   const openCreateModal = async () => {
     act(() => {
-      fireEvent.click(screen.getAllByRole("button", { name: /create team/i })[0]);
+      fireEvent.click(screen.getAllByRole("button", { name: /创建团队/ })[0]);
     });
-    await screen.findByLabelText(/team name/i);
+    await screen.findByLabelText(/团队名称/);
   };
 
   beforeEach(() => {
@@ -1580,7 +1580,7 @@ describe("Teams - the create form keeps the organization and models picks while 
     fireEvent.change(modelsField(), { target: { value: "gpt-4" } });
 
     mockUseOrganizations.mockReturnValue({ data: ORGS.map((org) => ({ ...org, spend: 1 })) });
-    fireEvent.click(screen.getByText("Additional Settings"));
+    fireEvent.click(screen.getByText("更多设置"));
 
     expect(orgField()).toHaveValue("Org 1");
     expect(modelsField()).toHaveValue("gpt-4");
@@ -1669,7 +1669,7 @@ describe("Teams - the create form keeps the organization and models picks while 
     expect(orgField()).toHaveValue("");
 
     mockUseOrganizations.mockReturnValue({ data: [orgAdminOrgs[0]] });
-    fireEvent.click(screen.getByText("Additional Settings"));
+    fireEvent.click(screen.getByText("更多设置"));
 
     expect(orgField()).toBeEnabled();
   });
@@ -1685,12 +1685,12 @@ describe("Teams - the create form keeps the organization and models picks while 
     await chooseSelectOption(user, orgField(), /Org 1/);
 
     mockUseOrganizations.mockReturnValue({ data: [orgAdminOrgs[1]] });
-    fireEvent.click(screen.getByText("Additional Settings"));
+    fireEvent.click(screen.getByText("更多设置"));
 
-    const submitButtons = screen.getAllByRole("button", { name: /create team/i });
+    const submitButtons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(submitButtons[submitButtons.length - 1]);
 
-    await screen.findByText(/no longer create teams in this organization/i);
+    await screen.findByText(/无法再在该组织中创建团队/);
     expect(teamCreateCall).not.toHaveBeenCalled();
   });
 
@@ -1715,11 +1715,11 @@ describe("Teams - the create form keeps the organization and models picks while 
     await chooseSelectOption(user, orgField(), /Org 1/);
 
     mockUseOrganizations.mockReturnValue({ data: [orgAdminOrgs[1]] });
-    fireEvent.click(screen.getByText("Additional Settings"));
+    fireEvent.click(screen.getByText("更多设置"));
 
     expect(orgField()).toBeEnabled();
     await chooseSelectOption(user, orgField(), /Org 2/);
-    const submitButtons = screen.getAllByRole("button", { name: /create team/i });
+    const submitButtons = screen.getAllByRole("button", { name: /创建团队/ });
     fireEvent.click(submitButtons[submitButtons.length - 1]);
 
     await waitFor(() =>
@@ -1738,7 +1738,7 @@ describe("Teams - the create form keeps the organization and models picks while 
     await chooseSelectOption(user, orgField(), /Org 1/);
     fireEvent.change(modelsField(), { target: { value: "gpt-4" } });
     fireEvent.click(screen.getByRole("button", { name: /^close$/i }));
-    await waitFor(() => expect(screen.queryByLabelText(/team name/i)).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByLabelText(/团队名称/)).not.toBeInTheDocument());
 
     await openCreateModal();
     expect(orgField()).toHaveValue("");
