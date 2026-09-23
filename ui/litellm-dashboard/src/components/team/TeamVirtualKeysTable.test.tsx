@@ -127,7 +127,7 @@ describe("TeamVirtualKeysTable", () => {
     renderWithProviders(<TeamVirtualKeysTable {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Key ID")).toBeInTheDocument();
+      expect(screen.getByText("密钥 ID")).toBeInTheDocument();
     });
   });
 
@@ -267,7 +267,7 @@ describe("TeamVirtualKeysTable", () => {
 
     await user.click(await screen.findByTestId("datatable-filters-trigger"));
     const drawerBody = await screen.findByTestId("filter-drawer-body");
-    const userInput = within(drawerBody).getByPlaceholderText("Filter by user ID…");
+    const userInput = within(drawerBody).getByPlaceholderText("按用户 ID 筛选…");
     fireEvent.change(userInput, { target: { value: "user-42" } });
     await user.click(screen.getByTestId("filter-drawer-apply"));
 
@@ -294,13 +294,13 @@ describe("TeamVirtualKeysTable", () => {
 
     await user.click(await screen.findByTestId("datatable-filters-trigger"));
     const drawerBody = await screen.findByTestId("filter-drawer-body");
-    fireEvent.change(within(drawerBody).getByPlaceholderText("Enter Key ID…"), { target: { value: KEY_HASH } });
+    fireEvent.change(within(drawerBody).getByPlaceholderText("输入密钥 ID…"), { target: { value: KEY_HASH } });
     await user.click(screen.getByTestId("filter-drawer-apply"));
 
     await waitFor(() =>
       expect(mockUseKeys).toHaveBeenLastCalledWith(1, 50, expect.objectContaining({ keyHash: KEY_HASH })),
     );
-    expect(screen.getByTestId("filter-chip-key_hash")).toHaveTextContent("Key ID");
+    expect(screen.getByTestId("filter-chip-key_hash")).toHaveTextContent("密钥 ID");
 
     await user.click(screen.getByTestId("datatable-clear-filters"));
     await waitFor(() =>
@@ -319,7 +319,7 @@ describe("TeamVirtualKeysTable", () => {
     renderWithProviders(<TeamVirtualKeysTable {...defaultProps} />);
 
     const searchBox = await screen.findByTestId("datatable-search");
-    expect(searchBox).toHaveAttribute("placeholder", "Search by key alias or ID…");
+    expect(searchBox).toHaveAttribute("placeholder", "按密钥别名或 ID 搜索…");
     fireEvent.change(searchBox, { target: { value: KEY_HASH } });
 
     await waitFor(() =>
@@ -341,7 +341,7 @@ describe("TeamVirtualKeysTable", () => {
     renderWithProviders(<TeamVirtualKeysTable {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Loading keys...")).toBeInTheDocument();
+      expect(screen.getByText("正在加载密钥...")).toBeInTheDocument();
     });
   });
 
