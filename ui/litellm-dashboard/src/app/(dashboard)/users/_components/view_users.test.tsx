@@ -107,10 +107,10 @@ describe("ViewUserDashboard", () => {
     renderDashboard();
 
     await waitFor(() => {
-      expect(screen.getByText("Users")).toBeInTheDocument();
+      expect(screen.getByText("用户")).toBeInTheDocument();
     });
 
-    expect(screen.getAllByText("Default User Settings").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("默认用户设置").length).toBeGreaterThan(0);
   });
 
   it("switches between the users table and default settings tabs for proxy admins", async () => {
@@ -119,8 +119,8 @@ describe("ViewUserDashboard", () => {
 
     expect(await screen.findByText("test@example.com")).toBeInTheDocument();
 
-    const usersTab = screen.getByRole("tab", { name: "Users" });
-    const settingsTab = screen.getByRole("tab", { name: "Default User Settings" });
+    const usersTab = screen.getByRole("tab", { name: "用户" });
+    const settingsTab = screen.getByRole("tab", { name: "默认用户设置" });
     expect(usersTab).toHaveAttribute("aria-selected", "true");
 
     await user.click(settingsTab);
@@ -166,7 +166,7 @@ describe("ViewUserDashboard", () => {
 
     renderDashboard();
 
-    expect(screen.getByText("Loading users…")).toBeInTheDocument();
+    expect(screen.getByText("正在加载用户…")).toBeInTheDocument();
     expect(screen.queryByTestId("toggle-user-selection")).not.toBeInTheDocument();
     expect(screen.queryByTestId("bulk-edit-users")).not.toBeInTheDocument();
   });
@@ -179,17 +179,15 @@ describe("ViewUserDashboard", () => {
       expect(screen.getByText("test@example.com")).toBeInTheDocument();
     });
 
-    expect(screen.queryByText("Delete User?")).not.toBeInTheDocument();
+    expect(screen.queryByText("删除用户？")).not.toBeInTheDocument();
 
     await user.click(screen.getByTestId("user-actions-user-1"));
     await user.click(await screen.findByTestId("user-action-delete"));
 
     await waitFor(() => {
-      expect(screen.getByText("Delete User?")).toBeInTheDocument();
+      expect(screen.getByText("删除用户？")).toBeInTheDocument();
     });
-    expect(
-      screen.getByText("Are you sure you want to delete this user? This action cannot be undone."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("确定要删除该用户吗？此操作无法撤销。")).toBeInTheDocument();
     expect(screen.getAllByText("user-1").length).toBeGreaterThan(0);
   });
 
@@ -260,15 +258,15 @@ describe("ViewUserDashboard", () => {
       await user.click(screen.getByTestId("toggle-user-selection"));
 
       const bulkEdit = screen.getByTestId("bulk-edit-users");
-      expect(bulkEdit).toHaveTextContent("Bulk Edit (0 selected)");
+      expect(bulkEdit).toHaveTextContent("批量编辑（已选 0 个）");
       expect(bulkEdit).toBeDisabled();
 
       await user.click(screen.getByTestId("datatable-select-row-user-2"));
-      expect(screen.getByTestId("bulk-edit-users")).toHaveTextContent("Bulk Edit (1 selected)");
+      expect(screen.getByTestId("bulk-edit-users")).toHaveTextContent("批量编辑（已选 1 个）");
       expect(screen.getByTestId("bulk-edit-users")).toBeEnabled();
 
       await user.click(screen.getByTestId("datatable-select-all"));
-      expect(screen.getByTestId("bulk-edit-users")).toHaveTextContent("Bulk Edit (2 selected)");
+      expect(screen.getByTestId("bulk-edit-users")).toHaveTextContent("批量编辑（已选 2 个）");
     });
 
     it("clears the selection when selection mode is cancelled", async () => {
@@ -281,12 +279,12 @@ describe("ViewUserDashboard", () => {
 
       await user.click(screen.getByTestId("toggle-user-selection"));
       await user.click(screen.getByTestId("datatable-select-row-user-1"));
-      expect(screen.getByTestId("bulk-edit-users")).toHaveTextContent("Bulk Edit (1 selected)");
+      expect(screen.getByTestId("bulk-edit-users")).toHaveTextContent("批量编辑（已选 1 个）");
 
       await user.click(screen.getByTestId("toggle-user-selection"));
       await user.click(screen.getByTestId("toggle-user-selection"));
 
-      expect(screen.getByTestId("bulk-edit-users")).toHaveTextContent("Bulk Edit (0 selected)");
+      expect(screen.getByTestId("bulk-edit-users")).toHaveTextContent("批量编辑（已选 0 个）");
     });
   });
 
@@ -333,7 +331,7 @@ describe("ViewUserDashboard", () => {
       });
 
       const searchedUserId = "a6f5c02b-0163-45ce-815f-f88d10e95686";
-      await user.type(screen.getByPlaceholderText("Search by email or ID…"), searchedUserId);
+      await user.type(screen.getByPlaceholderText("按邮箱或 ID 搜索…"), searchedUserId);
 
       await waitFor(() => {
         const latest = userListCall.mock.calls[userListCall.mock.calls.length - 1];
@@ -350,9 +348,9 @@ describe("ViewUserDashboard", () => {
       expect(await screen.findByText("test@example.com")).toBeInTheDocument();
 
       userListCall.mockReturnValue(new Promise(() => undefined));
-      fireEvent.change(screen.getByPlaceholderText("Search by email or ID…"), { target: { value: "zzznomatch" } });
+      fireEvent.change(screen.getByPlaceholderText("按邮箱或 ID 搜索…"), { target: { value: "zzznomatch" } });
 
-      expect(await screen.findByText("Loading users…")).toBeInTheDocument();
+      expect(await screen.findByText("正在加载用户…")).toBeInTheDocument();
       expect(screen.queryByText("test@example.com")).not.toBeInTheDocument();
     });
   });

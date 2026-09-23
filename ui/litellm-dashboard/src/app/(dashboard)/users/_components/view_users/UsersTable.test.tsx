@@ -107,17 +107,17 @@ describe("UsersTable", () => {
     const headerRow = screen.getAllByRole("row")[0];
 
     [
-      "User ID",
-      "Email",
-      "Status",
-      "Global Proxy Role",
-      "User Alias",
-      "Spend (tokens)",
-      "Budget (tokens)",
+      "用户 ID",
+      "邮箱",
+      "状态",
+      "全局代理角色",
+      "用户别名",
+      "消费（tokens）",
+      "预算（tokens）",
       "SSO ID",
-      "Virtual Keys",
-      "Created At",
-      "Updated At",
+      "虚拟密钥",
+      "创建时间",
+      "更新时间",
     ].forEach((header) => {
       expect(headerRow).toHaveTextContent(header);
     });
@@ -195,13 +195,13 @@ describe("UsersTable", () => {
 
   it("renders the SCIM status cell from metadata", () => {
     const { rerender } = render(<Harness data={[makeUser()]} />);
-    expect(screen.getByTestId("user-status-user-1")).toHaveTextContent("Active");
+    expect(screen.getByTestId("user-status-user-1")).toHaveTextContent("活跃");
 
     rerender(<Harness data={[makeUser({ metadata: { scim_active: false } } as Partial<UserInfo>)]} />);
-    expect(screen.getByTestId("user-status-user-1")).toHaveTextContent("Inactive");
+    expect(screen.getByTestId("user-status-user-1")).toHaveTextContent("停用");
 
     rerender(<Harness data={[makeUser({ metadata: { scim_active: true } } as Partial<UserInfo>)]} />);
-    expect(screen.getByTestId("user-status-user-1")).toHaveTextContent("Active");
+    expect(screen.getByTestId("user-status-user-1")).toHaveTextContent("活跃");
   });
 
   describe("row selection", () => {
@@ -258,14 +258,14 @@ describe("UsersTable", () => {
   it("renders the empty state when there are no users", () => {
     render(<Harness data={[]} rowCount={0} />);
 
-    expect(screen.getByText("No users found")).toBeInTheDocument();
+    expect(screen.getByText("未找到用户")).toBeInTheDocument();
   });
 
   it("shows skeleton rows on the initial load instead of the empty state", () => {
     render(<Harness data={[]} rowCount={0} isLoading />);
 
     expect(screen.getAllByTestId("skeleton-row").length).toBeGreaterThan(0);
-    expect(screen.queryByText("No users found")).not.toBeInTheDocument();
+    expect(screen.queryByText("未找到用户")).not.toBeInTheDocument();
   });
 
   it("keeps the row menu out of the identity cell so only the name and menu act on a row", () => {
