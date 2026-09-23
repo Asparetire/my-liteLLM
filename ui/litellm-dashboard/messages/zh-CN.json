@@ -516,6 +516,25 @@
     "modelScope": "模型范围",
     "modelScopeTooltip": "您在该团队内可访问的模型。",
     "allTeamModels": "全部团队模型",
-    "infoAriaLabel": "{label} 说明"
+    "infoAriaLabel": "{label} 说明",
+    "addMember": "添加成员",
+    "editMember": "编辑成员",
+    "emailLabel": "邮箱",
+    "or": "或",
+    "userIdLabel": "用户 ID",
+    "roleLabel": "角色",
+    "currentRole": "（当前：{role}）",
+    "cancel": "取消",
+    "adding": "添加中...",
+    "saving": "保存中...",
+    "invalidEmail": "请输入有效的邮箱！",
+    "roleRequired": "请选择角色！",
+    "enterNumber": "请输入数值",
+    "selectOptions": "请选择选项",
+    "guardrailsPlaceholder": "选择护栏",
+    "guardrailsEmpty": "未找到护栏",
+    "guardrailGroupGlobal": "全局",
+    "guardrailGroupOther": "其他",
+    "globalGuardrailAria": "全局护栏"
   }
 }

@@ -30,8 +30,8 @@ describe("EditMembership", () => {
     );
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.getByLabelText("Email")).toBeInTheDocument();
-    expect(screen.getByLabelText("Role")).toBeInTheDocument();
+    expect(screen.getByLabelText("邮箱")).toBeInTheDocument();
+    expect(screen.getByLabelText("角色")).toBeInTheDocument();
   });
 
   it("should submit form data when adding a member", async () => {
@@ -46,7 +46,7 @@ describe("EditMembership", () => {
     );
 
     const emailInput = screen.getByPlaceholderText("user@example.com");
-    const submitButton = screen.getByRole("button", { name: "Add Member" });
+    const submitButton = screen.getByRole("button", { name: "添加成员" });
 
     act(() => {
       fireEvent.change(emailInput, { target: { value: "test@example.com" } });

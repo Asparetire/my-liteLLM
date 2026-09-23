@@ -516,6 +516,25 @@
     "modelScope": "Model Scope",
     "modelScopeTooltip": "Models you can access within this team.",
     "allTeamModels": "All Team Models",
-    "infoAriaLabel": "{label} information"
+    "infoAriaLabel": "{label} information",
+    "addMember": "Add Member",
+    "editMember": "Edit Member",
+    "emailLabel": "Email",
+    "or": "OR",
+    "userIdLabel": "User ID",
+    "roleLabel": "Role",
+    "currentRole": "(Current: {role})",
+    "cancel": "Cancel",
+    "adding": "Adding...",
+    "saving": "Saving...",
+    "invalidEmail": "Please enter a valid email!",
+    "roleRequired": "Please select a role!",
+    "enterNumber": "Enter a numerical value",
+    "selectOptions": "Select options",
+    "guardrailsPlaceholder": "Select guardrails",
+    "guardrailsEmpty": "No guardrails found",
+    "guardrailGroupGlobal": "Global",
+    "guardrailGroupOther": "Other",
+    "globalGuardrailAria": "Global guardrail"
   }
 }
