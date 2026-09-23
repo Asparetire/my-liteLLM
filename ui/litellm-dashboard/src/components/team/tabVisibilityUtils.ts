@@ -22,6 +22,19 @@ export const TEAM_INFO_TAB_LABELS: Record<string, string> = {
 };
 
 /**
+ * teamInfo namespace keys for each tab label. Components resolve these
+ * through useTranslations("teamInfo") to render the active locale.
+ */
+export const TEAM_INFO_TAB_LABEL_KEYS: Record<string, string> = {
+  [TEAM_INFO_TAB_KEYS.OVERVIEW]: "tabOverview",
+  [TEAM_INFO_TAB_KEYS.MY_USER]: "tabMyUser",
+  [TEAM_INFO_TAB_KEYS.VIRTUAL_KEYS]: "tabVirtualKeys",
+  [TEAM_INFO_TAB_KEYS.MEMBERS]: "tabMembers",
+  [TEAM_INFO_TAB_KEYS.MEMBER_PERMISSIONS]: "tabMemberPermissions",
+  [TEAM_INFO_TAB_KEYS.SETTINGS]: "tabSettings",
+};
+
+/**
  * Returns the list of tab keys that should be visible based on permissions.
  * - Overview, My User, Virtual Keys: always visible
  * - Members, Member Permissions, Settings: only when canEditTeam is true

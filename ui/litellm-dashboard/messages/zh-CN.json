@@ -614,6 +614,22 @@
     "docsLink": "此处",
     "loadingAvailableTeams": "正在加载可用团队…",
     "joinSuccess": "成功加入团队",
-    "joinError": "加入团队失败"
+    "joinError": "加入团队失败",
+    "tabOverview": "总览",
+    "tabMyUser": "我的用户",
+    "tabVirtualKeys": "虚拟密钥",
+    "tabMembers": "成员",
+    "tabMemberPermissions": "成员权限",
+    "tabSettings": "设置",
+    "badgeNoDefaultModels": "无默认模型",
+    "badgeAllProxyFromEntry": "由团队模型列表中的“全部代理模型”条目授予",
+    "badgeAllProxyEmptyList": "团队模型列表为空，因此可访问代理上的全部模型",
+    "badgeNoDefaultTooltip": "没有直接授予的模型，访问权限仅来自访问组",
+    "badgeGrantedDirect": "由团队模型列表直接授予",
+    "badgeGrantedDirectAndVia": "由团队模型列表直接授予，也可通过 {groups} 获得",
+    "badgeGrantedVia": "通过 {groups} 授予",
+    "badgeViaAccessGroup": "访问组 {name}",
+    "badgeViaAccessGroups": "访问组 {names}",
+    "badgeViaUnknownGroup": "某个访问组"
   }
 }

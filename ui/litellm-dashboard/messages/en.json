@@ -614,6 +614,22 @@
     "docsLink": "here",
     "loadingAvailableTeams": "Loading available teams…",
     "joinSuccess": "Successfully joined team",
-    "joinError": "Failed to join team"
+    "joinError": "Failed to join team",
+    "tabOverview": "Overview",
+    "tabMyUser": "My User",
+    "tabVirtualKeys": "Virtual Keys",
+    "tabMembers": "Members",
+    "tabMemberPermissions": "Member Permissions",
+    "tabSettings": "Settings",
+    "badgeNoDefaultModels": "No default models",
+    "badgeAllProxyFromEntry": "Granted by the All Proxy Models entry in the team's model list",
+    "badgeAllProxyEmptyList": "The team's model list is empty, so it can access every model on the proxy",
+    "badgeNoDefaultTooltip": "No models are granted directly. Access comes only from access groups",
+    "badgeGrantedDirect": "Granted directly in the team's model list",
+    "badgeGrantedDirectAndVia": "Granted directly in the team's model list, and also via {groups}",
+    "badgeGrantedVia": "Granted via {groups}",
+    "badgeViaAccessGroup": "access group {name}",
+    "badgeViaAccessGroups": "access groups {names}",
+    "badgeViaUnknownGroup": "an access group"
   }
 }

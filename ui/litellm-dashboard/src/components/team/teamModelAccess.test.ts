@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { computeTeamModelBadges, normalizeTeamModelSelection, TeamAccessGroupModelGrant } from "./teamModelAccess";
+import {
+  computeTeamModelBadges,
+  normalizeTeamModelSelection,
+  TeamAccessGroupModelGrant,
+  TeamModelBadgeMessages,
+} from "./teamModelAccess";
 
 const GRANTS: TeamAccessGroupModelGrant[] = [
   { access_group_id: "ag-1", access_group_name: "shared", models: ["haiku", "gpt-4o-mini"] },
@@ -82,5 +87,29 @@ describe("computeTeamModelBadges", () => {
       { label: "direct-model", kind: "direct", tooltip: "Granted directly in the team's model list" },
       { label: "haiku", kind: "access-group", tooltip: "Granted via an access group" },
     ]);
+  });
+
+  it("renders labels and tooltips from the injected messages instead of English defaults", () => {
+    const messages: TeamModelBadgeMessages = {
+      allProxyModels: "全部代理模型",
+      allProxyFromEntry: "由团队模型列表中的“全部代理模型”条目授予",
+      allProxyEmptyList: "团队模型列表为空，因此可访问代理上的全部模型",
+      noDefaultModels: "无默认模型",
+      noDefaultTooltip: "没有直接授予的模型，访问权限仅来自访问组",
+      grantedDirect: "由团队模型列表直接授予",
+      grantedDirectAndVia: (groups) => `由团队模型列表直接授予，也可通过 ${groups} 获得`,
+      grantedVia: (groups) => `通过 ${groups} 授予`,
+      viaAccessGroup: (name) => `访问组 ${name}`,
+      viaAccessGroups: (names) => `访问组 ${names}`,
+      viaUnknownGroup: "某个访问组",
+    };
+
+    const badges = computeTeamModelBadges(["haiku"], [], GRANTS, messages);
+    expect(badges).toEqual([
+      { label: "haiku", kind: "direct", tooltip: "由团队模型列表直接授予，也可通过 访问组 shared, extra 获得" },
+      { label: "gpt-4o-mini", kind: "access-group", tooltip: "通过 访问组 shared 授予" },
+      { label: "sonnet", kind: "access-group", tooltip: "通过 访问组 extra 授予" },
+    ]);
+    expect(badges.every((b) => !b.tooltip.includes("Granted"))).toBe(true);
   });
 });
