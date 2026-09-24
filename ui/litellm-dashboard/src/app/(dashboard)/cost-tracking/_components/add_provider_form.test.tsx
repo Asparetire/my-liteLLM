@@ -23,7 +23,7 @@ describe("AddProviderForm", () => {
 
   it("should render", () => {
     renderWithProviders(<AddProviderForm {...DEFAULT_PROPS} />);
-    expect(screen.getByRole("button", { name: /add provider discount/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "添加提供商折扣" })).toBeInTheDocument();
   });
 
   it("should render the discount percentage input field", () => {
@@ -33,22 +33,22 @@ describe("AddProviderForm", () => {
 
   it("should disable the submit button when no provider is selected and no discount is entered", () => {
     renderWithProviders(<AddProviderForm {...DEFAULT_PROPS} />);
-    expect(screen.getByRole("button", { name: /add provider discount/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "添加提供商折扣" })).toBeDisabled();
   });
 
   it("should disable the submit button when a provider is selected but no discount is entered", () => {
     renderWithProviders(<AddProviderForm {...DEFAULT_PROPS} selectedProvider="OpenAI" newDiscount="" />);
-    expect(screen.getByRole("button", { name: /add provider discount/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "添加提供商折扣" })).toBeDisabled();
   });
 
   it("should disable the submit button when a discount is entered but no provider is selected", () => {
     renderWithProviders(<AddProviderForm {...DEFAULT_PROPS} selectedProvider={undefined} newDiscount="5" />);
-    expect(screen.getByRole("button", { name: /add provider discount/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "添加提供商折扣" })).toBeDisabled();
   });
 
   it("should enable the submit button when both a provider and a discount value are provided", () => {
     renderWithProviders(<AddProviderForm {...DEFAULT_PROPS} selectedProvider="OpenAI" newDiscount="5" />);
-    expect(screen.getByRole("button", { name: /add provider discount/i })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "添加提供商折扣" })).toBeEnabled();
   });
 
   it("should call onAddProvider when the enabled submit button is clicked", async () => {
@@ -58,7 +58,7 @@ describe("AddProviderForm", () => {
       <AddProviderForm {...DEFAULT_PROPS} selectedProvider="OpenAI" newDiscount="5" onAddProvider={onAddProvider} />,
     );
 
-    await user.click(screen.getByRole("button", { name: /add provider discount/i }));
+    await user.click(screen.getByRole("button", { name: "添加提供商折扣" }));
     expect(onAddProvider).toHaveBeenCalledTimes(1);
   });
 

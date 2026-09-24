@@ -26,7 +26,7 @@ describe("AddMarginForm", () => {
 
   it("should render", () => {
     renderWithProviders(<AddMarginForm {...DEFAULT_PROPS} />);
-    expect(screen.getByRole("button", { name: /add provider margin/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "添加提供商加价" })).toBeInTheDocument();
   });
 
   it("should show the percentage input when marginType is percentage", () => {
@@ -51,37 +51,37 @@ describe("AddMarginForm", () => {
 
   it("should show the Percentage-based and Fixed Amount radio options", () => {
     renderWithProviders(<AddMarginForm {...DEFAULT_PROPS} />);
-    expect(screen.getByText("Percentage-based")).toBeInTheDocument();
-    expect(screen.getByText("Fixed Amount")).toBeInTheDocument();
+    expect(screen.getByText("按百分比")).toBeInTheDocument();
+    expect(screen.getByText("固定金额")).toBeInTheDocument();
   });
 
   it("should disable the submit button when no provider is selected (percentage mode)", () => {
     renderWithProviders(<AddMarginForm {...DEFAULT_PROPS} selectedProvider={undefined} percentageValue="10" />);
-    expect(screen.getByRole("button", { name: /add provider margin/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "添加提供商加价" })).toBeDisabled();
   });
 
   it("should disable the submit button when provider is selected but no percentage value (percentage mode)", () => {
     renderWithProviders(<AddMarginForm {...DEFAULT_PROPS} selectedProvider="OpenAI" percentageValue="" />);
-    expect(screen.getByRole("button", { name: /add provider margin/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "添加提供商加价" })).toBeDisabled();
   });
 
   it("should enable the submit button when provider and percentage value are both provided", () => {
     renderWithProviders(<AddMarginForm {...DEFAULT_PROPS} selectedProvider="OpenAI" percentageValue="10" />);
-    expect(screen.getByRole("button", { name: /add provider margin/i })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "添加提供商加价" })).toBeEnabled();
   });
 
   it("should disable the submit button in fixed mode when no fixed amount is provided", () => {
     renderWithProviders(
       <AddMarginForm {...DEFAULT_PROPS} selectedProvider="OpenAI" marginType="fixed" fixedAmountValue="" />,
     );
-    expect(screen.getByRole("button", { name: /add provider margin/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "添加提供商加价" })).toBeDisabled();
   });
 
   it("should enable the submit button in fixed mode when provider and fixed amount are provided", () => {
     renderWithProviders(
       <AddMarginForm {...DEFAULT_PROPS} selectedProvider="OpenAI" marginType="fixed" fixedAmountValue="0.001" />,
     );
-    expect(screen.getByRole("button", { name: /add provider margin/i })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "添加提供商加价" })).toBeEnabled();
   });
 
   it("should call onAddProvider when the enabled submit button is clicked", async () => {
@@ -91,7 +91,7 @@ describe("AddMarginForm", () => {
       <AddMarginForm {...DEFAULT_PROPS} selectedProvider="OpenAI" percentageValue="10" onAddProvider={onAddProvider} />,
     );
 
-    await user.click(screen.getByRole("button", { name: /add provider margin/i }));
+    await user.click(screen.getByRole("button", { name: "添加提供商加价" }));
     expect(onAddProvider).toHaveBeenCalledTimes(1);
   });
 
@@ -127,7 +127,7 @@ describe("AddMarginForm", () => {
     const user = userEvent.setup();
     renderWithProviders(<AddMarginForm {...DEFAULT_PROPS} onMarginTypeChange={onMarginTypeChange} />);
 
-    await user.click(screen.getByText("Fixed Amount"));
+    await user.click(screen.getByText("固定金额"));
     expect(onMarginTypeChange).toHaveBeenCalledWith("fixed");
   });
 

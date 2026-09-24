@@ -7,10 +7,10 @@ import ProviderMarginTable from "./provider_margin_table";
 import { Providers, providerLogoMap } from "@/components/provider_info_helpers";
 
 const ROW_ACTION_NAME = {
-  edit: /^Edit margin for /,
-  save: /^Save margin for /,
-  cancel: /^Cancel editing margin for /,
-  remove: /^Remove margin for /,
+  edit: /^编辑.+的加价$/,
+  save: /^保存.+的加价$/,
+  cancel: /^取消编辑.+的加价$/,
+  remove: /^移除.+的加价$/,
 } as const;
 
 const rowAction = (action: keyof typeof ROW_ACTION_NAME): HTMLElement =>
@@ -43,9 +43,9 @@ describe("ProviderMarginTable", () => {
         onRemoveProvider={onRemoveProvider}
       />,
     );
-    expect(screen.getByRole("columnheader", { name: "Provider" })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: "Margin" })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: "Actions" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "提供商" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "加价" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "操作" })).toBeInTheDocument();
   });
 
   it("should display the provider display name", () => {
@@ -91,7 +91,7 @@ describe("ProviderMarginTable", () => {
         onRemoveProvider={onRemoveProvider}
       />,
     );
-    expect(screen.getByText("Global (All Providers)")).toBeInTheDocument();
+    expect(screen.getByText("全局（所有提供商）")).toBeInTheDocument();
   });
 
   it("should sort the global row above provider rows", () => {
@@ -104,7 +104,7 @@ describe("ProviderMarginTable", () => {
     );
     const rows = screen.getAllByRole("row").slice(1);
     expect(rows.map((row) => row.textContent)).toEqual([
-      expect.stringContaining("Global (All Providers)"),
+      expect.stringContaining("全局（所有提供商）"),
       expect.stringContaining("OpenAI"),
     ]);
   });
@@ -259,7 +259,7 @@ describe("ProviderMarginTable", () => {
 
     await user.click(rowAction("remove"));
 
-    expect(onRemoveProvider).toHaveBeenCalledWith("global", "Global");
+    expect(onRemoveProvider).toHaveBeenCalledWith("global", "全局");
   });
 
   it("should expose each row action as a button named for its provider", async () => {
@@ -272,13 +272,13 @@ describe("ProviderMarginTable", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: "Edit margin for OpenAI" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Remove margin for OpenAI" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "编辑OpenAI的加价" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "移除OpenAI的加价" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Edit margin for OpenAI" }));
+    await user.click(screen.getByRole("button", { name: "编辑OpenAI的加价" }));
 
-    expect(screen.getByRole("button", { name: "Save margin for OpenAI" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cancel editing margin for OpenAI" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "保存OpenAI的加价" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "取消编辑OpenAI的加价" })).toBeInTheDocument();
   });
 
   it("should name the global row's actions after the global provider", () => {
@@ -290,15 +290,15 @@ describe("ProviderMarginTable", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: "Edit margin for Global" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Remove margin for Global" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "编辑全局的加价" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "移除全局的加价" })).toBeInTheDocument();
   });
 
   it("should render the empty message when no margins are configured", () => {
     renderWithProviders(
       <ProviderMarginTable marginConfig={{}} onMarginChange={onMarginChange} onRemoveProvider={onRemoveProvider} />,
     );
-    expect(screen.getByText("No provider margins configured")).toBeInTheDocument();
+    expect(screen.getByText("尚未配置提供商加价")).toBeInTheDocument();
   });
 
   describe("when both percentage and fixed amount are entered", () => {

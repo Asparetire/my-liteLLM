@@ -16,7 +16,7 @@ describe("HowItWorks", () => {
 
   it("should render", () => {
     renderWithProviders(<HowItWorks />);
-    expect(screen.getByText("Cost Calculation")).toBeInTheDocument();
+    expect(screen.getByText("成本计算")).toBeInTheDocument();
   });
 
   it("should display the cost calculation formula", () => {
@@ -26,7 +26,7 @@ describe("HowItWorks", () => {
 
   it("should display the valid range information", () => {
     renderWithProviders(<HowItWorks />);
-    expect(screen.getByText(/0% and 100%/i)).toBeInTheDocument();
+    expect(screen.getByText(/0% 到 100%/)).toBeInTheDocument();
   });
 
   it("should render the code block with a curl example", () => {
@@ -44,7 +44,7 @@ describe("HowItWorks", () => {
 
   it("should not show calculated results initially when no input is provided", () => {
     renderWithProviders(<HowItWorks />);
-    expect(screen.queryByText("Calculated Results")).not.toBeInTheDocument();
+    expect(screen.queryByText("计算结果")).not.toBeInTheDocument();
   });
 
   it("should not show calculated results when only response cost is entered", async () => {
@@ -54,7 +54,7 @@ describe("HowItWorks", () => {
     const responseCostInput = screen.getByPlaceholderText("0.0171938125");
     fireEvent.change(responseCostInput, { target: { value: "0.01" } });
 
-    expect(screen.queryByText("Calculated Results")).not.toBeInTheDocument();
+    expect(screen.queryByText("计算结果")).not.toBeInTheDocument();
   });
 
   it("should not show calculated results when only discount amount is entered", async () => {
@@ -64,7 +64,7 @@ describe("HowItWorks", () => {
     const discountAmountInput = screen.getByPlaceholderText("0.0009049375");
     fireEvent.change(discountAmountInput, { target: { value: "0.001" } });
 
-    expect(screen.queryByText("Calculated Results")).not.toBeInTheDocument();
+    expect(screen.queryByText("计算结果")).not.toBeInTheDocument();
   });
 
   it("should show calculated results when both fields are filled", async () => {
@@ -77,7 +77,7 @@ describe("HowItWorks", () => {
     fireEvent.change(responseCostInput, { target: { value: "0.0171938125" } });
     fireEvent.change(discountAmountInput, { target: { value: "0.0009049375" } });
 
-    expect(await screen.findByText("Calculated Results")).toBeInTheDocument();
+    expect(await screen.findByText("计算结果")).toBeInTheDocument();
   });
 
   it("should show original cost, final cost, and discount amount in results", async () => {
@@ -87,9 +87,9 @@ describe("HowItWorks", () => {
     fireEvent.change(screen.getByPlaceholderText("0.0171938125"), { target: { value: "0.0171938125" } });
     fireEvent.change(screen.getByPlaceholderText("0.0009049375"), { target: { value: "0.0009049375" } });
 
-    expect(await screen.findByText("Original Cost:")).toBeInTheDocument();
-    expect(screen.getByText("Final Cost:")).toBeInTheDocument();
-    expect(screen.getByText("Discount Amount:")).toBeInTheDocument();
-    expect(screen.getByText("Discount Applied:")).toBeInTheDocument();
+    expect(await screen.findByText("原始成本：")).toBeInTheDocument();
+    expect(screen.getByText("最终成本：")).toBeInTheDocument();
+    expect(screen.getByText("折扣金额：")).toBeInTheDocument();
+    expect(screen.getByText("已应用折扣：")).toBeInTheDocument();
   });
 });
