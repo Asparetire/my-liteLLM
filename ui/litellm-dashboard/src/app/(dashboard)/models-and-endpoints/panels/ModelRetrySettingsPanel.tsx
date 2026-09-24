@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import ModelRetrySettingsTab from "@/app/(dashboard)/models-and-endpoints/components/ModelRetrySettingsTab";
 import { getCallbacksCall } from "@/components/networking";
 import { useUpdateRetryPolicy } from "@/app/(dashboard)/hooks/routerSettings/useUpdateRetryPolicy";
@@ -23,6 +24,7 @@ interface RouterSettings {
 }
 
 export default function ModelRetrySettingsPanel() {
+  const t = useTranslations("modelsEndpoints");
   const { accessToken, userId: userID, userRole } = useAuthorized();
   const { availableModelGroups } = useModelDashboardData();
   const updateRetryPolicy = useUpdateRetryPolicy(accessToken);
@@ -69,7 +71,7 @@ export default function ModelRetrySettingsPanel() {
       { retry_policy: globalRetryPolicy, model_group_retry_policy: modelGroupRetryPolicy },
       {
         onSuccess: () => {
-          toast.success("Retry settings saved successfully");
+          toast.success(t("retrySettingsSavedToast"));
           void fetchRetrySettings().then((routerSettings) => {
             if (routerSettings) {
               applyRetrySettings(routerSettings);
@@ -77,7 +79,7 @@ export default function ModelRetrySettingsPanel() {
           });
         },
         onError: () => {
-          toast.fromError("Failed to save retry settings");
+          toast.fromError(t("retrySettingsSaveFailed"));
         },
       },
     );

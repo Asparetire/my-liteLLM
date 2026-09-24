@@ -66,8 +66,10 @@ describe("AccessGroupBudgetsPanel", () => {
     renderPanel();
 
     expect(await screen.findByText("premium")).toBeInTheDocument();
-    expect(screen.getByText("$1.2500")).toBeInTheDocument();
-    expect(screen.getByText("of $2.50")).toBeInTheDocument();
+    // SpendBudgetCell speaks token semantics since REQ-06: 1.25 spend renders "1 token",
+    // a 2.5 budget renders "of 3 tokens" (rounded to whole tokens).
+    expect(screen.getByText("1 token")).toBeInTheDocument();
+    expect(screen.getByText("of 3 tokens")).toBeInTheDocument();
     expect(screen.getByText("monthly")).toBeInTheDocument();
     expect(GET).toHaveBeenCalledWith("/access_group/list");
   });
@@ -78,7 +80,7 @@ describe("AccessGroupBudgetsPanel", () => {
     });
     renderPanel();
 
-    expect(await screen.findByText("of $0.00002")).toBeInTheDocument();
+    expect(await screen.findByText("of 0 tokens")).toBeInTheDocument();
   });
 
   it("shows a group with no budget as unlimited and offers nothing to clear", async () => {
@@ -88,17 +90,17 @@ describe("AccessGroupBudgetsPanel", () => {
 
     await openActions("shared");
 
-    expect(await screen.findByText("Set budget")).toBeInTheDocument();
+    expect(await screen.findByText("设置预算")).toBeInTheDocument();
     expect(screen.getByTestId("access-group-action-clear-budget")).toHaveAttribute("aria-disabled", "true");
   });
 
   it("sends the filled fields to the group's budget route", async () => {
     renderPanel();
     await openActions("shared");
-    await userEvent.click(await screen.findByText("Set budget"));
+    await userEvent.click(await screen.findByText("设置预算"));
 
-    fireEvent.change(await screen.findByLabelText(/Max Budget/), { target: { value: "12.5" } });
-    await userEvent.click(screen.getByRole("button", { name: "Save Budget" }));
+    fireEvent.change(await screen.findByLabelText(/最大预算/), { target: { value: "12.5" } });
+    await userEvent.click(screen.getByRole("button", { name: "保存预算" }));
 
     await waitFor(() =>
       expect(PUT).toHaveBeenCalledWith("/access_group/{access_group}/budget", {
@@ -111,18 +113,18 @@ describe("AccessGroupBudgetsPanel", () => {
   it("pre-fills the modal from the budget the group already has", async () => {
     renderPanel();
     await openActions("premium");
-    await userEvent.click(await screen.findByText("Edit budget"));
+    await userEvent.click(await screen.findByText("编辑预算"));
 
-    expect(await screen.findByLabelText(/Max Budget/)).toHaveValue(2.5);
+    expect(await screen.findByLabelText(/最大预算/)).toHaveValue(2.5);
   });
 
   it("refuses to save a budget with every field blank", async () => {
     renderPanel();
     await openActions("shared");
-    await userEvent.click(await screen.findByText("Set budget"));
-    await userEvent.click(await screen.findByRole("button", { name: "Save Budget" }));
+    await userEvent.click(await screen.findByText("设置预算"));
+    await userEvent.click(await screen.findByRole("button", { name: "保存预算" }));
 
-    expect(await screen.findByText(/Set at least one of max budget/)).toBeInTheDocument();
+    expect(await screen.findByText(/至少填写最大预算/)).toBeInTheDocument();
     expect(PUT).not.toHaveBeenCalled();
   });
 
@@ -150,11 +152,11 @@ describe("AccessGroupBudgetsPanel", () => {
   it("clears a budget only after the confirmation is accepted", async () => {
     renderPanel();
     await openActions("premium");
-    await userEvent.click(await screen.findByRole("menuitem", { name: /clear budget/i }));
+    await userEvent.click(await screen.findByRole("menuitem", { name: /清除预算/ }));
 
     expect(DELETE).not.toHaveBeenCalled();
 
-    await userEvent.click(await screen.findByRole("button", { name: /^delete$/i }));
+    await userEvent.click(await screen.findByRole("button", { name: /^删除$/ }));
 
     await waitFor(() =>
       expect(DELETE).toHaveBeenCalledWith("/access_group/{access_group}/budget", {

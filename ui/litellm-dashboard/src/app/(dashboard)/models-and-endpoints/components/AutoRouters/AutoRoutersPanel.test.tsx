@@ -169,8 +169,8 @@ describe("AutoRoutersPanel", () => {
   it("labels Type by classifier rather than by router family", async () => {
     renderPanel();
 
-    expect(await screen.findByText("Heuristic")).toBeInTheDocument();
-    expect(await screen.findByText("Semantic")).toBeInTheDocument();
+    expect(await screen.findByText("启发式")).toBeInTheDocument();
+    expect(await screen.findByText("语义")).toBeInTheDocument();
   });
 
   // Reuses the models-page drill-in, so an auto router opens the full ModelInfoView with
@@ -192,11 +192,11 @@ describe("AutoRoutersPanel", () => {
     const callsBeforeCreate = modelInfoCall.mock.calls.length;
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Add Auto Router" }));
+    await user.click(screen.getByRole("button", { name: "添加自动路由器" }));
 
     // A dialog, not a full-panel swap: the list stays mounted behind it.
     const dialog = await screen.findByRole("dialog");
-    expect(dialog).toHaveTextContent("Add Auto Router");
+    expect(dialog).toHaveTextContent("添加自动路由器");
     expect(screen.getByText("tri-tier-router")).toBeInTheDocument();
 
     await user.click(await screen.findByRole("button", { name: "Submit auto router" }));
@@ -214,7 +214,7 @@ describe("AutoRoutersPanel", () => {
     renderPanel(false);
 
     expect(await screen.findByText("tri-tier-router")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Add Auto Router" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "添加自动路由器" })).not.toBeInTheDocument();
     expect(screen.queryByTestId("auto-router-actions-auto-1")).not.toBeInTheDocument();
     // Still navigable, because opening the detail view is a read.
     expect(screen.getByRole("button", { name: "tri-tier-router" })).toBeInTheDocument();
@@ -231,7 +231,7 @@ describe("AutoRoutersPanel", () => {
 
     await user.click(screen.getByTestId("auto-router-actions-auto-2"));
     await user.click(await screen.findByTestId("auto-router-action-delete"));
-    await user.click(await screen.findByRole("button", { name: /^delete$/i }));
+    await user.click(await screen.findByRole("button", { name: /^删除$/ }));
 
     await waitFor(() => expect(modelDeleteCall).toHaveBeenCalledWith("token", "auto-2"));
     await waitFor(() => expect(modelInfoCall.mock.calls.length).toBeGreaterThan(callsBeforeDelete));
@@ -245,7 +245,7 @@ describe("AutoRoutersPanel", () => {
 
     await user.click(screen.getByTestId("auto-router-actions-auto-2"));
     await user.click(await screen.findByTestId("auto-router-action-delete"));
-    await user.click(await screen.findByRole("button", { name: /cancel/i }));
+    await user.click(await screen.findByRole("button", { name: /取消/ }));
 
     expect(modelDeleteCall).not.toHaveBeenCalled();
   });
@@ -264,7 +264,7 @@ describe("AutoRoutersPanel", () => {
 
     renderPanel();
 
-    expect(await screen.findByText("No auto routers yet")).toBeInTheDocument();
+    expect(await screen.findByText("尚无自动路由器")).toBeInTheDocument();
   });
 
   it("keeps delete available on a DB-created adaptive router that has no editor", async () => {
@@ -274,7 +274,7 @@ describe("AutoRoutersPanel", () => {
     await screen.findByText("adaptive-router");
     await user.click(screen.getByTestId("auto-router-actions-auto-3"));
     await user.click(await screen.findByTestId("auto-router-action-delete"));
-    await user.click(await screen.findByRole("button", { name: /^delete$/i }));
+    await user.click(await screen.findByRole("button", { name: /^删除$/ }));
 
     await waitFor(() => expect(modelDeleteCall).toHaveBeenCalledWith("token", "auto-3"));
   });

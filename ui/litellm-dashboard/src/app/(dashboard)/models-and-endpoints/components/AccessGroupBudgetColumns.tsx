@@ -1,6 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 import { MoreHorizontal, Trash2, Wallet } from "lucide-react";
 
 import { getBudgetDurationLabel } from "@/components/common_components/budget_duration_dropdown";
@@ -16,6 +17,20 @@ import {
 import { cn } from "@/lib/cva.config";
 import { ModelAccessGroup } from "@/app/(dashboard)/hooks/modelAccessGroups/useModelAccessGroups";
 
+type Translator = (key: string, values?: Record<string, string | number>) => string;
+
+const writeBlockedReason = (
+  accessGroup: ModelAccessGroup,
+  canWrite: boolean,
+  t: Translator,
+): string | undefined => {
+  if (!canWrite) return t("onlyProxyAdminCanChangeBudget");
+  if (!isBudgetAddressable(accessGroup.access_group)) {
+    return t("slashGroupNoBudget");
+  }
+  return undefined;
+};
+
 const budgetDecimals = (maxBudget: number | null | undefined): number =>
   maxBudget != null && maxBudget > 0 && maxBudget < 0.01 ? 5 : 2;
 
@@ -25,14 +40,6 @@ const budgetDecimals = (maxBudget: number | null | undefined): number =>
  */
 export const isBudgetAddressable = (accessGroup: string): boolean => !accessGroup.includes("/");
 
-const writeBlockedReason = (accessGroup: ModelAccessGroup, canWrite: boolean): string | undefined => {
-  if (!canWrite) return "Only a proxy admin can change an access group budget";
-  if (!isBudgetAddressable(accessGroup.access_group)) {
-    return "A budget cannot be set on a group whose name contains a slash";
-  }
-  return undefined;
-};
-
 interface AccessGroupRowActionsProps {
   accessGroup: ModelAccessGroup;
   canWrite: boolean;
@@ -41,13 +48,14 @@ interface AccessGroupRowActionsProps {
 }
 
 function AccessGroupRowActions({ accessGroup, canWrite, onSetBudget, onClearBudget }: AccessGroupRowActionsProps) {
+  const t = useTranslations("modelsEndpoints");
   const hasBudget = accessGroup.budget != null;
-  const blocked = writeBlockedReason(accessGroup, canWrite);
+  const blocked = writeBlockedReason(accessGroup, canWrite, t);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label={`Open budget actions for ${accessGroup.access_group}`}
+        aria-label={t("openBudgetActionsAria", { group: accessGroup.access_group })}
         data-testid={`access-group-actions-${accessGroup.access_group}`}
         className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "text-muted-foreground")}
       >
@@ -61,17 +69,17 @@ function AccessGroupRowActions({ accessGroup, canWrite, onSetBudget, onClearBudg
           onClick={() => onSetBudget(accessGroup)}
         >
           <Wallet />
-          {hasBudget ? "Edit budget" : "Set budget"}
+          {hasBudget ? t("editBudget") : t("setBudget")}
         </DropdownMenuItem>
         <DropdownMenuItem
           variant="destructive"
           disabled={blocked !== undefined || !hasBudget}
           data-testid="access-group-action-clear-budget"
-          title={blocked ?? (hasBudget ? undefined : "This access group has no budget to clear")}
+          title={blocked ?? (hasBudget ? undefined : t("noBudgetToClear"))}
           onClick={() => onClearBudget(accessGroup)}
         >
           <Trash2 />
-          Clear budget
+          {t("clearBudget")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -80,20 +88,22 @@ function AccessGroupRowActions({ accessGroup, canWrite, onSetBudget, onClearBudg
 
 interface AccessGroupBudgetColumnsDeps {
   canWrite: boolean;
+  t: Translator;
   onSetBudget: (accessGroup: ModelAccessGroup) => void;
   onClearBudget: (accessGroup: ModelAccessGroup) => void;
 }
 
 export const getAccessGroupBudgetColumns = ({
   canWrite,
+  t,
   onSetBudget,
   onClearBudget,
 }: AccessGroupBudgetColumnsDeps): ColumnDef<ModelAccessGroup>[] => [
   {
     id: "access_group",
     accessorKey: "access_group",
-    meta: { title: "Access Group" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Access Group" />,
+    meta: { title: t("colAccessGroup") },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colAccessGroup")} />,
     size: 220,
     enableSorting: true,
     cell: ({ row }) => (
@@ -104,8 +114,8 @@ export const getAccessGroupBudgetColumns = ({
   },
   {
     id: "models",
-    meta: { title: "Models", skeleton: "chips" },
-    header: "Models",
+    meta: { title: t("colModels"), skeleton: "chips" },
+    header: t("colModels"),
     size: 280,
     enableSorting: false,
     cell: ({ row }) => <ModelsCell models={row.original.model_names} />,
@@ -113,8 +123,8 @@ export const getAccessGroupBudgetColumns = ({
   {
     id: "deployment_count",
     accessorKey: "deployment_count",
-    meta: { title: "Deployments", numeric: true },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Deployments" />,
+    meta: { title: t("colDeployments"), numeric: true },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colDeployments")} />,
     size: 120,
     enableSorting: true,
     cell: ({ row }) => row.original.deployment_count,
@@ -122,8 +132,8 @@ export const getAccessGroupBudgetColumns = ({
   {
     id: "spend",
     accessorKey: "spend",
-    meta: { title: "Shared Spend" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Shared Spend" />,
+    meta: { title: t("colSharedSpend") },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colSharedSpend")} />,
     size: 180,
     enableSorting: true,
     cell: ({ row }) => (
@@ -136,8 +146,8 @@ export const getAccessGroupBudgetColumns = ({
   },
   {
     id: "budget_duration",
-    meta: { title: "Resets" },
-    header: "Resets",
+    meta: { title: t("colResets") },
+    header: t("colResets"),
     size: 110,
     enableSorting: false,
     cell: ({ row }) => (
@@ -149,7 +159,7 @@ export const getAccessGroupBudgetColumns = ({
   {
     id: "actions",
     meta: { className: "text-right", headerClassName: "text-right" },
-    header: () => <span className="sr-only">Actions</span>,
+    header: () => <span className="sr-only">{t("colActions")}</span>,
     size: 64,
     enableSorting: false,
     enableHiding: false,

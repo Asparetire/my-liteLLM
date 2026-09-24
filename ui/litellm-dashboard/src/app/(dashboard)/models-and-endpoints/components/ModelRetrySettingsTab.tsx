@@ -1,4 +1,5 @@
 import { LoaderCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -52,11 +53,15 @@ const ModelRetrySettingsTab = ({
   handleSaveRetrySettings,
   isSaving = false,
 }: ModelRetrySettingsTabProps) => {
+  const t = useTranslations("modelsEndpoints");
   const isGlobalScope = selectedModelGroup === "global";
   const scopeItems = [
-    { value: "global", label: "Global Default" },
+    { value: "global", label: t("globalDefaultOption") },
     ...availableModelGroups.map((group) => ({ value: group, label: group })),
   ];
+
+  const displayType = (exceptionType: string): string =>
+    exceptionType === "All other errors" ? t("allOtherErrors") : exceptionType;
 
   const setGlobalValue = (retryPolicyKey: string, value: number | null) => {
     if (value == null) return;
@@ -85,7 +90,7 @@ const ModelRetrySettingsTab = ({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Label htmlFor="retry-policy-scope">Retry Policy Scope:</Label>
+        <Label htmlFor="retry-policy-scope">{t("retryPolicyScopeLabel")}</Label>
         <div className="w-48">
           <Select
             items={scopeItems}
@@ -108,17 +113,13 @@ const ModelRetrySettingsTab = ({
 
       {isGlobalScope ? (
         <div>
-          <h2 className="text-lg font-semibold">Global Retry Policy</h2>
-          <p className="text-sm text-muted-foreground">
-            Default retry settings applied to all model groups unless overridden
-          </p>
+          <h2 className="text-lg font-semibold">{t("globalRetryPolicyTitle")}</h2>
+          <p className="text-sm text-muted-foreground">{t("globalRetryPolicyDesc")}</p>
         </div>
       ) : (
         <div>
-          <h2 className="text-lg font-semibold">Retry Policy for {selectedModelGroup}</h2>
-          <p className="text-sm text-muted-foreground">
-            Model-specific retry settings. Falls back to global defaults if not set.
-          </p>
+          <h2 className="text-lg font-semibold">{t("retryPolicyFor", { group: selectedModelGroup ?? "" })}</h2>
+          <p className="text-sm text-muted-foreground">{t("modelRetryPolicyDesc")}</p>
         </div>
       )}
       <table className="w-full">
@@ -131,16 +132,18 @@ const ModelRetrySettingsTab = ({
             return (
               <tr key={retryPolicyKey} className="flex items-center justify-between gap-4 border-b py-2 last:border-0">
                 <td className="text-sm">
-                  <span>{exceptionType}</span>
+                  <span>{displayType(exceptionType)}</span>
                   {!isGlobalScope && (
-                    <span className="ml-2 text-xs text-muted-foreground">(Global: {inheritedValue})</span>
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      {t("globalInherited", { value: inheritedValue })}
+                    </span>
                   )}
                 </td>
                 <td className="flex items-center gap-2">
                   <Input
                     className="w-28"
                     type="number"
-                    aria-label={`${exceptionType} retry count`}
+                    aria-label={t("retryCountAria", { exceptionType: displayType(exceptionType) })}
                     min={0}
                     step={1}
                     value={isGlobalScope ? inheritedValue : hasOverride ? override : ""}
@@ -149,7 +152,7 @@ const ModelRetrySettingsTab = ({
                   />
                   {!isGlobalScope && hasOverride && (
                     <Button variant="ghost" size="xs" onClick={() => setModelOverride(retryPolicyKey, null)}>
-                      Reset
+                      {t("resetBtn")}
                     </Button>
                   )}
                 </td>
@@ -160,7 +163,7 @@ const ModelRetrySettingsTab = ({
       </table>
       <Button onClick={handleSaveRetrySettings} disabled={isSaving}>
         {isSaving && <LoaderCircle className="animate-spin" />}
-        Save
+        {t("saveBtn")}
       </Button>
     </div>
   );

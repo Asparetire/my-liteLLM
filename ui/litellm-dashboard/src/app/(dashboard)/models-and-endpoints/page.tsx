@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { RefreshCw } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
@@ -40,16 +41,16 @@ type ModelTabSlug =
 
 const BASE_TAB_KEY = "all-models";
 
-const TAB_LABELS: Record<ModelTabSlug, string> = {
-  add: "Add Model",
-  "auto-routers": "Auto-Routers",
-  "llm-credentials": "LLM Credentials",
-  "pass-through": "Pass-Through Endpoints",
-  health: "Health Status",
-  "retry-settings": "Model Retry Settings",
-  "model-group-alias": "Model Group Alias",
-  "access-group-budgets": "Model Access Group Budgets",
-  "price-data": "Price Data Reload",
+const TAB_LABEL_KEYS: Record<ModelTabSlug, string> = {
+  add: "tabAddModel",
+  "auto-routers": "tabAutoRouters",
+  "llm-credentials": "tabLlmCredentials",
+  "pass-through": "tabPassThroughEndpoints",
+  health: "tabHealthStatus",
+  "retry-settings": "tabRetrySettings",
+  "model-group-alias": "tabModelGroupAlias",
+  "access-group-budgets": "tabAccessGroupBudgets",
+  "price-data": "tabPriceDataReload",
 };
 
 const renderPanel = (key: string) => {
@@ -80,6 +81,7 @@ const renderPanel = (key: string) => {
 };
 
 export default function ModelsAndEndpointsPage() {
+  const t = useTranslations("modelsEndpoints");
   const { accessToken, userRole, userId: userID, premiumUser, isViewOnly } = useAuthorized();
   const { data: teams } = useTeams();
   const { data: uiSettings } = useUISettings();
@@ -118,17 +120,17 @@ export default function ModelsAndEndpointsPage() {
     [canCreate, isAdmin, isViewOnly],
   );
 
-  const allModelsLabel = isAdmin ? "All Models" : "Your Models";
+  const allModelsLabel = isAdmin ? t("allModels") : t("yourModels");
   const tabLabel = (slug: "" | ModelTabSlug): React.ReactNode => {
     if (!slug) return allModelsLabel;
     if (slug === "auto-routers" || slug === "access-group-budgets") {
       return (
         <span className="flex items-center gap-2">
-          {TAB_LABELS[slug]} <BetaBadge />
+          {t(TAB_LABEL_KEYS[slug])} <BetaBadge />
         </span>
       );
     }
-    return TAB_LABELS[slug];
+    return t(TAB_LABEL_KEYS[slug]);
   };
 
   const handleRefreshClick = () => {
@@ -161,11 +163,11 @@ export default function ModelsAndEndpointsPage() {
       <div className="mt-2 flex w-full flex-col gap-2 p-8">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold">Model Management</h2>
+            <h2 className="text-lg font-semibold">{t("modelManagementTitle")}</h2>
             {isAdmin ? (
-              <p className="text-sm text-muted-foreground">Add and manage models for the proxy</p>
+              <p className="text-sm text-muted-foreground">{t("adminSubtitle")}</p>
             ) : (
-              <p className="text-sm text-muted-foreground">Add models for teams you are an admin for.</p>
+              <p className="text-sm text-muted-foreground">{t("teamAdminSubtitle")}</p>
             )}
           </div>
         </div>
@@ -200,9 +202,9 @@ export default function ModelsAndEndpointsPage() {
               </div>
               <div className="flex shrink-0 items-center gap-2 pb-1">
                 {lastRefreshed && (
-                  <span className="text-xs text-muted-foreground">Last Refreshed: {lastRefreshed}</span>
+                  <span className="text-xs text-muted-foreground">{t("lastRefreshed", { time: lastRefreshed })}</span>
                 )}
-                <Button variant="ghost" size="icon-sm" onClick={handleRefreshClick} aria-label="Refresh models">
+                <Button variant="ghost" size="icon-sm" onClick={handleRefreshClick} aria-label={t("refreshModelsAria")}>
                   <RefreshCw />
                 </Button>
               </div>

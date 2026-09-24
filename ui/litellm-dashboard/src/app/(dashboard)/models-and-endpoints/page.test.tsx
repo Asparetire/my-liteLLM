@@ -79,16 +79,16 @@ describe("ModelsAndEndpointsPage", () => {
 
   it("renders the admin tab bar and the All Models panel by default", () => {
     renderPage();
-    expect(screen.getByRole("tab", { name: "All Models" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "LLM Credentials" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Health Status" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "全部模型" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "LLM 凭据" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "健康状态" })).toBeInTheDocument();
     expect(screen.getByTestId("panel-all-models")).toBeInTheDocument();
   });
 
   it("switches tabs in-memory, mounting only the active panel", async () => {
     const user = userEvent.setup();
     renderPage();
-    await user.click(screen.getByRole("tab", { name: "Health Status" }));
+    await user.click(screen.getByRole("tab", { name: "健康状态" }));
     expect(screen.getByTestId("panel-health")).toBeInTheDocument();
     expect(screen.queryByTestId("panel-all-models")).not.toBeInTheDocument();
   });
@@ -97,7 +97,7 @@ describe("ModelsAndEndpointsPage", () => {
     detailState.modelId = "abc-123";
     renderPage();
     expect(screen.getByTestId("model-info")).toHaveTextContent("model:abc-123");
-    expect(screen.queryByRole("tab", { name: "All Models" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "全部模型" })).not.toBeInTheDocument();
   });
 
   it("renders the team detail overlay from the ?team drill-in with admin edit rights", () => {
@@ -118,45 +118,45 @@ describe("ModelsAndEndpointsPage", () => {
   it("hides admin-only tabs for a non-admin user", () => {
     mockUseAuthorized.mockReturnValue(NON_ADMIN);
     renderPage();
-    expect(screen.queryByRole("tab", { name: "LLM Credentials" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("tab", { name: "Health Status" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "LLM 凭据" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "健康状态" })).not.toBeInTheDocument();
   });
 
   it("keeps the full admin tab order for a real admin", () => {
     renderPage();
     expect(screen.getAllByRole("tab").map((tab) => tab.textContent)).toEqual([
-      "All Models",
-      "Add Model",
-      "Auto-Routers Beta",
-      "LLM Credentials",
-      "Pass-Through Endpoints",
-      "Health Status",
-      "Model Retry Settings",
-      "Model Group Alias",
-      "Model Access Group Budgets Beta",
-      "Price Data Reload",
+      "全部模型",
+      "添加模型",
+      "自动路由器 Beta",
+      "LLM 凭据",
+      "透传端点",
+      "健康状态",
+      "模型重试设置",
+      "模型组别名",
+      "模型访问组预算 Beta",
+      "价格数据重载",
     ]);
   });
 
   it("hides the admin write-form tabs from a view-only admin, keeping the read views", () => {
     mockUseAuthorized.mockReturnValue(VIEW_ONLY_ADMIN);
     renderPage();
-    expect(screen.getByRole("tab", { name: "All Models" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Health Status" })).toBeInTheDocument();
-    expect(screen.queryByRole("tab", { name: "LLM Credentials" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("tab", { name: "Pass-Through Endpoints" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("tab", { name: "Model Retry Settings" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("tab", { name: "Model Group Alias" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("tab", { name: /Model Access Group Budgets/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("tab", { name: "Price Data Reload" })).not.toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "全部模型" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "健康状态" })).toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "LLM 凭据" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "透传端点" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "模型重试设置" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "模型组别名" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: /模型访问组预算/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "价格数据重载" })).not.toBeInTheDocument();
   });
 
   // POST /model/new 403s a proxy_admin_viewer, so the form's tab must not render for one.
   it("hides the Add Model tab for a view-only admin session", () => {
     mockUseAuthorized.mockReturnValue(VIEW_ONLY_ADMIN);
     renderPage();
-    expect(screen.queryByRole("tab", { name: "Add Model" })).not.toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "All Models" })).toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "添加模型" })).not.toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "全部模型" })).toBeInTheDocument();
   });
 
   // Read parity: the Auto-Routers list stays reachable for a view-only admin; only the
@@ -164,7 +164,7 @@ describe("ModelsAndEndpointsPage", () => {
   it("keeps the Auto-Routers tab for a view-only admin session", () => {
     mockUseAuthorized.mockReturnValue(VIEW_ONLY_ADMIN);
     renderPage();
-    expect(screen.getByRole("tab", { name: /Auto-Routers/ })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /自动路由器/ })).toBeInTheDocument();
   });
 
   // Auto-routers are excluded from the All Models table, so this tab is their home: the only
@@ -174,9 +174,9 @@ describe("ModelsAndEndpointsPage", () => {
       renderPage();
 
       const tabs = screen.getAllByRole("tab").map((tab) => tab.textContent);
-      expect(tabs[0]).toContain("All Models");
-      expect(tabs[1]).toBe("Add Model");
-      expect(tabs[2]).toContain("Auto-Routers");
+      expect(tabs[0]).toContain("全部模型");
+      expect(tabs[1]).toBe("添加模型");
+      expect(tabs[2]).toContain("自动路由器");
       // Badged Beta while the tab settles; BetaBadge renders the label text.
       expect(tabs[2]).toContain("Beta");
     });
@@ -185,7 +185,7 @@ describe("ModelsAndEndpointsPage", () => {
       const user = userEvent.setup();
       renderPage();
 
-      await user.click(screen.getByRole("tab", { name: /Auto-Routers/ }));
+      await user.click(screen.getByRole("tab", { name: /自动路由器/ }));
       expect(screen.getByTestId("panel-auto-routers")).toBeInTheDocument();
     });
 
@@ -193,7 +193,7 @@ describe("ModelsAndEndpointsPage", () => {
       mockUseAuthorized.mockReturnValue(NON_ADMIN);
       renderPage();
 
-      expect(screen.queryByRole("tab", { name: /Auto-Routers/ })).not.toBeInTheDocument();
+      expect(screen.queryByRole("tab", { name: /自动路由器/ })).not.toBeInTheDocument();
     });
   });
 });

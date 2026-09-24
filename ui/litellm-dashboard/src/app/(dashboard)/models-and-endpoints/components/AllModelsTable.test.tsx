@@ -81,29 +81,29 @@ describe("AllModelsTable", () => {
     render(<AllModelsTable {...baseProps} />);
 
     for (const header of [
-      "Model ID",
-      "Model Information",
-      "Credentials",
-      "Created By",
-      "Updated At",
-      "Costs",
-      "Team ID",
-      "Model Access Group",
-      "Actions",
+      "模型 ID",
+      "模型信息",
+      "凭据",
+      "创建者",
+      "更新时间",
+      "成本",
+      "团队 ID",
+      "模型访问组",
+      "操作",
     ]) {
       expect(screen.getByRole("columnheader", { name: new RegExp(header, "i") })).toBeInTheDocument();
     }
 
-    expect(screen.queryByRole("columnheader", { name: /^source$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("columnheader", { name: /^来源$/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("columnheader", { name: /^status$/i })).not.toBeInTheDocument();
-    expect(screen.queryByText("DB Model")).not.toBeInTheDocument();
+    expect(screen.queryByText("DB 模型")).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /columns/i }));
     expect(screen.queryByRole("menuitemcheckbox", { name: /status/i })).not.toBeInTheDocument();
-    await user.click(await screen.findByRole("menuitemcheckbox", { name: /^source$/i }));
+    await user.click(await screen.findByRole("menuitemcheckbox", { name: /^来源$/ }));
 
-    expect(await screen.findByRole("columnheader", { name: /^source$/i })).toBeInTheDocument();
-    expect(await screen.findByText("DB Model")).toBeInTheDocument();
+    expect(await screen.findByRole("columnheader", { name: /^来源$/ })).toBeInTheDocument();
+    expect(await screen.findByText("DB 模型")).toBeInTheDocument();
   });
 
   it("opens the model detail from the model ID cell", async () => {
@@ -151,10 +151,10 @@ describe("AllModelsTable", () => {
       />,
     );
     expect(screen.getByText("openai-prod")).toBeInTheDocument();
-    expect(screen.queryByText("Manual")).not.toBeInTheDocument();
+    expect(screen.queryByText("手动")).not.toBeInTheDocument();
 
     rerender(<AllModelsTable {...baseProps} data={[makeModel()]} />);
-    expect(screen.getByText("Manual")).toBeInTheDocument();
+    expect(screen.getByText("手动")).toBeInTheDocument();
   });
 
   it("shows 'Defined in config' for a config model and the creator for a DB model", () => {
@@ -167,7 +167,7 @@ describe("AllModelsTable", () => {
         data={[makeModel({ model_info: { db_model: false } as ModelData["model_info"] })]}
       />,
     );
-    expect(screen.getByText("Defined in config")).toBeInTheDocument();
+    expect(screen.getByText("定义于配置")).toBeInTheDocument();
   });
 
   it("renders input and output costs and a dash when both are missing", () => {
@@ -197,7 +197,7 @@ describe("AllModelsTable", () => {
     );
 
     expect(screen.getByText("sales-team")).toBeInTheDocument();
-    expect(screen.getByText("+2 more")).toBeInTheDocument();
+    expect(screen.getByText("+2 个")).toBeInTheDocument();
   });
 
   it("renders the toolbar divider centered rather than stretched to the top of the row", () => {
@@ -375,7 +375,7 @@ describe("AllModelsTable", () => {
       expect(onOpenModelSettings).toHaveBeenCalled();
 
       expect(screen.getByTestId("models-team-select")).toHaveTextContent("Personal");
-      expect(screen.getByTestId("models-view-select")).toHaveTextContent("Current Team Models");
+      expect(screen.getByTestId("models-view-select")).toHaveTextContent("当前团队模型");
     });
 
     it("switches the current team", async () => {
@@ -436,8 +436,8 @@ describe("AllModelsTable", () => {
       );
 
       const chip = screen.getByTestId("filter-chip-model_name");
-      expect(chip).toHaveTextContent("Public Model Name");
-      expect(chip).toHaveTextContent("Wildcard Models (*)");
+      expect(chip).toHaveTextContent("公开模型名称");
+      expect(chip).toHaveTextContent("通配符模型 (*)");
 
       await user.click(screen.getByTestId("filter-chip-remove-model_name"));
       expect(onColumnFiltersChange).toHaveBeenCalled();
@@ -453,6 +453,6 @@ describe("AllModelsTable", () => {
   it("shows the empty state when there are no models", () => {
     render(<AllModelsTable {...baseProps} data={[]} rowCount={0} />);
 
-    expect(screen.getByText("No models found")).toBeInTheDocument();
+    expect(screen.getByText("未找到模型")).toBeInTheDocument();
   });
 });

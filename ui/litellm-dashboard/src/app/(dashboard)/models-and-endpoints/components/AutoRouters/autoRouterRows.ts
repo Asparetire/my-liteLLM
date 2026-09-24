@@ -11,6 +11,8 @@ import { type ModelActor, canModifyModel } from "@/utils/modelPermissions";
 
 export type { AutoRouterKind };
 
+type Translator = (key: string, values?: Record<string, string | number>) => string;
+
 /** Who is looking at the list; decides which rows offer write affordances. */
 export type AutoRouterActor = ModelActor;
 
@@ -55,15 +57,17 @@ const asStringArray = (value: unknown): string[] =>
 
 const dedupe = (models: string[]): string[] => Array.from(new Set(models));
 
-const COMPLEXITY_TYPE_LABELS: Record<string, string> = {
-  llm: "LLM Classifier",
-  heuristic_first: "Heuristic first",
-  hybrid: "Hybrid",
-  custom: "Custom classifier",
+const COMPLEXITY_TYPE_LABEL_KEYS: Record<string, string> = {
+  llm: "complexityLlmClassifier",
+  heuristic_first: "complexityHeuristicFirst",
+  hybrid: "complexityHybrid",
+  custom: "complexityCustomClassifier",
 };
 
-export const complexityTypeLabel = (config: Record<string, unknown>): string =>
-  (typeof config.classifier_type === "string" && COMPLEXITY_TYPE_LABELS[config.classifier_type]) || "Heuristic";
+export const complexityTypeLabel = (config: Record<string, unknown>, t: Translator): string => {
+  const key = typeof config.classifier_type === "string" ? COMPLEXITY_TYPE_LABEL_KEYS[config.classifier_type] : null;
+  return (key && t(key)) || t("complexityHeuristic");
+};
 
 interface Presentation {
   typeLabel: string;
@@ -78,28 +82,33 @@ const configManaged = (label: string, config: Record<string, unknown>): Presenta
 });
 
 /** How each strategy renders itself, given its own config object. */
-const PRESENTERS: Record<AutoRouterKind, (config: Record<string, unknown>) => Presentation> = {
-  complexity: (config) => ({
-    typeLabel: complexityTypeLabel(config),
+const PRESENTERS: Record<AutoRouterKind, (config: Record<string, unknown>, t: Translator) => Presentation> = {
+  complexity: (config, t) => ({
+    typeLabel: complexityTypeLabel(config, t),
     targets: dedupe(Object.values(asRecord(config.tiers)).flatMap(normalizeTierModels)),
   }),
-  semantic: (config) => {
+  semantic: (config, t) => {
     const routes = dedupe(
       (Array.isArray(config.routes) ? config.routes : [])
         .map((route) => asRecord(route).name)
         .filter((name): name is string => typeof name === "string" && name.length > 0),
     );
-    return { typeLabel: "Semantic", targets: routes };
+    return { typeLabel: t("typeSemantic"), targets: routes };
   },
-  adaptive: (config) => configManaged("Adaptive", config),
-  quality: (config) => configManaged("Quality", config),
+  adaptive: (config, t) => configManaged(t("typeAdaptive"), config),
+  quality: (config, t) => configManaged(t("typeQuality"), config),
 };
+
+export interface AutoRouterRowContext {
+  actor: AutoRouterActor;
+  teams: Team[] | null;
+  t: Translator;
+}
 
 export const toAutoRouterRow = (
   deployment: AutoRouterDeployment,
   index: number,
-  actor: AutoRouterActor,
-  teams: Team[] | null,
+  { actor, teams, t }: AutoRouterRowContext,
 ): AutoRouterRow => {
   const params = deployment.litellm_params ?? {};
   const info = deployment.model_info ?? {};
@@ -118,12 +127,11 @@ export const toAutoRouterRow = (
     createdAt: info.created_at ?? undefined,
     defaultModel: (params[strategy.defaultModelKey] as string | null | undefined) ?? null,
     deployment,
-    ...PRESENTERS[strategy.kind](asRecord(params[strategy.configKey])),
+    ...PRESENTERS[strategy.kind](asRecord(params[strategy.configKey]), t),
   };
 };
 
 export const toAutoRouterRows = (
   deployments: AutoRouterDeployment[],
-  actor: AutoRouterActor,
-  teams: Team[] | null,
-): AutoRouterRow[] => deployments.map((deployment, index) => toAutoRouterRow(deployment, index, actor, teams));
+  context: AutoRouterRowContext,
+): AutoRouterRow[] => deployments.map((deployment, index) => toAutoRouterRow(deployment, index, context));

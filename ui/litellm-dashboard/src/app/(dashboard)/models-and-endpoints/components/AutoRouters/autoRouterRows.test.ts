@@ -9,6 +9,20 @@ const ADMIN = { userRole: "Admin", userID: "u-admin", isViewOnly: false };
 const TEAM_ADMIN = { userRole: "Internal User", userID: "u-team-admin", isViewOnly: false };
 const VIEW_ONLY_ADMIN = { userRole: "Admin", userID: "u-viewer", isViewOnly: true };
 
+// zh-CN label stub mirroring messages/zh-CN.json so typeLabel assertions pin the translated
+// output (the production code resolves labels through next-intl at render time).
+const zhLabels: Record<string, string> = {
+  complexityLlmClassifier: "LLM 分类器",
+  complexityHeuristicFirst: "启发式优先",
+  complexityHybrid: "混合",
+  complexityCustomClassifier: "自定义分类器",
+  complexityHeuristic: "启发式",
+  typeSemantic: "语义",
+  typeAdaptive: "自适应",
+  typeQuality: "质量",
+};
+const t = (key: string): string => zhLabels[key] ?? key;
+
 const complexityDeployment = {
   model_name: "tri-tier-router",
   litellm_params: {
@@ -44,10 +58,10 @@ const semanticDeployment = {
 
 describe("autoRouterRows", () => {
   it("classifies a complexity router and unions its tier models as targets", () => {
-    const row = toAutoRouterRow(complexityDeployment, 0, ADMIN, null);
+    const row = toAutoRouterRow(complexityDeployment, 0, { actor: ADMIN, teams: null, t });
 
     expect(row.kind).toBe("complexity");
-    expect(row.typeLabel).toBe("Heuristic");
+    expect(row.typeLabel).toBe("启发式");
     // Union across tiers, de-duplicated: gpt-4o-mini appears in both SIMPLE and COMPLEX.
     expect(row.targets).toEqual(["gpt-4o-mini", "anthropic-sonnet-4-6", "anthropic-opus-4-6"]);
     expect(row.defaultModel).toBe("gpt-4o-mini");
@@ -55,10 +69,10 @@ describe("autoRouterRows", () => {
   });
 
   it("parses a semantic router whose config arrives as a JSON string", () => {
-    const row = toAutoRouterRow(semanticDeployment, 0, ADMIN, null);
+    const row = toAutoRouterRow(semanticDeployment, 0, { actor: ADMIN, teams: null, t });
 
     expect(row.kind).toBe("semantic");
-    expect(row.typeLabel).toBe("Semantic");
+    expect(row.typeLabel).toBe("语义");
     expect(row.targets).toEqual(["gpt-4o-mini", "anthropic-opus-4-6"]);
     expect(row.defaultModel).toBe("gpt-4o-mini");
   });
@@ -76,8 +90,7 @@ describe("autoRouterRows", () => {
         },
       },
       0,
-      ADMIN,
-      null,
+      { actor: ADMIN, teams: null, t },
     );
 
     expect(row.targets).toEqual(["gpt-4o-mini", "anthropic-sonnet-4-6"]);
@@ -93,11 +106,10 @@ describe("autoRouterRows", () => {
         },
       },
       0,
-      ADMIN,
-      null,
+      { actor: ADMIN, teams: null, t },
     );
 
-    expect(row.typeLabel).toBe("LLM Classifier");
+    expect(row.typeLabel).toBe("LLM 分类器");
   });
 
   it("treats a deployment carrying complexity_router_config as complexity even off the canonical model string", () => {
@@ -112,8 +124,7 @@ describe("autoRouterRows", () => {
         model_info: { id: "bid-1" },
       },
       0,
-      ADMIN,
-      null,
+      { actor: ADMIN, teams: null, t },
     );
 
     expect(row.kind).toBe("semantic");
@@ -126,8 +137,7 @@ describe("autoRouterRows", () => {
         { model_name: "a", litellm_params: { model: "auto_router/a" } },
         { model_name: "b", litellm_params: { model: "auto_router/b" } },
       ],
-      ADMIN,
-      null,
+      { actor: ADMIN, teams: null, t },
     );
 
     expect(rows.map((row) => row.id)).toEqual(["a-0", "b-1"]);
@@ -146,12 +156,11 @@ describe("autoRouterRows", () => {
         model_info: { id: "ad-1" },
       },
       0,
-      ADMIN,
-      null,
+      { actor: ADMIN, teams: null, t },
     );
 
     expect(row.kind).toBe("adaptive");
-    expect(row.typeLabel).toBe("Adaptive");
+    expect(row.typeLabel).toBe("自适应");
     expect(row.targets).toEqual(["gpt-4o", "gpt-4o-mini"]);
     expect(row.defaultModel).toBe("gpt-4o-mini");
   });
@@ -168,12 +177,11 @@ describe("autoRouterRows", () => {
         model_info: { id: "q-1" },
       },
       0,
-      ADMIN,
-      null,
+      { actor: ADMIN, teams: null, t },
     );
 
     expect(row.kind).toBe("quality");
-    expect(row.typeLabel).toBe("Quality");
+    expect(row.typeLabel).toBe("质量");
     expect(row.targets).toEqual(["gpt-4o"]);
   });
 
@@ -193,8 +201,7 @@ describe("autoRouterRows", () => {
     toAutoRouterRow(
       { model_name: "r", litellm_params: { model }, model_info: { id: "x", db_model: dbModel } },
       0,
-      ADMIN,
-      null,
+      { actor: ADMIN, teams: null, t },
     );
 
   it.each([
@@ -214,7 +221,7 @@ describe("autoRouterRows", () => {
   });
 
   it("treats a missing db_model as config-defined rather than assuming it is writable", () => {
-    const row = toAutoRouterRow({ ...complexityDeployment, model_info: { id: "unknown-1" } }, 0, ADMIN, null);
+    const row = toAutoRouterRow({ ...complexityDeployment, model_info: { id: "unknown-1" } }, 0, { actor: ADMIN, teams: null, t });
     expect(row.canEdit).toBe(false);
     expect(row.canDelete).toBe(false);
   });
@@ -229,8 +236,7 @@ describe("autoRouterRows actor gating", () => {
     toAutoRouterRow(
       { ...complexityDeployment, model_info: { id: "cid-1", db_model: true, team_id: teamId } },
       0,
-      actor,
-      TEAMS,
+      { actor, teams: TEAMS, t },
     );
 
   // Opening the tab to team admins puts rows they cannot act on in the same list: other

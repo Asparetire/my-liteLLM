@@ -168,7 +168,7 @@ describe("AllModelsTab", () => {
     setModelsInfo([], 0);
     render(<AllModelsTab {...defaultProps} />);
 
-    expect(screen.getByText("No models found")).toBeInTheDocument();
+    expect(screen.getByText("未找到模型")).toBeInTheDocument();
   });
 
   it("shows the loading skeleton while the first page is in flight", () => {
@@ -176,7 +176,7 @@ describe("AllModelsTab", () => {
     render(<AllModelsTab {...defaultProps} />);
 
     expect(screen.getAllByTestId("skeleton-row").length).toBeGreaterThan(0);
-    expect(screen.queryByText("No models found")).not.toBeInTheDocument();
+    expect(screen.queryByText("未找到模型")).not.toBeInTheDocument();
   });
 
   describe("server sort contract", () => {
@@ -259,7 +259,7 @@ describe("AllModelsTab", () => {
     render(<AllModelsTab {...defaultProps} />);
 
     await user.click(screen.getByTestId("datatable-filters-trigger"));
-    await user.click(await screen.findByPlaceholderText("Filter by Public Model Name"));
+    await user.click(await screen.findByPlaceholderText("按公开模型名称筛选"));
     await user.click(await screen.findByRole("option", { name: "gpt-3.5-turbo" }));
     await user.click(screen.getByTestId("filter-drawer-apply"));
 
@@ -293,7 +293,7 @@ describe("AllModelsTab", () => {
     expect(lastModelsInfoCall().wildcardOnly).toBe(false);
 
     await user.click(screen.getByTestId("datatable-filters-trigger"));
-    await user.click(await screen.findByPlaceholderText("Filter by Model Access Group"));
+    await user.click(await screen.findByPlaceholderText("按模型访问组筛选"));
     await user.click(await screen.findByRole("option", { name: "sales-team" }));
     await user.click(screen.getByTestId("filter-drawer-apply"));
 
@@ -318,7 +318,7 @@ describe("AllModelsTab", () => {
   it("keeps the exact model group alongside a typed search", async () => {
     render(<AllModelsTab {...defaultProps} selectedModelGroup="claude-opus" />);
 
-    fireEvent.change(screen.getByPlaceholderText("Search model names…"), { target: { value: "opus" } });
+    fireEvent.change(screen.getByPlaceholderText("按模型名称搜索…"), { target: { value: "opus" } });
 
     await waitFor(() => expect(lastModelsInfoCall().search).toBe("opus"));
     expect(lastModelsInfoCall().modelName).toBe("claude-opus");
@@ -346,9 +346,9 @@ describe("AllModelsTab", () => {
     render(<AllModelsTab {...defaultProps} />);
 
     await user.click(await screen.findByTestId("model-delete-model-1"));
-    expect(await screen.findByText("Delete Model")).toBeInTheDocument();
+    expect(await screen.findByText("删除模型")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /^delete$/i }));
+    await user.click(screen.getByRole("button", { name: /^删除$/ }));
 
     await waitFor(() => {
       expect(mockModelDeleteCall).toHaveBeenCalledWith("mock-access-token", "model-1");
@@ -397,24 +397,27 @@ describe("AllModelsTab", () => {
     it("explains personal key creation while viewing current team models", () => {
       render(<AllModelsTab {...defaultProps} />);
 
-      expect(screen.getByText(/create a Virtual Key without selecting a team/i)).toBeInTheDocument();
+      expect(screen.getByText(/创建虚拟密钥，不选择团队/)).toBeInTheDocument();
     });
 
-    it("links the Virtual Keys page through the migrated /ui route", () => {
+    it("renders the personal hint text with the Virtual Keys page reference", () => {
       render(<AllModelsTab {...defaultProps} />);
 
-      expect(screen.getByRole("link", { name: "Virtual Keys page" })).toHaveAttribute("href", "/ui/api-keys");
+      // The global next-intl test mock strips rich-text tags, so the <link> renders as plain
+      // text here; the real anchor href is exercised in the browser check.
+      expect(screen.getByText(/虚拟密钥页面/)).toBeInTheDocument();
+      expect(screen.getByText(/创建虚拟密钥，不选择团队/)).toBeInTheDocument();
     });
 
-    it("links the team hint's Virtual Keys page through the migrated /ui route", async () => {
+    it("renders the team hint text with the Virtual Keys page reference", async () => {
       const user = userEvent.setup();
       render(<AllModelsTab {...defaultProps} />);
 
       await user.click(screen.getByTestId("models-team-select"));
       await user.click(await screen.findByRole("option", { name: "Engineering" }));
 
-      await screen.findByText(/select Team as "Engineering"/i);
-      expect(screen.getByRole("link", { name: "Virtual Keys page" })).toHaveAttribute("href", "/ui/api-keys");
+      expect(await screen.findByText(/选择团队为 "Engineering"/)).toBeInTheDocument();
+      expect(screen.getByText(/虚拟密钥页面/)).toBeInTheDocument();
     });
 
     it("names the selected team in the hint", async () => {
@@ -424,7 +427,7 @@ describe("AllModelsTab", () => {
       await user.click(screen.getByTestId("models-team-select"));
       await user.click(await screen.findByRole("option", { name: "Engineering" }));
 
-      expect(await screen.findByText(/select Team as "Engineering"/i)).toBeInTheDocument();
+      expect(await screen.findByText(/选择团队为 "Engineering"/)).toBeInTheDocument();
     });
 
     it("hides the hint when viewing all available models", async () => {
@@ -432,10 +435,10 @@ describe("AllModelsTab", () => {
       render(<AllModelsTab {...defaultProps} />);
 
       await user.click(screen.getByTestId("models-view-select"));
-      await user.click(await screen.findByRole("option", { name: "All Available Models" }));
+      await user.click(await screen.findByRole("option", { name: "全部可用模型" }));
 
       await waitFor(() => {
-        expect(screen.queryByText(/create a Virtual Key/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/创建虚拟密钥/)).not.toBeInTheDocument();
       });
     });
   });
