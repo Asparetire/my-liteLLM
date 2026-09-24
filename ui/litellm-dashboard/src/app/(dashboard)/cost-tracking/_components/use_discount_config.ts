@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { getProxyBaseUrl, getGlobalLitellmHeaderName } from "@/components/networking";
 import { toast } from "@/lib/toast";
 import { DiscountConfig } from "./types";
@@ -20,6 +21,7 @@ export interface UseDiscountConfigReturn {
 }
 
 export function useDiscountConfig({ accessToken }: UseDiscountConfigProps): UseDiscountConfigReturn {
+  const t = useTranslations("costTracking");
   const [discountConfig, setDiscountConfig] = useState<DiscountConfig>({});
 
   const fetchDiscountConfig = useCallback(async () => {
@@ -43,9 +45,9 @@ export function useDiscountConfig({ accessToken }: UseDiscountConfigProps): UseD
       }
     } catch (error) {
       console.error("Error fetching discount config:", error);
-      toast.fromError("Failed to fetch discount configuration");
+      toast.fromError(t("fetchDiscountFailed"));
     }
-  }, [accessToken]);
+  }, [accessToken, t]);
 
   const saveDiscountConfig = useCallback(
     async (config: DiscountConfig) => {
@@ -63,45 +65,43 @@ export function useDiscountConfig({ accessToken }: UseDiscountConfigProps): UseD
         });
 
         if (response.ok) {
-          toast.success("Discount configuration updated successfully");
+          toast.success(t("discountConfigUpdated"));
           await fetchDiscountConfig();
         } else {
           const errorData = await response.json();
-          const errorMessage = errorData.detail?.error || errorData.detail || "Failed to update settings";
+          const errorMessage = errorData.detail?.error || errorData.detail || t("updateSettingsFailed");
           toast.fromError(errorMessage);
         }
       } catch (error) {
         console.error("Error updating discount config:", error);
-        toast.fromError("Failed to update discount configuration");
+        toast.fromError(t("updateDiscountFailed"));
       }
     },
-    [accessToken, fetchDiscountConfig],
+    [accessToken, fetchDiscountConfig, t],
   );
 
   const handleAddProvider = useCallback(
     async (selectedProvider: string | undefined, newDiscount: string): Promise<boolean> => {
       if (!selectedProvider || !newDiscount) {
-        toast.fromError("Please select a provider and enter discount percentage");
+        toast.fromError(t("selectProviderAndDiscount"));
         return false;
       }
 
       const percentageValue = parseFloat(newDiscount);
       if (isNaN(percentageValue) || percentageValue < 0 || percentageValue > 100) {
-        toast.fromError("Discount must be between 0% and 100%");
+        toast.fromError(t("discountRangeInvalid"));
         return false;
       }
 
       const providerValue = getProviderBackendValue(selectedProvider);
 
       if (!providerValue) {
-        toast.fromError("Invalid provider selected");
+        toast.fromError(t("invalidProvider"));
         return false;
       }
 
       if (discountConfig[providerValue]) {
-        toast.fromError(
-          `Discount for ${Providers[selectedProvider as keyof typeof Providers]} already exists. Edit it in the table above.`,
-        );
+        toast.fromError(t("discountExists", { name: Providers[selectedProvider as keyof typeof Providers] }));
         return false;
       }
 
@@ -115,7 +115,7 @@ export function useDiscountConfig({ accessToken }: UseDiscountConfigProps): UseD
       await saveDiscountConfig(updatedConfig);
       return true;
     },
-    [discountConfig, saveDiscountConfig],
+    [discountConfig, saveDiscountConfig, t],
   );
 
   const handleRemoveProvider = useCallback(

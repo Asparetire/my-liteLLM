@@ -78,17 +78,17 @@ describe("CostTrackingSettings", () => {
 
   it("should render the page title", () => {
     renderWithProviders(<CostTrackingSettings {...ADMIN_PROPS} />);
-    expect(screen.getByText("Cost Tracking Settings")).toBeInTheDocument();
+    expect(screen.getByText("成本跟踪设置")).toBeInTheDocument();
   });
 
   it("should show the Provider Discounts accordion header for proxy_admin", () => {
     renderWithProviders(<CostTrackingSettings {...ADMIN_PROPS} />);
-    expect(screen.getByText("Provider Discounts")).toBeInTheDocument();
+    expect(screen.getByText("提供商折扣")).toBeInTheDocument();
   });
 
   it("should show the Fee/Price Margin accordion header for proxy_admin", () => {
     renderWithProviders(<CostTrackingSettings {...ADMIN_PROPS} />);
-    expect(screen.getByText("Fee/Price Margin")).toBeInTheDocument();
+    expect(screen.getByText("费率加价")).toBeInTheDocument();
   });
 
   it("should always show the Pricing Calculator section", () => {
@@ -104,22 +104,22 @@ describe("CostTrackingSettings", () => {
 
   it("should not show Provider Discounts section for a non-admin role", () => {
     renderWithProviders(<CostTrackingSettings userID="user-1" userRole="internal_user" accessToken="test-token" />);
-    expect(screen.queryByText("Provider Discounts")).not.toBeInTheDocument();
+    expect(screen.queryByText("提供商折扣")).not.toBeInTheDocument();
   });
 
   it("should not show Fee/Price Margin section for a non-admin role", () => {
     renderWithProviders(<CostTrackingSettings userID="user-1" userRole="internal_user" accessToken="test-token" />);
-    expect(screen.queryByText("Fee/Price Margin")).not.toBeInTheDocument();
+    expect(screen.queryByText("费率加价")).not.toBeInTheDocument();
   });
 
   it("should show Provider Discounts for the 'Admin' role as well", () => {
     renderWithProviders(<CostTrackingSettings userID="user-1" userRole="Admin" accessToken="test-token" />);
-    expect(screen.getByText("Provider Discounts")).toBeInTheDocument();
+    expect(screen.getByText("提供商折扣")).toBeInTheDocument();
   });
 
   it("should show the subtitle describing discount/margin configuration", () => {
     renderWithProviders(<CostTrackingSettings {...ADMIN_PROPS} />);
-    expect(screen.getByText(/configure cost discounts and margins/i)).toBeInTheDocument();
+    expect(screen.getByText(/为不同 LLM 提供商配置成本折扣与加价/)).toBeInTheDocument();
   });
 
   describe("Add Provider Discount modal", () => {
@@ -128,15 +128,15 @@ describe("CostTrackingSettings", () => {
       renderWithProviders(<CostTrackingSettings {...ADMIN_PROPS} />);
 
       // The button lives inside the Provider Discounts accordion — click the header to expand first
-      const accordionHeader = screen.getByText("Provider Discounts").closest("button");
+      const accordionHeader = screen.getByText("提供商折扣").closest("button");
       if (accordionHeader) {
         await user.click(accordionHeader);
       }
 
-      const addButton = await screen.findByRole("button", { name: /add provider discount/i });
+      const addButton = await screen.findByRole("button", { name: "+ 添加提供商折扣" });
       await user.click(addButton);
 
-      expect(await screen.findByRole("dialog", { name: "Add Provider Discount" })).toBeInTheDocument();
+      expect(await screen.findByRole("dialog", { name: "添加提供商折扣" })).toBeInTheDocument();
     });
   });
 
@@ -145,15 +145,15 @@ describe("CostTrackingSettings", () => {
       const user = userEvent.setup();
       renderWithProviders(<CostTrackingSettings {...ADMIN_PROPS} />);
 
-      const accordionHeader = screen.getByText("Fee/Price Margin").closest("button");
+      const accordionHeader = screen.getByText("费率加价").closest("button");
       if (accordionHeader) {
         await user.click(accordionHeader);
       }
 
-      const addButton = await screen.findByRole("button", { name: /add provider margin/i });
+      const addButton = await screen.findByRole("button", { name: "+ 添加提供商加价" });
       await user.click(addButton);
 
-      expect(await screen.findByRole("dialog", { name: "Add Provider Margin" })).toBeInTheDocument();
+      expect(await screen.findByRole("dialog", { name: "添加提供商加价" })).toBeInTheDocument();
     });
   });
 
@@ -171,18 +171,18 @@ describe("CostTrackingSettings", () => {
     it("should ask to confirm before removing a discount", async () => {
       mockDiscountConfig.mockReturnValue({ openai: 0.05 });
 
-      await expandAndRemove("Provider Discounts", "Remove discount for openai");
+      await expandAndRemove("提供商折扣", "移除openai的折扣");
 
-      expect(await screen.findByRole("button", { name: "Remove" })).toBeInTheDocument();
-      expect(screen.getByText(/are you sure you want to remove the discount for openai\?/i)).toBeInTheDocument();
+      expect(await screen.findByRole("button", { name: "移除" })).toBeInTheDocument();
+      expect(screen.getByText(/确定要移除 openai 的折扣吗/)).toBeInTheDocument();
       expect(mockRemoveDiscount).not.toHaveBeenCalled();
     });
 
     it("should remove the discount once removal is confirmed", async () => {
       mockDiscountConfig.mockReturnValue({ openai: 0.05 });
 
-      const user = await expandAndRemove("Provider Discounts", "Remove discount for openai");
-      await user.click(await screen.findByRole("button", { name: "Remove" }));
+      const user = await expandAndRemove("提供商折扣", "移除openai的折扣");
+      await user.click(await screen.findByRole("button", { name: "移除" }));
 
       expect(mockRemoveDiscount).toHaveBeenCalledWith("openai");
     });
@@ -190,11 +190,11 @@ describe("CostTrackingSettings", () => {
     it("should leave the discount in place when the confirmation is cancelled", async () => {
       mockDiscountConfig.mockReturnValue({ openai: 0.05 });
 
-      const user = await expandAndRemove("Provider Discounts", "Remove discount for openai");
-      await user.click(await screen.findByRole("button", { name: "Cancel" }));
+      const user = await expandAndRemove("提供商折扣", "移除openai的折扣");
+      await user.click(await screen.findByRole("button", { name: "取消" }));
 
       expect(mockRemoveDiscount).not.toHaveBeenCalled();
-      expect(screen.queryByRole("button", { name: "Remove" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "移除" })).not.toBeInTheDocument();
     });
 
     it("should hold the confirmation open while the removal is still in flight", async () => {
@@ -202,12 +202,12 @@ describe("CostTrackingSettings", () => {
       const { promise, resolve: settleRemoval } = Promise.withResolvers<void>();
       mockRemoveDiscount.mockReturnValue(promise);
 
-      const user = await expandAndRemove("Provider Discounts", "Remove discount for openai");
-      await user.click(await screen.findByRole("button", { name: "Remove" }));
+      const user = await expandAndRemove("提供商折扣", "移除openai的折扣");
+      await user.click(await screen.findByRole("button", { name: "移除" }));
 
-      const removing = await screen.findByRole("button", { name: "Removing…" });
+      const removing = await screen.findByRole("button", { name: "移除中…" });
       expect(removing).toBeDisabled();
-      expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "取消" })).toBeDisabled();
 
       await act(async () => {
         settleRemoval();
@@ -222,9 +222,9 @@ describe("CostTrackingSettings", () => {
     it("should remove the margin once removal is confirmed", async () => {
       mockMarginConfig.mockReturnValue({ openai: 0.1 });
 
-      const user = await expandAndRemove("Fee/Price Margin", "Remove margin for openai");
-      expect(screen.getByText(/are you sure you want to remove the margin for openai\?/i)).toBeInTheDocument();
-      await user.click(await screen.findByRole("button", { name: "Remove" }));
+      const user = await expandAndRemove("费率加价", "移除openai的加价");
+      expect(screen.getByText(/确定要移除 openai 的加价吗/)).toBeInTheDocument();
+      await user.click(await screen.findByRole("button", { name: "移除" }));
 
       expect(mockRemoveMargin).toHaveBeenCalledWith("openai");
     });
@@ -235,24 +235,24 @@ describe("CostTrackingSettings", () => {
       mockDiscountConfig.mockReturnValue({});
       renderWithProviders(<CostTrackingSettings {...ADMIN_PROPS} />);
 
-      const accordionHeader = screen.getByText("Provider Discounts").closest("button");
+      const accordionHeader = screen.getByText("提供商折扣").closest("button");
       if (accordionHeader) {
         await userEvent.setup().click(accordionHeader);
       }
 
-      expect(await screen.findByText(/no provider discounts configured/i)).toBeInTheDocument();
+      expect(await screen.findByText(/尚未配置提供商折扣/)).toBeInTheDocument();
     });
 
     it("should show the empty state message when no margin config is loaded", async () => {
       mockMarginConfig.mockReturnValue({});
       renderWithProviders(<CostTrackingSettings {...ADMIN_PROPS} />);
 
-      const accordionHeader = screen.getByText("Fee/Price Margin").closest("button");
+      const accordionHeader = screen.getByText("费率加价").closest("button");
       if (accordionHeader) {
         await userEvent.setup().click(accordionHeader);
       }
 
-      expect(await screen.findByText(/no provider margins configured/i)).toBeInTheDocument();
+      expect(await screen.findByText(/尚未配置提供商加价/)).toBeInTheDocument();
     });
   });
 });

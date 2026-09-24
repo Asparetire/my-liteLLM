@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { getProxyBaseUrl, getGlobalLitellmHeaderName } from "@/components/networking";
 import { toast } from "@/lib/toast";
 import { MarginConfig } from "./types";
@@ -30,6 +31,7 @@ export interface AddMarginParams {
 }
 
 export function useMarginConfig({ accessToken }: UseMarginConfigProps): UseMarginConfigReturn {
+  const t = useTranslations("costTracking");
   const [marginConfig, setMarginConfig] = useState<MarginConfig>({});
 
   const fetchMarginConfig = useCallback(async () => {
@@ -53,9 +55,9 @@ export function useMarginConfig({ accessToken }: UseMarginConfigProps): UseMargi
       }
     } catch (error) {
       console.error("Error fetching margin config:", error);
-      toast.fromError("Failed to fetch margin configuration");
+      toast.fromError(t("fetchMarginFailed"));
     }
-  }, [accessToken]);
+  }, [accessToken, t]);
 
   const saveMarginConfig = useCallback(
     async (config: MarginConfig) => {
@@ -73,19 +75,19 @@ export function useMarginConfig({ accessToken }: UseMarginConfigProps): UseMargi
         });
 
         if (response.ok) {
-          toast.success("Margin configuration updated successfully");
+          toast.success(t("marginConfigUpdated"));
           await fetchMarginConfig();
         } else {
           const errorData = await response.json();
-          const errorMessage = errorData.detail?.error || errorData.detail || "Failed to update settings";
+          const errorMessage = errorData.detail?.error || errorData.detail || t("updateSettingsFailed");
           toast.fromError(errorMessage);
         }
       } catch (error) {
         console.error("Error updating margin config:", error);
-        toast.fromError("Failed to update margin configuration");
+        toast.fromError(t("updateMarginFailed"));
       }
     },
-    [accessToken, fetchMarginConfig],
+    [accessToken, fetchMarginConfig, t],
   );
 
   const handleAddMargin = useCallback(
@@ -93,7 +95,7 @@ export function useMarginConfig({ accessToken }: UseMarginConfigProps): UseMargi
       const { selectedProvider, marginType, percentageValue, fixedAmountValue } = params;
 
       if (!selectedProvider) {
-        toast.fromError("Please select a provider");
+        toast.fromError(t("selectProviderRequired"));
         return false;
       }
 
@@ -103,7 +105,7 @@ export function useMarginConfig({ accessToken }: UseMarginConfigProps): UseMargi
       } else {
         const backendValue = getProviderBackendValue(selectedProvider);
         if (!backendValue) {
-          toast.fromError("Invalid provider selected");
+          toast.fromError(t("invalidProvider"));
           return false;
         }
         providerValue = backendValue;
@@ -111,8 +113,8 @@ export function useMarginConfig({ accessToken }: UseMarginConfigProps): UseMargi
 
       if (marginConfig[providerValue]) {
         const displayName =
-          providerValue === "global" ? "Global" : Providers[selectedProvider as keyof typeof Providers];
-        toast.fromError(`Margin for ${displayName} already exists. Edit it in the table above.`);
+          providerValue === "global" ? t("globalRowName") : Providers[selectedProvider as keyof typeof Providers];
+        toast.fromError(t("marginExists", { name: displayName }));
         return false;
       }
 
@@ -120,14 +122,14 @@ export function useMarginConfig({ accessToken }: UseMarginConfigProps): UseMargi
       if (marginType === "percentage") {
         const percentValue = parseFloat(percentageValue);
         if (isNaN(percentValue) || percentValue < 0 || percentValue > 1000) {
-          toast.fromError("Percentage must be between 0% and 1000%");
+          toast.fromError(t("percentageRangeInvalid"));
           return false;
         }
         marginValue = percentValue / 100;
       } else {
         const fixedValue = parseFloat(fixedAmountValue);
         if (isNaN(fixedValue) || fixedValue < 0) {
-          toast.fromError("Fixed amount must be non-negative");
+          toast.fromError(t("fixedAmountInvalid"));
           return false;
         }
         marginValue = { fixed_amount: fixedValue };
@@ -142,7 +144,7 @@ export function useMarginConfig({ accessToken }: UseMarginConfigProps): UseMargi
       await saveMarginConfig(updatedConfig);
       return true;
     },
-    [marginConfig, saveMarginConfig],
+    [marginConfig, saveMarginConfig, t],
   );
 
   const handleRemoveMargin = useCallback(

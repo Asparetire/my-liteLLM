@@ -69,16 +69,16 @@ describe("CostTrackingSettings submit paths", () => {
 
   const openDiscountModal = async (user: ReturnType<typeof userEvent.setup>) => {
     renderWithProviders(<CostTrackingSettings {...ADMIN_PROPS} />);
-    const header = screen.getByText("Provider Discounts").closest("button");
+    const header = screen.getByText("提供商折扣").closest("button");
     if (header) await user.click(header);
-    await user.click(await screen.findByRole("button", { name: /add provider discount/i }));
-    await screen.findByRole("dialog", { name: "Add Provider Discount" });
+    await user.click(await screen.findByRole("button", { name: "+ 添加提供商折扣" }));
+    await screen.findByRole("dialog", { name: "添加提供商折扣" });
   };
 
   const submitDiscount = () =>
     screen
       .getAllByRole("button")
-      .filter((button) => (button.textContent || "").trim() === "Add Provider Discount")
+      .filter((button) => (button.textContent || "").trim() === "添加提供商折扣")
       .pop()!;
 
   it("requests the discount exactly once per click", async () => {
@@ -87,7 +87,7 @@ describe("CostTrackingSettings submit paths", () => {
 
     await user.click(screen.getAllByRole("combobox")[0]);
     await user.click((await screen.findAllByRole("option"))[0]);
-    fireEvent.change(screen.getByLabelText(/Discount Percentage/i), { target: { value: "5" } });
+    fireEvent.change(screen.getByLabelText(/折扣百分比/), { target: { value: "5" } });
     await user.click(submitDiscount());
 
     await waitFor(() => expect(stableDiscountCallbacks.handleAddProvider).toHaveBeenCalled());
@@ -98,18 +98,18 @@ describe("CostTrackingSettings submit paths", () => {
   it("requests the margin exactly once per click", async () => {
     const user = userEvent.setup();
     renderWithProviders(<CostTrackingSettings {...ADMIN_PROPS} />);
-    const header = screen.getByText("Fee/Price Margin").closest("button");
+    const header = screen.getByText("费率加价").closest("button");
     if (header) await user.click(header);
-    await user.click(await screen.findByRole("button", { name: /add provider margin/i }));
-    await screen.findByRole("dialog", { name: "Add Provider Margin" });
+    await user.click(await screen.findByRole("button", { name: "+ 添加提供商加价" }));
+    await screen.findByRole("dialog", { name: "添加提供商加价" });
 
     await user.click(screen.getAllByRole("combobox")[0]);
     await user.click((await screen.findAllByRole("option"))[0]);
-    fireEvent.change(screen.getByLabelText(/Margin Percentage/i), { target: { value: "10" } });
+    fireEvent.change(screen.getByLabelText(/加价百分比/), { target: { value: "10" } });
 
     const submit = screen
       .getAllByRole("button")
-      .filter((button) => (button.textContent || "").trim() === "Add Provider Margin")
+      .filter((button) => (button.textContent || "").trim() === "添加提供商加价")
       .pop()!;
     await user.click(submit);
 
@@ -123,7 +123,7 @@ describe("CostTrackingSettings submit paths", () => {
 
     await user.click(screen.getAllByRole("combobox")[0]);
     await user.click((await screen.findAllByRole("option"))[0]);
-    await user.type(screen.getByLabelText(/Discount Percentage/i), "5{Enter}");
+    await user.type(screen.getByLabelText(/折扣百分比/), "5{Enter}");
 
     await waitFor(() => expect(stableDiscountCallbacks.handleAddProvider).toHaveBeenCalled());
     expect(stableDiscountCallbacks.handleAddProvider).toHaveBeenCalledTimes(1);
@@ -133,14 +133,14 @@ describe("CostTrackingSettings submit paths", () => {
   it("requests the margin exactly once when Enter is pressed in the percentage field", async () => {
     const user = userEvent.setup();
     renderWithProviders(<CostTrackingSettings {...ADMIN_PROPS} />);
-    const header = screen.getByText("Fee/Price Margin").closest("button");
+    const header = screen.getByText("费率加价").closest("button");
     if (header) await user.click(header);
-    await user.click(await screen.findByRole("button", { name: /add provider margin/i }));
-    await screen.findByRole("dialog", { name: "Add Provider Margin" });
+    await user.click(await screen.findByRole("button", { name: "+ 添加提供商加价" }));
+    await screen.findByRole("dialog", { name: "添加提供商加价" });
 
     await user.click(screen.getAllByRole("combobox")[0]);
     await user.click((await screen.findAllByRole("option"))[0]);
-    await user.type(screen.getByLabelText(/Margin Percentage/i), "10{Enter}");
+    await user.type(screen.getByLabelText(/加价百分比/), "10{Enter}");
 
     await waitFor(() => expect(stableMarginCallbacks.handleAddMargin).toHaveBeenCalled());
     expect(stableMarginCallbacks.handleAddMargin).toHaveBeenCalledTimes(1);

@@ -70,7 +70,7 @@ describe("useDiscountConfig", () => {
         await result.current.fetchDiscountConfig();
       });
 
-      expect(toast.fromError).toHaveBeenCalledWith(expect.stringMatching(/failed to fetch/i));
+      expect(toast.fromError).toHaveBeenCalledWith(expect.stringMatching(/获取折扣配置失败/));
     });
   });
 
@@ -84,7 +84,7 @@ describe("useDiscountConfig", () => {
       });
 
       expect(success!).toBe(false);
-      expect(toast.fromError).toHaveBeenCalledWith("Please select a provider and enter discount percentage");
+      expect(toast.fromError).toHaveBeenCalledWith("请选择提供商并输入折扣百分比");
     });
 
     it("should return false and notify when no discount is provided", async () => {
@@ -96,7 +96,7 @@ describe("useDiscountConfig", () => {
       });
 
       expect(success!).toBe(false);
-      expect(toast.fromError).toHaveBeenCalledWith("Please select a provider and enter discount percentage");
+      expect(toast.fromError).toHaveBeenCalledWith("请选择提供商并输入折扣百分比");
     });
 
     it("should return false and notify when the discount exceeds 100", async () => {
@@ -108,7 +108,7 @@ describe("useDiscountConfig", () => {
       });
 
       expect(success!).toBe(false);
-      expect(toast.fromError).toHaveBeenCalledWith(expect.stringMatching(/0%.*100%/i));
+      expect(toast.fromError).toHaveBeenCalledWith(expect.stringMatching(/折扣必须在 0% 到 100% 之间/));
     });
 
     it("should return false and notify when the provider already exists in the config", async () => {
@@ -131,7 +131,7 @@ describe("useDiscountConfig", () => {
       });
 
       expect(success!).toBe(false);
-      expect(toast.fromError).toHaveBeenCalledWith(expect.stringMatching(/already exists/i));
+      expect(toast.fromError).toHaveBeenCalledWith(expect.stringMatching(/已存在/));
     });
 
     it("should save the config and return true on a valid new provider", async () => {
@@ -152,7 +152,7 @@ describe("useDiscountConfig", () => {
       });
 
       expect(success!).toBe(true);
-      expect(toast.success).toHaveBeenCalledWith("Discount configuration updated successfully");
+      expect(toast.success).toHaveBeenCalledWith("折扣配置已更新");
     });
   });
 

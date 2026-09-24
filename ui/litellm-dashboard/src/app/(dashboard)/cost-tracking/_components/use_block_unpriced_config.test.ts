@@ -72,7 +72,7 @@ describe("useBlockUnpricedConfig", () => {
         body: { enabled: true },
       });
       expect(result.current.blockUnpriced).toBe(true);
-      expect(toast.success).toHaveBeenCalledWith(expect.stringMatching(/will now be blocked/i));
+      expect(toast.success).toHaveBeenCalledWith(expect.stringMatching(/现已拦截/));
       expect(result.current.isUpdating).toBe(false);
     });
 
@@ -86,7 +86,7 @@ describe("useBlockUnpricedConfig", () => {
       });
 
       expect(result.current.blockUnpriced).toBe(false);
-      expect(toast.success).toHaveBeenCalledWith(expect.stringMatching(/now allowed/i));
+      expect(toast.success).toHaveBeenCalledWith(expect.stringMatching(/现已放行/));
     });
 
     it("surfaces the proxy error and leaves the flag unchanged when the update fails", async () => {

@@ -70,7 +70,7 @@ describe("useMarginConfig", () => {
         await result.current.fetchMarginConfig();
       });
 
-      expect(toast.fromError).toHaveBeenCalledWith(expect.stringMatching(/failed to fetch/i));
+      expect(toast.fromError).toHaveBeenCalledWith(expect.stringMatching(/获取加价配置失败/));
     });
   });
 
@@ -89,7 +89,7 @@ describe("useMarginConfig", () => {
       });
 
       expect(success!).toBe(false);
-      expect(toast.fromError).toHaveBeenCalledWith("Please select a provider");
+      expect(toast.fromError).toHaveBeenCalledWith("请选择提供商");
     });
 
     it("should return false and notify when percentage is out of range", async () => {
@@ -106,7 +106,7 @@ describe("useMarginConfig", () => {
       });
 
       expect(success!).toBe(false);
-      expect(toast.fromError).toHaveBeenCalledWith(expect.stringMatching(/0%.*1000%/i));
+      expect(toast.fromError).toHaveBeenCalledWith(expect.stringMatching(/0% 到 1000%/));
     });
 
     it("should return false when the provider already has a margin configured", async () => {
@@ -134,7 +134,7 @@ describe("useMarginConfig", () => {
       });
 
       expect(success!).toBe(false);
-      expect(toast.fromError).toHaveBeenCalledWith(expect.stringMatching(/already exists/i));
+      expect(toast.fromError).toHaveBeenCalledWith(expect.stringMatching(/已存在/));
     });
 
     it("should save a percentage margin and return true for a valid new provider", async () => {
@@ -160,7 +160,7 @@ describe("useMarginConfig", () => {
       });
 
       expect(success!).toBe(true);
-      expect(toast.success).toHaveBeenCalledWith("Margin configuration updated successfully");
+      expect(toast.success).toHaveBeenCalledWith("加价配置已更新");
     });
 
     it("should save a fixed amount margin and return true for a valid new provider", async () => {
@@ -189,7 +189,7 @@ describe("useMarginConfig", () => {
       });
 
       expect(success!).toBe(true);
-      expect(toast.success).toHaveBeenCalledWith("Margin configuration updated successfully");
+      expect(toast.success).toHaveBeenCalledWith("加价配置已更新");
     });
 
     it("should accept the global provider without provider_map lookup", async () => {

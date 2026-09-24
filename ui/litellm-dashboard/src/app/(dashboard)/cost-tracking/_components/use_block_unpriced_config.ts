@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { apiClient } from "@/components/networking";
 import { toast } from "@/lib/toast";
 
@@ -20,6 +21,7 @@ interface BlockUnpricedResponse {
 const ENDPOINT = "/config/block_requests_for_models_without_pricing";
 
 export function useBlockUnpricedConfig({ accessToken }: UseBlockUnpricedConfigProps): UseBlockUnpricedConfigReturn {
+  const t = useTranslations("costTracking");
   const [blockUnpriced, setBlockUnpricedState] = useState<boolean>(false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
@@ -41,11 +43,7 @@ export function useBlockUnpricedConfig({ accessToken }: UseBlockUnpricedConfigPr
       try {
         const data = await apiClient.patch<BlockUnpricedResponse>(ENDPOINT, { accessToken, body: { enabled } });
         setBlockUnpricedState(Boolean(data?.enabled));
-        toast.success(
-          enabled
-            ? "Requests for models without pricing will now be blocked"
-            : "Requests for models without pricing are now allowed",
-        );
+        toast.success(enabled ? t("blockUnpricedEnabled") : t("blockUnpricedDisabled"));
       } catch (error) {
         console.error("Error updating block-unpriced-models setting:", error);
         toast.fromError(error);
@@ -53,7 +51,7 @@ export function useBlockUnpricedConfig({ accessToken }: UseBlockUnpricedConfigPr
         setIsUpdating(false);
       }
     },
-    [accessToken],
+    [accessToken, t],
   );
 
   return {
