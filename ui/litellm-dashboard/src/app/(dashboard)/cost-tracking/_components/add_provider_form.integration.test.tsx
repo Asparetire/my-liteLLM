@@ -37,7 +37,7 @@ describe("AddProviderForm inside the form its parent owns", () => {
     const user = userEvent.setup();
     renderWithProviders(<ParentOwnedForm />);
 
-    await user.click(screen.getByRole("button", { name: /add provider discount/i }));
+    await user.click(screen.getByRole("button", { name: "添加提供商折扣" }));
 
     expect(onAddProvider).toHaveBeenCalledTimes(1);
     expect(onParentFinish).toHaveBeenCalledTimes(1);
