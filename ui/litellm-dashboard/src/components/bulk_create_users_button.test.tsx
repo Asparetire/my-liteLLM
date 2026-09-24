@@ -20,14 +20,14 @@ const csvFile = () =>
 const openUploadStep = async () => {
   const user = userEvent.setup();
   render(<BulkCreateUsersButton accessToken="test-token" teams={[]} possibleUIRoles={null} />);
-  await user.click(screen.getByText("+ Bulk Invite Users"));
+  await user.click(screen.getByText("+ 批量邀请用户"));
   return user;
 };
 
 describe("BulkCreateUsersButton", () => {
   it("should render", () => {
     render(<BulkCreateUsersButton accessToken="test-token" teams={[]} possibleUIRoles={null} />);
-    expect(screen.getByText("+ Bulk Invite Users")).toBeInTheDocument();
+    expect(screen.getByText("+ 批量邀请用户")).toBeInTheDocument();
   });
 
   it("parses a CSV chosen through the file input", async () => {
@@ -42,7 +42,7 @@ describe("BulkCreateUsersButton", () => {
   it("parses a CSV dropped onto the drop zone", async () => {
     await openUploadStep();
 
-    const dropZone = screen.getByLabelText(/drag and drop your csv file here/i).closest("label");
+    const dropZone = screen.getByLabelText(/将 CSV 文件拖放到此处/).closest("label");
     fireEvent.drop(dropZone as HTMLLabelElement, { dataTransfer: { files: [csvFile()], types: ["Files"] } });
 
     expect(await screen.findByText("new.hire@example.com")).toBeInTheDocument();
@@ -51,7 +51,7 @@ describe("BulkCreateUsersButton", () => {
   it("exposes the drop zone as a label for a keyboard-reachable file input", async () => {
     await openUploadStep();
 
-    const fileInput = screen.getByLabelText(/drag and drop your csv file here/i) as HTMLInputElement;
+    const fileInput = screen.getByLabelText(/将 CSV 文件拖放到此处/) as HTMLInputElement;
     expect(fileInput).toHaveAttribute("type", "file");
     expect(fileInput).toHaveAttribute("accept", ".csv");
     expect(fileInput).toBeVisible();

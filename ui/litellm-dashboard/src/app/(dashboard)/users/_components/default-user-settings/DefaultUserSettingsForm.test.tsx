@@ -83,10 +83,10 @@ const renderForm = (overrides?: { fetchSettings?: Mock; updateSettings?: Mock })
   return { fetchSettings, updateSettings };
 };
 
-const saveButton = async () => await screen.findByRole("button", { name: "Save Changes" });
+const saveButton = async () => await screen.findByRole("button", { name: "保存更改" });
 
 const enterEditMode = async (user: ReturnType<typeof userEvent.setup>) => {
-  await user.click(await screen.findByRole("button", { name: "Edit Settings" }));
+  await user.click(await screen.findByRole("button", { name: "编辑设置" }));
 };
 
 describe("DefaultUserSettingsForm", () => {
@@ -99,11 +99,11 @@ describe("DefaultUserSettingsForm", () => {
 
     expect(await screen.findByText("Internal User")).toBeInTheDocument();
     expect(screen.getByText("100")).toBeInTheDocument();
-    expect(screen.getByText("monthly")).toBeInTheDocument();
+    expect(screen.getByText("每月")).toBeInTheDocument();
     expect(screen.getByText("gpt-5.2")).toBeInTheDocument();
     expect(screen.getByText(/team-alpha/)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Save Changes" })).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Max Budget (tokens)")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "保存更改" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("最大预算（tokens）")).not.toBeInTheDocument();
   });
 
   it("labels model sentinels in the read-only summary", async () => {
@@ -128,9 +128,9 @@ describe("DefaultUserSettingsForm", () => {
   it("shows an error instead of the form when the settings cannot be loaded", async () => {
     renderForm({ fetchSettings: vi.fn().mockRejectedValue(new Error("nope")) });
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Could not load the default user settings.");
-    expect(screen.queryByRole("button", { name: "Edit Settings" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Save Changes" })).not.toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent("无法加载默认用户设置");
+    expect(screen.queryByRole("button", { name: "编辑设置" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "保存更改" })).not.toBeInTheDocument();
   });
 
   it("sends every field on save, not only the edited one", async () => {
@@ -138,8 +138,8 @@ describe("DefaultUserSettingsForm", () => {
     const { updateSettings } = renderForm();
 
     await enterEditMode(user);
-    await user.clear(await screen.findByLabelText("Max Budget (tokens)"));
-    await user.type(screen.getByLabelText("Max Budget (tokens)"), "250");
+    await user.clear(await screen.findByLabelText("最大预算（tokens）"));
+    await user.type(screen.getByLabelText("最大预算（tokens）"), "250");
     await user.click(await saveButton());
 
     await waitFor(() => expect(updateSettings).toHaveBeenCalledTimes(1));
@@ -151,11 +151,11 @@ describe("DefaultUserSettingsForm", () => {
     const { updateSettings } = renderForm();
 
     await enterEditMode(user);
-    const budget: HTMLInputElement = await screen.findByLabelText("Max Budget (tokens)");
+    const budget: HTMLInputElement = await screen.findByLabelText("最大预算（tokens）");
     await user.clear(budget);
     await user.type(budget, "0.001");
 
-    const teamBudget: HTMLInputElement = screen.getByLabelText("Max Budget in Team (tokens)");
+    const teamBudget: HTMLInputElement = screen.getByLabelText("团队内最大预算（tokens）");
     await user.clear(teamBudget);
     await user.type(teamBudget, "0.002");
 
@@ -179,7 +179,7 @@ describe("DefaultUserSettingsForm", () => {
     const { updateSettings } = renderForm();
 
     await enterEditMode(user);
-    await user.clear(await screen.findByLabelText("Max Budget (tokens)"));
+    await user.clear(await screen.findByLabelText("最大预算（tokens）"));
     await user.click(await saveButton());
 
     await waitFor(() => expect(updateSettings).toHaveBeenCalledTimes(1));
@@ -203,8 +203,8 @@ describe("DefaultUserSettingsForm", () => {
     const { updateSettings } = renderForm();
 
     await enterEditMode(user);
-    await user.click(await screen.findByRole("button", { name: "Add Team" }));
-    await user.click(screen.getAllByLabelText("Team")[1]);
+    await user.click(await screen.findByRole("button", { name: "添加团队" }));
+    await user.click(screen.getAllByLabelText("团队")[1]);
     await user.click(await screen.findByText("Beta"));
     await user.click(await saveButton());
 
@@ -223,13 +223,13 @@ describe("DefaultUserSettingsForm", () => {
     const { updateSettings } = renderForm();
 
     await enterEditMode(user);
-    await user.click(await screen.findByRole("button", { name: "Add Team" }));
-    await user.type(screen.getAllByLabelText("Team")[1], "team-alhpa");
+    await user.click(await screen.findByRole("button", { name: "添加团队" }));
+    await user.type(screen.getAllByLabelText("团队")[1], "team-alhpa");
     await user.keyboard("{Escape}");
     await user.click(await saveButton());
 
-    expect(await screen.findByText("Select a team")).toBeInTheDocument();
-    expect(screen.getAllByLabelText("Team")[1]).toHaveValue("");
+    expect(await screen.findByText("请选择团队")).toBeInTheDocument();
+    expect(screen.getAllByLabelText("团队")[1]).toHaveValue("");
     expect(updateSettings).not.toHaveBeenCalled();
   });
 
@@ -238,12 +238,12 @@ describe("DefaultUserSettingsForm", () => {
     const { updateSettings } = renderForm();
 
     await enterEditMode(user);
-    await user.click(await screen.findByRole("button", { name: "Add Team" }));
-    await user.click(screen.getAllByLabelText("Team")[1]);
+    await user.click(await screen.findByRole("button", { name: "添加团队" }));
+    await user.click(screen.getAllByLabelText("团队")[1]);
     await user.click(await screen.findByText("Alpha"));
     await user.click(await saveButton());
 
-    expect(await screen.findByText("This team is already listed")).toBeInTheDocument();
+    expect(await screen.findByText("该团队已添加")).toBeInTheDocument();
     expect(updateSettings).not.toHaveBeenCalled();
   });
 
@@ -252,7 +252,7 @@ describe("DefaultUserSettingsForm", () => {
     const { updateSettings } = renderForm();
 
     await enterEditMode(user);
-    await user.click(await screen.findByRole("button", { name: "Remove" }));
+    await user.click(await screen.findByRole("button", { name: "移除" }));
     await user.click(await saveButton());
 
     await waitFor(() => expect(updateSettings).toHaveBeenCalledTimes(1));
@@ -267,15 +267,15 @@ describe("DefaultUserSettingsForm", () => {
     });
 
     await enterEditMode(user);
-    await user.clear(await screen.findByLabelText("Max Budget (tokens)"));
-    await user.type(screen.getByLabelText("Max Budget (tokens)"), "250");
+    await user.clear(await screen.findByLabelText("最大预算（tokens）"));
+    await user.type(screen.getByLabelText("最大预算（tokens）"), "250");
     await user.click(await saveButton());
 
     await waitFor(() => expect(updateSettings).toHaveBeenCalledTimes(1));
-    expect(await screen.findByRole("button", { name: "Edit Settings" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "编辑设置" })).toBeInTheDocument();
     expect(await screen.findByText("250")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Save Changes" })).not.toBeInTheDocument();
-    expect(toast.success).toHaveBeenCalledWith("Default user settings updated successfully");
+    expect(screen.queryByRole("button", { name: "保存更改" })).not.toBeInTheDocument();
+    expect(toast.success).toHaveBeenCalledWith("默认用户设置更新成功");
 
     await enterEditMode(user);
     expect(await saveButton()).toBeDisabled();
@@ -288,14 +288,14 @@ describe("DefaultUserSettingsForm", () => {
     });
 
     await enterEditMode(user);
-    await user.clear(await screen.findByLabelText("Max Budget (tokens)"));
-    await user.type(screen.getByLabelText("Max Budget (tokens)"), "250");
+    await user.clear(await screen.findByLabelText("最大预算（tokens）"));
+    await user.type(screen.getByLabelText("最大预算（tokens）"), "250");
     await user.click(await saveButton());
 
     await waitFor(() => expect(updateSettings).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(toast.fromError).toHaveBeenCalledWith("Team(s) not found: team-alhpa."));
     expect(await saveButton()).toBeEnabled();
-    expect(screen.getByLabelText("Max Budget (tokens)")).toHaveValue(250);
+    expect(screen.getByLabelText("最大预算（tokens）")).toHaveValue(250);
   });
 
   it("discards edits and returns to the read-only view when Cancel is pressed", async () => {
@@ -303,17 +303,17 @@ describe("DefaultUserSettingsForm", () => {
     const { updateSettings } = renderForm();
 
     await enterEditMode(user);
-    await user.clear(await screen.findByLabelText("Max Budget (tokens)"));
-    await user.type(screen.getByLabelText("Max Budget (tokens)"), "250");
-    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await user.clear(await screen.findByLabelText("最大预算（tokens）"));
+    await user.type(screen.getByLabelText("最大预算（tokens）"), "250");
+    await user.click(screen.getByRole("button", { name: "取消" }));
 
-    expect(await screen.findByRole("button", { name: "Edit Settings" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "编辑设置" })).toBeInTheDocument();
     expect(screen.getByText("100")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Save Changes" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "保存更改" })).not.toBeInTheDocument();
     expect(updateSettings).not.toHaveBeenCalled();
 
     await enterEditMode(user);
-    expect(screen.getByLabelText("Max Budget (tokens)")).toHaveValue(100);
+    expect(screen.getByLabelText("最大预算（tokens）")).toHaveValue(100);
     expect(await saveButton()).toBeDisabled();
   });
 });

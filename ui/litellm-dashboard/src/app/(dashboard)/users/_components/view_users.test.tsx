@@ -143,8 +143,8 @@ describe("ViewUserDashboard", () => {
   it("renders invite and bulk invite as toolbar actions alongside the other admin controls", async () => {
     renderDashboard();
 
-    const inviteButton = await screen.findByRole("button", { name: /\+ invite user/i });
-    const bulkInviteButton = screen.getByRole("button", { name: /\+ bulk invite users/i });
+    const inviteButton = await screen.findByRole("button", { name: /\+ 邀请用户/ });
+    const bulkInviteButton = screen.getByRole("button", { name: /\+ 批量邀请用户/ });
     const toolbar = screen.getByTestId("toggle-user-selection").parentElement;
 
     expect(inviteButton.parentElement).toBe(toolbar);
@@ -157,8 +157,8 @@ describe("ViewUserDashboard", () => {
     expect(await screen.findByText("test@example.com")).toBeInTheDocument();
     expect(screen.queryByRole("tab")).not.toBeInTheDocument();
     expect(screen.queryByTestId("toggle-user-selection")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /\+ invite user/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /\+ bulk invite users/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /\+ 邀请用户/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /\+ 批量邀请用户/ })).not.toBeInTheDocument();
   });
 
   it("keeps actions unavailable while the user list is loading", () => {

@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultUserSettingsSchema, type DefaultUserSettingsFormValues } from "./schema";
+import { buildDefaultUserSettingsSchema, type DefaultUserSettingsFormValues } from "./schema";
+
+const MESSAGES = {
+  selectTeam: "Select a team",
+  teamAlreadyListed: "This team is already listed",
+  nonNegativeNumber: "Must be a non-negative number",
+};
+
+const defaultUserSettingsSchema = buildDefaultUserSettingsSchema(MESSAGES);
 
 const values = (overrides: Partial<DefaultUserSettingsFormValues> = {}): DefaultUserSettingsFormValues => ({
   user_role: "internal_user",

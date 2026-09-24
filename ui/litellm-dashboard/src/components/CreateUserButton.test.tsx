@@ -61,39 +61,39 @@ describe("CreateUserButton", () => {
   describe("rendering and visibility", () => {
     it("should render the create user form when embedded", () => {
       renderWithProviders(<CreateUserButton {...defaultProps} isEmbedded />);
-      expect(screen.getByRole("button", { name: /create user/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /创建用户/ })).toBeInTheDocument();
     });
 
     it("should render the invite user button when not embedded", async () => {
       renderWithProviders(<CreateUserButton {...defaultProps} />);
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
       });
     });
 
     it("should not render the bulk invite button", async () => {
       renderWithProviders(<CreateUserButton {...defaultProps} />);
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
       });
-      expect(screen.queryByRole("button", { name: /bulk invite users/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /批量邀请用户/ })).not.toBeInTheDocument();
     });
 
     it("should open the invite modal when invite user button is clicked", async () => {
       const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
       renderWithProviders(<CreateUserButton {...defaultProps} />);
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
       });
-      await user.click(screen.getByRole("button", { name: /\+ invite user/i }));
-      const dialog = screen.getByRole("dialog", { name: /invite user/i });
+      await user.click(screen.getByRole("button", { name: /\+ 邀请用户/ }));
+      const dialog = screen.getByRole("dialog", { name: /邀请用户/ });
       expect(dialog).toBeInTheDocument();
-      expect(within(dialog).getByRole("button", { name: /invite user/i })).toBeInTheDocument();
+      expect(within(dialog).getByRole("button", { name: /邀请用户/ })).toBeInTheDocument();
     });
 
     it("should display email invitations info message in embedded mode", () => {
       renderWithProviders(<CreateUserButton {...defaultProps} isEmbedded />);
-      expect(screen.getByText("Email invitations")).toBeInTheDocument();
+      expect(screen.getByText("邮件邀请")).toBeInTheDocument();
     });
 
     it("should display user role options when possibleUIRoles is provided", async () => {
@@ -102,7 +102,7 @@ describe("CreateUserButton", () => {
         proxy_user: { ui_label: "User", description: "Limited access" },
       };
       renderWithProviders(<CreateUserButton {...defaultProps} possibleUIRoles={possibleUIRoles} isEmbedded />);
-      await userEvent.click(screen.getByRole("combobox", { name: /user role/i }));
+      await userEvent.click(screen.getByRole("combobox", { name: /用户角色/ }));
       expect(screen.getByText("Admin")).toBeInTheDocument();
       expect(screen.getByText("User")).toBeInTheDocument();
     });
@@ -112,12 +112,12 @@ describe("CreateUserButton", () => {
       renderWithProviders(<CreateUserButton {...defaultProps} />);
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
       });
-      await user.click(screen.getByRole("button", { name: /\+ invite user/i }));
-      expect(screen.getByRole("dialog", { name: /invite user/i })).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /\+ 邀请用户/ }));
+      expect(screen.getByRole("dialog", { name: /邀请用户/ })).toBeInTheDocument();
 
-      const dialog = screen.getByRole("dialog", { name: /invite user/i });
+      const dialog = screen.getByRole("dialog", { name: /邀请用户/ });
       await user.click(within(dialog).getByRole("button", { name: /close/i }));
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
@@ -141,10 +141,10 @@ describe("CreateUserButton", () => {
         />,
       );
 
-      await user.type(screen.getByLabelText(/user email/i), "test@example.com");
-      await user.click(screen.getByRole("combobox", { name: /user role/i }));
+      await user.type(screen.getByLabelText(/用户邮箱/), "test@example.com");
+      await user.click(screen.getByRole("combobox", { name: /用户角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(screen.getByRole("button", { name: /create user/i }));
+      await user.click(screen.getByRole("button", { name: /创建用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalledWith(
@@ -172,10 +172,10 @@ describe("CreateUserButton", () => {
         />,
       );
 
-      await user.type(screen.getByLabelText(/user email/i), "embedded@example.com");
-      await user.click(screen.getByRole("combobox", { name: /user role/i }));
+      await user.type(screen.getByLabelText(/用户邮箱/), "embedded@example.com");
+      await user.click(screen.getByRole("combobox", { name: /用户角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(screen.getByRole("button", { name: /create user/i }));
+      await user.click(screen.getByRole("button", { name: /创建用户/ }));
 
       await waitFor(() => {
         expect(onUserCreated).toHaveBeenCalledWith("new-user-456");
@@ -194,10 +194,10 @@ describe("CreateUserButton", () => {
         />,
       );
 
-      await user.type(screen.getByLabelText(/user email/i), "duplicate@example.com");
-      await user.click(screen.getByRole("combobox", { name: /user role/i }));
+      await user.type(screen.getByLabelText(/用户邮箱/), "duplicate@example.com");
+      await user.click(screen.getByRole("combobox", { name: /用户角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(screen.getByRole("button", { name: /create user/i }));
+      await user.click(screen.getByRole("button", { name: /创建用户/ }));
 
       await waitFor(() => {
         expect(mockToast.fromError).toHaveBeenCalledWith("Email already exists");
@@ -221,13 +221,13 @@ describe("CreateUserButton", () => {
         />,
       );
 
-      await user.type(screen.getByLabelText(/user email/i), "info@example.com");
-      await user.click(screen.getByRole("combobox", { name: /user role/i }));
+      await user.type(screen.getByLabelText(/用户邮箱/), "info@example.com");
+      await user.click(screen.getByRole("combobox", { name: /用户角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(screen.getByRole("button", { name: /create user/i }));
+      await user.click(screen.getByRole("button", { name: /创建用户/ }));
 
       await waitFor(() => {
-        expect(mockToast.info).toHaveBeenCalledWith("Making API Call");
+        expect(mockToast.info).toHaveBeenCalledWith("正在调用 API");
       });
     });
   });
@@ -247,18 +247,18 @@ describe("CreateUserButton", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
       });
-      await user.click(screen.getByRole("button", { name: /\+ invite user/i }));
+      await user.click(screen.getByRole("button", { name: /\+ 邀请用户/ }));
 
-      const dialog = screen.getByRole("dialog", { name: /invite user/i });
-      await user.type(within(dialog).getByLabelText(/user email/i), "standalone@example.com");
-      await user.click(within(dialog).getByRole("combobox", { name: /global proxy role/i }));
+      const dialog = screen.getByRole("dialog", { name: /邀请用户/ });
+      await user.type(within(dialog).getByLabelText(/用户邮箱/), "standalone@example.com");
+      await user.click(within(dialog).getByRole("combobox", { name: /全局代理角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(within(dialog).getByRole("button", { name: /invite user/i }));
+      await user.click(within(dialog).getByRole("button", { name: /邀请用户/ }));
 
       await waitFor(() => {
-        expect(mockToast.success).toHaveBeenCalledWith("API user Created");
+        expect(mockToast.success).toHaveBeenCalledWith("API 用户创建成功");
       });
     });
 
@@ -276,21 +276,21 @@ describe("CreateUserButton", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
       });
-      await user.click(screen.getByRole("button", { name: /\+ invite user/i }));
+      await user.click(screen.getByRole("button", { name: /\+ 邀请用户/ }));
 
-      const dialog = screen.getByRole("dialog", { name: /invite user/i });
-      await user.type(within(dialog).getByLabelText(/user email/i), "sso@example.com");
-      await user.click(within(dialog).getByRole("combobox", { name: /global proxy role/i }));
+      const dialog = screen.getByRole("dialog", { name: /邀请用户/ });
+      await user.type(within(dialog).getByLabelText(/用户邮箱/), "sso@example.com");
+      await user.click(within(dialog).getByRole("combobox", { name: /全局代理角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(within(dialog).getByRole("button", { name: /invite user/i }));
+      await user.click(within(dialog).getByRole("button", { name: /邀请用户/ }));
 
       await waitFor(() => {
         expect(mockInvitationCreateCall).toHaveBeenCalledWith("token", "sso-user");
       });
       await waitFor(() => {
-        expect(mockToast.success).toHaveBeenCalledWith("API user Created");
+        expect(mockToast.success).toHaveBeenCalledWith("API 用户创建成功");
       });
     });
   });
@@ -300,11 +300,11 @@ describe("CreateUserButton", () => {
     renderWithProviders(<CreateUserButton {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
     });
-    await user.click(screen.getByRole("button", { name: /\+ invite user/i }));
+    await user.click(screen.getByRole("button", { name: /\+ 邀请用户/ }));
 
-    const dialog = screen.getByRole("dialog", { name: /invite user/i });
+    const dialog = screen.getByRole("dialog", { name: /邀请用户/ });
 
     expectControlBesideLabel(within(dialog).getByRole("checkbox"));
   });
@@ -330,21 +330,21 @@ describe("CreateUserButton", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
       });
-      await user.click(screen.getByRole("button", { name: /\+ invite user/i }));
+      await user.click(screen.getByRole("button", { name: /\+ 邀请用户/ }));
 
-      const dialog = screen.getByRole("dialog", { name: /invite user/i });
-      await user.type(within(dialog).getByLabelText(/user email/i), "org@example.com");
-      await user.click(within(dialog).getByRole("combobox", { name: /global proxy role/i }));
+      const dialog = screen.getByRole("dialog", { name: /邀请用户/ });
+      await user.type(within(dialog).getByLabelText(/用户邮箱/), "org@example.com");
+      await user.click(within(dialog).getByRole("combobox", { name: /全局代理角色/ }));
       await user.click(screen.getByText("User"));
 
       // Select org from the dropdown
-      const orgSelect = within(dialog).getByRole("combobox", { name: /organization/i });
+      const orgSelect = within(dialog).getByRole("combobox", { name: /组织/ });
       await user.click(orgSelect);
       await user.click(screen.getByText("My Org (org-1)"));
 
-      await user.click(within(dialog).getByRole("button", { name: /invite user/i }));
+      await user.click(within(dialog).getByRole("button", { name: /邀请用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalledWith(
@@ -377,15 +377,15 @@ describe("CreateUserButton", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
       });
-      await user.click(screen.getByRole("button", { name: /\+ invite user/i }));
+      await user.click(screen.getByRole("button", { name: /\+ 邀请用户/ }));
 
-      const dialog = screen.getByRole("dialog", { name: /invite user/i });
-      await user.type(within(dialog).getByLabelText(/user email/i), "nomemberadd@example.com");
-      await user.click(within(dialog).getByRole("combobox", { name: /global proxy role/i }));
+      const dialog = screen.getByRole("dialog", { name: /邀请用户/ });
+      await user.type(within(dialog).getByLabelText(/用户邮箱/), "nomemberadd@example.com");
+      await user.click(within(dialog).getByRole("combobox", { name: /全局代理角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(within(dialog).getByRole("button", { name: /invite user/i }));
+      await user.click(within(dialog).getByRole("button", { name: /邀请用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalled();
@@ -407,10 +407,10 @@ describe("CreateUserButton", () => {
         />,
       );
 
-      await user.type(screen.getByLabelText(/user email/i), "default@example.com");
-      await user.click(screen.getByRole("combobox", { name: /user role/i }));
+      await user.type(screen.getByLabelText(/用户邮箱/), "default@example.com");
+      await user.click(screen.getByRole("combobox", { name: /用户角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(screen.getByRole("button", { name: /create user/i }));
+      await user.click(screen.getByRole("button", { name: /创建用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalledWith(
@@ -435,11 +435,11 @@ describe("CreateUserButton", () => {
         />,
       );
 
-      await user.type(screen.getByLabelText(/user email/i), "off@example.com");
-      await user.click(screen.getByRole("combobox", { name: /user role/i }));
+      await user.type(screen.getByLabelText(/用户邮箱/), "off@example.com");
+      await user.click(screen.getByRole("combobox", { name: /用户角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(screen.getByRole("checkbox", { name: /send invitation email/i }));
-      await user.click(screen.getByRole("button", { name: /create user/i }));
+      await user.click(screen.getByRole("checkbox", { name: /发送邀请邮件/ }));
+      await user.click(screen.getByRole("button", { name: /创建用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalledWith(
@@ -466,15 +466,15 @@ describe("CreateUserButton", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
       });
-      await user.click(screen.getByRole("button", { name: /\+ invite user/i }));
+      await user.click(screen.getByRole("button", { name: /\+ 邀请用户/ }));
 
-      const dialog = screen.getByRole("dialog", { name: /invite user/i });
-      await user.type(within(dialog).getByLabelText(/user email/i), "standalone-default@example.com");
-      await user.click(within(dialog).getByRole("combobox", { name: /global proxy role/i }));
+      const dialog = screen.getByRole("dialog", { name: /邀请用户/ });
+      await user.type(within(dialog).getByLabelText(/用户邮箱/), "standalone-default@example.com");
+      await user.click(within(dialog).getByRole("combobox", { name: /全局代理角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(within(dialog).getByRole("button", { name: /invite user/i }));
+      await user.click(within(dialog).getByRole("button", { name: /邀请用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalledWith(
@@ -501,16 +501,16 @@ describe("CreateUserButton", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
       });
-      await user.click(screen.getByRole("button", { name: /\+ invite user/i }));
+      await user.click(screen.getByRole("button", { name: /\+ 邀请用户/ }));
 
-      const dialog = screen.getByRole("dialog", { name: /invite user/i });
-      await user.type(within(dialog).getByLabelText(/user email/i), "standalone-off@example.com");
-      await user.click(within(dialog).getByRole("combobox", { name: /global proxy role/i }));
+      const dialog = screen.getByRole("dialog", { name: /邀请用户/ });
+      await user.type(within(dialog).getByLabelText(/用户邮箱/), "standalone-off@example.com");
+      await user.click(within(dialog).getByRole("combobox", { name: /全局代理角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(within(dialog).getByRole("checkbox", { name: /send invitation email/i }));
-      await user.click(within(dialog).getByRole("button", { name: /invite user/i }));
+      await user.click(within(dialog).getByRole("checkbox", { name: /发送邀请邮件/ }));
+      await user.click(within(dialog).getByRole("button", { name: /邀请用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalledWith(
@@ -531,12 +531,12 @@ describe("CreateUserButton", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
       });
-      await user.click(screen.getByRole("button", { name: /\+ invite user/i }));
+      await user.click(screen.getByRole("button", { name: /\+ 邀请用户/ }));
 
-      const dialog = screen.getByRole("dialog", { name: /invite user/i });
-      expect(within(dialog).getByRole("checkbox", { name: /send invitation email/i })).toBeChecked();
+      const dialog = screen.getByRole("dialog", { name: /邀请用户/ });
+      expect(within(dialog).getByRole("checkbox", { name: /发送邀请邮件/ })).toBeChecked();
     });
   });
   describe("submit payload parity", () => {
@@ -546,9 +546,9 @@ describe("CreateUserButton", () => {
     };
 
     const openStandaloneModal = async (user: ReturnType<typeof userEvent.setup>) => {
-      expect(await screen.findByRole("button", { name: /\+ invite user/i })).toBeInTheDocument();
-      await user.click(screen.getByRole("button", { name: /\+ invite user/i }));
-      return screen.getByRole("dialog", { name: /invite user/i });
+      expect(await screen.findByRole("button", { name: /\+ 邀请用户/ })).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /\+ 邀请用户/ }));
+      return screen.getByRole("dialog", { name: /邀请用户/ });
     };
 
     const submittedPayload = () => mockUserCreateCall.mock.calls[0][2];
@@ -561,10 +561,10 @@ describe("CreateUserButton", () => {
       renderWithProviders(<CreateUserButton {...defaultProps} possibleUIRoles={ROLES} />);
       const dialog = await openStandaloneModal(user);
 
-      await user.type(within(dialog).getByLabelText(/user email/i), "parity@example.com");
-      await user.click(within(dialog).getByRole("combobox", { name: /global proxy role/i }));
+      await user.type(within(dialog).getByLabelText(/用户邮箱/), "parity@example.com");
+      await user.click(within(dialog).getByRole("combobox", { name: /全局代理角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(within(dialog).getByRole("button", { name: /invite user/i }));
+      await user.click(within(dialog).getByRole("button", { name: /邀请用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalled();
@@ -595,10 +595,10 @@ describe("CreateUserButton", () => {
 
       renderWithProviders(<CreateUserButton {...defaultProps} possibleUIRoles={ROLES} isEmbedded />);
 
-      await user.type(screen.getByLabelText(/user email/i), "embedded-parity@example.com");
-      await user.click(screen.getByRole("combobox", { name: /user role/i }));
+      await user.type(screen.getByLabelText(/用户邮箱/), "embedded-parity@example.com");
+      await user.click(screen.getByRole("combobox", { name: /用户角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(screen.getByRole("button", { name: /create user/i }));
+      await user.click(screen.getByRole("button", { name: /创建用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalled();
@@ -627,10 +627,10 @@ describe("CreateUserButton", () => {
 
       renderWithProviders(<CreateUserButton {...defaultProps} possibleUIRoles={ROLES} isEmbedded />);
 
-      await user.type(screen.getByLabelText(/user email/i), "admin-parity@example.com");
-      await user.click(screen.getByRole("combobox", { name: /user role/i }));
+      await user.type(screen.getByLabelText(/用户邮箱/), "admin-parity@example.com");
+      await user.click(screen.getByRole("combobox", { name: /用户角色/ }));
       await user.click(screen.getByText("Admin"));
-      await user.click(screen.getByRole("button", { name: /create user/i }));
+      await user.click(screen.getByRole("button", { name: /创建用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalled();
@@ -659,12 +659,12 @@ describe("CreateUserButton", () => {
       renderWithProviders(<CreateUserButton {...defaultProps} possibleUIRoles={ROLES} />);
       const dialog = await openStandaloneModal(user);
 
-      await user.type(within(dialog).getByLabelText(/user email/i), "org-parity@example.com");
-      await user.click(within(dialog).getByRole("combobox", { name: /global proxy role/i }));
+      await user.type(within(dialog).getByLabelText(/用户邮箱/), "org-parity@example.com");
+      await user.click(within(dialog).getByRole("combobox", { name: /全局代理角色/ }));
       await user.click(screen.getByText("User"));
-      await user.click(within(dialog).getByRole("combobox", { name: /organization/i }));
+      await user.click(within(dialog).getByRole("combobox", { name: /组织/ }));
       await user.click(screen.getByText("My Org (org-1)"));
-      await user.click(within(dialog).getByRole("button", { name: /invite user/i }));
+      await user.click(within(dialog).getByRole("button", { name: /邀请用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalled();
@@ -688,11 +688,11 @@ describe("CreateUserButton", () => {
 
       renderWithProviders(<CreateUserButton {...defaultProps} possibleUIRoles={ROLES} isEmbedded />);
 
-      await user.type(screen.getByLabelText(/user email/i), "meta-parity@example.com");
-      await user.click(screen.getByRole("combobox", { name: /user role/i }));
+      await user.type(screen.getByLabelText(/用户邮箱/), "meta-parity@example.com");
+      await user.click(screen.getByRole("combobox", { name: /用户角色/ }));
       await user.click(screen.getByText("User"));
-      await user.type(screen.getByLabelText(/metadata/i), '{{"a":1}');
-      await user.click(screen.getByRole("button", { name: /create user/i }));
+      await user.type(screen.getByLabelText(/元数据/), '{{"a":1}');
+      await user.click(screen.getByRole("button", { name: /创建用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalled();
@@ -707,10 +707,10 @@ describe("CreateUserButton", () => {
       renderWithProviders(<CreateUserButton {...defaultProps} possibleUIRoles={ROLES} />);
       const dialog = await openStandaloneModal(user);
 
-      await user.type(within(dialog).getByLabelText(/user email/i), "standalone-admin@example.com");
-      await user.click(within(dialog).getByRole("combobox", { name: /global proxy role/i }));
+      await user.type(within(dialog).getByLabelText(/用户邮箱/), "standalone-admin@example.com");
+      await user.click(within(dialog).getByRole("combobox", { name: /全局代理角色/ }));
       await user.click(screen.getByText("Admin"));
-      await user.click(within(dialog).getByRole("button", { name: /invite user/i }));
+      await user.click(within(dialog).getByRole("button", { name: /邀请用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalled();
@@ -733,17 +733,17 @@ describe("CreateUserButton", () => {
       renderWithProviders(<CreateUserButton {...defaultProps} possibleUIRoles={ROLES} />);
       const dialog = await openStandaloneModal(user);
 
-      await user.type(within(dialog).getByLabelText(/user email/i), "collapsed@example.com");
-      await user.click(within(dialog).getByRole("combobox", { name: /global proxy role/i }));
+      await user.type(within(dialog).getByLabelText(/用户邮箱/), "collapsed@example.com");
+      await user.click(within(dialog).getByRole("combobox", { name: /全局代理角色/ }));
       await user.click(screen.getByText("User"));
 
-      await user.click(within(dialog).getByText("Personal Key Creation"));
-      const modelsSelect = within(dialog).getByRole("combobox", { name: /select models/i });
+      await user.click(within(dialog).getByText("个人密钥创建"));
+      const modelsSelect = within(dialog).getByRole("combobox", { name: /选择模型/ });
       await user.click(modelsSelect);
-      await user.click(await screen.findByText("All Proxy Models"));
-      await user.click(within(dialog).getByText("Personal Key Creation"));
+      await user.click(await screen.findByText("全部代理模型"));
+      await user.click(within(dialog).getByText("个人密钥创建"));
 
-      await user.click(within(dialog).getByRole("button", { name: /invite user/i }));
+      await user.click(within(dialog).getByRole("button", { name: /邀请用户/ }));
 
       await waitFor(() => {
         expect(mockUserCreateCall).toHaveBeenCalled();
