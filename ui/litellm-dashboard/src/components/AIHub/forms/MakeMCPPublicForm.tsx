@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,7 +10,7 @@ import { makeMCPPublicCall } from "../../networking";
 import { toast } from "@/lib/toast";
 import { MCPServerData } from "@/components/AIHub/MCPHubTableColumns";
 
-const STEP_TITLES = ["Select Servers", "Confirm"];
+const STEP_TITLE_KEYS = ["stepSelect", "stepConfirm"];
 
 const statusVariant = (status?: string) => {
   if (status === "active" || status === "healthy") {
@@ -39,6 +40,8 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedServers, setSelectedServers] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
+  const t = useTranslations("aiHub");
+  const entity = t("entityMcpServer");
 
   const handleClose = () => {
     setCurrentStep(0);
@@ -49,7 +52,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
   const handleNext = () => {
     if (currentStep === 0) {
       if (selectedServers.size === 0) {
-        toast.fromError("Please select at least one MCP server to make public");
+        toast.fromError(t("selectAtLeastOne", { entity }));
         return;
       }
       setCurrentStep(1);
@@ -96,7 +99,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
 
   const handleSubmit = async () => {
     if (selectedServers.size === 0) {
-      toast.fromError("Please select at least one MCP server to make public");
+      toast.fromError(t("selectAtLeastOne", { entity }));
       return;
     }
 
@@ -107,12 +110,12 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
       // Make batch API call for all servers
       await makeMCPPublicCall(accessToken, serverIdsToMakePublic);
 
-      toast.success(`Successfully made ${serverIdsToMakePublic.length} MCP server(s) public!`);
+      toast.success(t("madePublicToast", { count: serverIdsToMakePublic.length, entity }));
       handleClose();
       onSuccess();
     } catch (error) {
       console.error("Error making MCP servers public:", error);
-      toast.fromError("Failed to make MCP servers public. Please try again.");
+      toast.fromError(t("makePublicFailed", { entity }));
     } finally {
       setLoading(false);
     }
@@ -126,7 +129,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Select MCP Servers to Make Public</h3>
+          <h3 className="text-lg font-semibold">{t("selectToMakePublicTitle", { entity })}</h3>
           <div className="flex items-center space-x-2">
             <label className="flex items-center gap-2 text-sm">
               <Checkbox
@@ -135,21 +138,18 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
                 onCheckedChange={(checked) => handleSelectAll(checked === true)}
                 disabled={mcpHubData.length === 0}
               />
-              Select All {mcpHubData.length > 0 && `(${mcpHubData.length})`}
+              {mcpHubData.length > 0 ? t("selectAllLabel", { count: mcpHubData.length }) : t("selectAllLabel", { count: 0 })}
             </label>
           </div>
         </div>
 
-        <p className="text-sm text-muted-foreground">
-          Select the MCP servers you want to be visible on the public model hub. Users will still require a valid
-          Virtual Key to use these servers.
-        </p>
+        <p className="text-sm text-muted-foreground">{t("selectPublicDescription", { entity })}</p>
 
         <div className="max-h-96 overflow-y-auto border rounded-lg p-4">
           <div className="space-y-3">
             {mcpHubData.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                <p>No MCP servers available.</p>
+                <p>{t("noEntitiesAvailable", { entity })}</p>
               </div>
             ) : (
               mcpHubData.map((server) => {
@@ -166,7 +166,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-medium break-words">{server.server_name}</p>
-                        {isPublic && <Badge>Public</Badge>}
+                        {isPublic && <Badge>{t("colPublic")}</Badge>}
                         <Badge variant="secondary">{server.transport}</Badge>
                         <Badge variant={statusVariant(server.status)}>{server.status || "unknown"}</Badge>
                       </div>
@@ -181,7 +181,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
                             </Badge>
                           ))}
                           {server.allowed_tools.length > 3 && (
-                            <p className="text-xs text-muted-foreground">+{server.allowed_tools.length - 3} more</p>
+                            <p className="text-xs text-muted-foreground">{t("moreItems", { count: server.allowed_tools.length - 3 })}</p>
                           )}
                         </div>
                       )}
@@ -195,9 +195,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
 
         {selectedServers.size > 0 && (
           <div className="bg-info/10 border border-info/20 rounded-lg p-3">
-            <p className="text-sm text-info">
-              <strong>{selectedServers.size}</strong> MCP server{selectedServers.size !== 1 ? "s" : ""} selected
-            </p>
+            <p className="text-sm text-info">{t("selectedCountInfo", { count: selectedServers.size, entity })}</p>
           </div>
         )}
       </div>
@@ -207,17 +205,16 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
   const renderStep2Content = () => {
     return (
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Confirm Making MCP Servers Public</h3>
+        <h3 className="text-lg font-semibold">{t("confirmMakePublicTitle", { entity })}</h3>
 
         <div className="bg-warning/10 border border-warning/20 rounded-lg p-4">
           <p className="text-sm text-warning">
-            <strong>Warning:</strong> Once you make these MCP servers public, anyone who can go to the{" "}
-            <code>/ui/model_hub_table</code> will be able to know they exist on the proxy.
+            {t.rich("makePublicWarning", { entity, code: (chunks) => <code>{chunks}</code> })}
           </p>
         </div>
 
         <div className="space-y-3">
-          <p className="font-medium">MCP Servers to be made public:</p>
+          <p className="font-medium">{t("toBeMadePublicLabel", { entity })}</p>
           <div className="max-h-48 overflow-y-auto border rounded-lg p-3">
             <div className="space-y-2">
               {Array.from(selectedServers).map((serverId) => {
@@ -247,10 +244,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
         </div>
 
         <div className="bg-info/10 border border-info/20 rounded-lg p-3">
-          <p className="text-sm text-info">
-            Total: <strong>{selectedServers.size}</strong> MCP server{selectedServers.size !== 1 ? "s" : ""} will be
-            made public
-          </p>
+          <p className="text-sm text-info">{t("totalToMakePublicInfo", { count: selectedServers.size, entity })}</p>
         </div>
       </div>
     );
@@ -271,20 +265,20 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
     return (
       <div className="flex justify-between mt-6">
         <Button variant="outline" onClick={currentStep === 0 ? handleClose : handlePrevious}>
-          {currentStep === 0 ? "Cancel" : "Previous"}
+          {currentStep === 0 ? t("cancelBtn") : t("previousBtn")}
         </Button>
 
         <div className="flex space-x-2">
           {currentStep === 0 && (
             <Button onClick={handleNext} disabled={selectedServers.size === 0}>
-              Next
+              {t("nextBtn")}
             </Button>
           )}
 
           {currentStep === 1 && (
             <Button onClick={handleSubmit} disabled={loading}>
               {loading && <Loader2 className="size-4 animate-spin" />}
-              Make Public
+              {t("makePublicBtn")}
             </Button>
           )}
         </div>
@@ -296,14 +290,14 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
     <Dialog open={visible} onOpenChange={(open) => !open && handleClose()} disablePointerDismissal>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-[1200px]">
         <DialogHeader>
-          <DialogTitle>Make MCP Servers Public</DialogTitle>
+          <DialogTitle>{t("makePublicTitle", { entity })}</DialogTitle>
         </DialogHeader>
 
         <div>
           <ol className="mb-6 flex items-center gap-6">
-            {STEP_TITLES.map((title, index) => (
+            {STEP_TITLE_KEYS.map((titleKey, index) => (
               <li
-                key={title}
+                key={titleKey}
                 className="flex items-center gap-2"
                 aria-current={currentStep === index ? "step" : undefined}
               >
@@ -318,7 +312,7 @@ const MakeMCPPublicForm: React.FC<MakeMCPPublicFormProps> = ({
                   {index + 1}
                 </span>
                 <span className={cn("text-sm", currentStep === index ? "font-medium" : "text-muted-foreground")}>
-                  {title}
+                  {t(titleKey, { entity })}
                 </span>
               </li>
             ))}

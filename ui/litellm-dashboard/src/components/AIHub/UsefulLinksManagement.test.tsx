@@ -35,7 +35,7 @@ describe("UsefulLinksManagement", () => {
   it("should render link management for admin users", async () => {
     render(<UsefulLinksManagement accessToken="token" userRole="Admin" />);
 
-    expect(await screen.findByText("Link Management")).toBeInTheDocument();
+    expect(await screen.findByText("链接管理")).toBeInTheDocument();
     await waitFor(() => expect(mockedGetPublicModelHubInfo).toHaveBeenCalled());
   });
 
@@ -43,12 +43,12 @@ describe("UsefulLinksManagement", () => {
     const user = userEvent.setup();
     render(<UsefulLinksManagement accessToken="token" userRole="Admin" />);
 
-    const displayNameInput = await screen.findByPlaceholderText("Friendly name");
+    const displayNameInput = await screen.findByPlaceholderText("友好的名称");
     const urlInput = screen.getByPlaceholderText("https://example.com");
 
     fireEvent.change(displayNameInput, { target: { value: "Docs" } });
     fireEvent.change(urlInput, { target: { value: "https://docs.example.com" } });
-    await user.click(screen.getByRole("button", { name: /add link/i }));
+    await user.click(screen.getByRole("button", { name: "添加链接" }));
 
     await waitFor(() =>
       expect(mockedUpdateUsefulLinksCall).toHaveBeenCalledWith("token", {
@@ -58,7 +58,7 @@ describe("UsefulLinksManagement", () => {
 
     expect(await screen.findByText("Docs")).toBeInTheDocument();
     expect(screen.getByText("https://docs.example.com")).toBeInTheDocument();
-    expect(mockedNotifications.success).toHaveBeenCalledWith("Link added successfully");
+    expect(mockedNotifications.success).toHaveBeenCalledWith("链接添加成功");
   });
 
   it("should rearrange links and save the new order", async () => {
@@ -78,12 +78,12 @@ describe("UsefulLinksManagement", () => {
 
     expect(await screen.findByText("First Link")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /rearrange order/i }));
+    await user.click(screen.getByRole("button", { name: "调整顺序" }));
 
     const secondLinkMoveUpButton = screen.getByTestId("move-up-1-Second Link");
     await user.click(secondLinkMoveUpButton);
 
-    await user.click(screen.getByRole("button", { name: /save order/i }));
+    await user.click(screen.getByRole("button", { name: "保存顺序" }));
 
     await waitFor(() =>
       expect(mockedUpdateUsefulLinksCall).toHaveBeenCalledWith("token", {
@@ -93,13 +93,13 @@ describe("UsefulLinksManagement", () => {
       }),
     );
 
-    expect(mockedNotifications.success).toHaveBeenCalledWith("Link order saved successfully");
+    expect(mockedNotifications.success).toHaveBeenCalledWith("链接顺序保存成功");
   });
 
   it("should display the Model Hub link", async () => {
     render(<UsefulLinksManagement accessToken="token" userRole="Admin" />);
 
-    expect(await screen.findByRole("link", { name: /public model hub/i })).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: "公共模型中心" })).toBeInTheDocument();
   });
 
   it("should edit a link when edit button is clicked", async () => {
@@ -151,7 +151,7 @@ describe("UsefulLinksManagement", () => {
     fireEvent.change(displayNameInput, { target: { value: "Updated Link" } });
 
     // Click save
-    await user.click(screen.getByRole("button", { name: /save/i }));
+    await user.click(screen.getByRole("button", { name: "保存" }));
 
     await waitFor(() =>
       expect(mockedUpdateUsefulLinksCall).toHaveBeenCalledWith("token", {
@@ -159,7 +159,7 @@ describe("UsefulLinksManagement", () => {
       }),
     );
 
-    expect(mockedNotifications.success).toHaveBeenCalledWith("Link updated successfully");
+    expect(mockedNotifications.success).toHaveBeenCalledWith("链接更新成功");
   });
 
   it("should cancel editing when cancel button is clicked", async () => {
@@ -187,7 +187,7 @@ describe("UsefulLinksManagement", () => {
     fireEvent.change(displayNameInput, { target: { value: "Updated Link" } });
 
     // Click cancel
-    await user.click(screen.getByRole("button", { name: /cancel/i }));
+    await user.click(screen.getByRole("button", { name: "取消" }));
 
     // Should go back to normal view
     expect(screen.getByText("Test Link")).toBeInTheDocument();
@@ -211,7 +211,7 @@ describe("UsefulLinksManagement", () => {
     expect(await screen.findByText("First Link")).toBeInTheDocument();
 
     // Enter rearrange mode
-    await user.click(screen.getByRole("button", { name: /rearrange order/i }));
+    await user.click(screen.getByRole("button", { name: "调整顺序" }));
 
     // Try to move down the last item (should not do anything)
     const secondLinkMoveDownButton = screen.getByTestId("move-down-1-Second Link");
@@ -227,21 +227,21 @@ describe("UsefulLinksManagement", () => {
     const user = userEvent.setup();
     render(<UsefulLinksManagement accessToken="token" userRole="Admin" />);
 
-    expect(await screen.findByText("Link Management")).toBeInTheDocument();
+    expect(await screen.findByText("链接管理")).toBeInTheDocument();
 
     // Initially expanded
-    expect(screen.getByText("Manage Existing Links")).toBeInTheDocument();
+    expect(screen.getByText("管理现有链接")).toBeInTheDocument();
 
     // Click to collapse
-    await user.click(screen.getByText("Link Management"));
+    await user.click(screen.getByText("链接管理"));
 
     // Should be collapsed
-    expect(screen.queryByText("Manage Existing Links")).not.toBeInTheDocument();
+    expect(screen.queryByText("管理现有链接")).not.toBeInTheDocument();
 
     // Click to expand again
-    await user.click(screen.getByText("Link Management"));
+    await user.click(screen.getByText("链接管理"));
 
     // Should be expanded
-    expect(screen.getByText("Manage Existing Links")).toBeInTheDocument();
+    expect(screen.getByText("管理现有链接")).toBeInTheDocument();
   });
 });

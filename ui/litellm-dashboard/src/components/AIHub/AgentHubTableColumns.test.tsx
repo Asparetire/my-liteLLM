@@ -2,7 +2,19 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { DataTable } from "@/components/shared/DataTable";
+import zhCN from "../../../messages/zh-CN.json";
 import { getAgentHubTableColumns, AgentHubData } from "./AgentHubTableColumns";
+
+// Resolve through the real zh-CN messages so header/count assertions pin the translated
+// output, mirroring the global next-intl mock that component-level hooks resolve through.
+const zhAiHub = (zhCN as { aiHub: Record<string, string> }).aiHub;
+const t = ((key: string, values?: Record<string, string | number>) => {
+  let message = zhAiHub[key] ?? key;
+  for (const [name, value] of Object.entries(values ?? {})) {
+    message = message.split(`{${name}}`).join(String(value));
+  }
+  return message;
+}) as unknown as Parameters<typeof getAgentHubTableColumns>[0]["t"];
 
 const mockAgent: AgentHubData = {
   agent_id: "agent-1",
@@ -26,7 +38,7 @@ function renderTable(data: AgentHubData[], onAgentClick = vi.fn()) {
   render(
     <DataTable
       data={data}
-      columns={getAgentHubTableColumns({ onAgentClick })}
+      columns={getAgentHubTableColumns({ onAgentClick, t })}
       getRowId={(agent, index) => agent.agent_id || String(index)}
       sortingMode="client"
       size="compact"
@@ -56,9 +68,9 @@ describe("getAgentHubTableColumns", () => {
     expect(screen.getByText("1.0")).toBeInTheDocument();
   });
 
-  it("should show skill count with correct pluralization", () => {
+  it("should show the skill count", () => {
     renderTable([mockAgent]);
-    expect(screen.getByText("3 skills")).toBeInTheDocument();
+    expect(screen.getByText("3 个技能")).toBeInTheDocument();
   });
 
   it("should show first two skills and '+1' for overflow", () => {
@@ -76,20 +88,20 @@ describe("getAgentHubTableColumns", () => {
 
   it("should display I/O modes", () => {
     renderTable([mockAgent]);
-    const inLabel = screen.getByText("In:");
-    expect(inLabel.parentElement?.textContent).toBe("In: text");
-    const outLabel = screen.getByText("Out:");
-    expect(outLabel.parentElement?.textContent).toBe("Out: text, image");
+    const inLabel = screen.getByText("输入：");
+    expect(inLabel.parentElement?.textContent).toBe("输入： text");
+    const outLabel = screen.getByText("输出：");
+    expect(outLabel.parentElement?.textContent).toBe("输出： text, image");
   });
 
-  it("should display 'Yes' badge for public agents", () => {
+  it("should display the public badge for public agents", () => {
     renderTable([mockAgent]);
-    expect(screen.getByText("Yes")).toBeInTheDocument();
+    expect(screen.getByText("是")).toBeInTheDocument();
   });
 
-  it("should display 'No' badge for non-public agents", () => {
+  it("should display the non-public badge for non-public agents", () => {
     renderTable([{ ...mockAgent, is_public: false }]);
-    expect(screen.getByText("No")).toBeInTheDocument();
+    expect(screen.getByText("否")).toBeInTheDocument();
   });
 
   it("should open the agent details when the name is clicked", async () => {
@@ -120,8 +132,8 @@ describe("getAgentHubTableColumns", () => {
     expect(screen.getAllByText("-").length).toBeGreaterThanOrEqual(1);
   });
 
-  it("should show singular 'skill' for one skill", () => {
+  it("should show the count for a single skill", () => {
     renderTable([{ ...mockAgent, skills: [{ id: "s1", name: "Only Skill", description: "One" }] }]);
-    expect(screen.getByText("1 skill")).toBeInTheDocument();
+    expect(screen.getByText("1 个技能")).toBeInTheDocument();
   });
 });

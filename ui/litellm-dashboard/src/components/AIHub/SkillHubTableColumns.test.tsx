@@ -3,7 +3,19 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { DataTable } from "@/components/shared/DataTable";
 import { Plugin } from "@/components/claude_code_plugins/types";
+import zhCN from "../../../messages/zh-CN.json";
 import { getSkillHubTableColumns } from "./SkillHubTableColumns";
+
+// Resolve through the real zh-CN messages so status assertions pin the translated output,
+// mirroring the global next-intl mock that component-level hooks resolve through.
+const zhAiHub = (zhCN as { aiHub: Record<string, string> }).aiHub;
+const t = ((key: string, values?: Record<string, string | number>) => {
+  let message = zhAiHub[key] ?? key;
+  for (const [name, value] of Object.entries(values ?? {})) {
+    message = message.split(`{${name}}`).join(String(value));
+  }
+  return message;
+}) as unknown as Parameters<typeof getSkillHubTableColumns>[0]["t"];
 
 const mockSkill: Plugin = {
   id: "skill-1",
@@ -19,7 +31,7 @@ function renderTable(data: Plugin[], onSkillClick = vi.fn()) {
   render(
     <DataTable
       data={data}
-      columns={getSkillHubTableColumns({ onSkillClick })}
+      columns={getSkillHubTableColumns({ onSkillClick, t })}
       getRowId={(skill, index) => skill.id || String(index)}
       sortingMode="client"
       size="compact"
@@ -42,10 +54,10 @@ describe("getSkillHubTableColumns", () => {
     expect(link).toHaveAttribute("href", "https://github.com/org/pdf-tools");
   });
 
-  it("shows Public for enabled skills and Draft for disabled ones", () => {
+  it("shows the public status for enabled skills and the draft status for disabled ones", () => {
     renderTable([mockSkill, { ...mockSkill, id: "skill-2", name: "draft-skill", enabled: false }]);
-    expect(screen.getByText("Public")).toBeInTheDocument();
-    expect(screen.getByText("Draft")).toBeInTheDocument();
+    expect(screen.getByText("已公开")).toBeInTheDocument();
+    expect(screen.getByText("草稿")).toBeInTheDocument();
   });
 
   it("opens the skill detail when the name is clicked", async () => {

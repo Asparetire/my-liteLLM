@@ -2,7 +2,19 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { DataTable } from "@/components/shared/DataTable";
+import zhCN from "../../../messages/zh-CN.json";
 import { getMCPHubTableColumns, MCPServerData } from "./MCPHubTableColumns";
+
+// Resolve through the real zh-CN messages so header assertions pin the translated output,
+// mirroring the global next-intl mock that component-level hooks resolve through.
+const zhAiHub = (zhCN as { aiHub: Record<string, string> }).aiHub;
+const t = ((key: string, values?: Record<string, string | number>) => {
+  let message = zhAiHub[key] ?? key;
+  for (const [name, value] of Object.entries(values ?? {})) {
+    message = message.split(`{${name}}`).join(String(value));
+  }
+  return message;
+}) as unknown as Parameters<typeof getMCPHubTableColumns>[0]["t"];
 
 const SERVER_URL = "https://mcp.exa.ai/mcp";
 
@@ -32,7 +44,7 @@ function renderTable(onServerClick = vi.fn()) {
   render(
     <DataTable
       data={[mockServer]}
-      columns={getMCPHubTableColumns({ onServerClick })}
+      columns={getMCPHubTableColumns({ onServerClick, t })}
       getRowId={(server) => server.server_id}
       sortingMode="client"
       size="compact"
@@ -49,15 +61,15 @@ describe("getMCPHubTableColumns", () => {
 
   it("keeps the non-sensitive columns", () => {
     renderTable();
-    expect(screen.getByText("Server Name")).toBeInTheDocument();
-    expect(screen.getByText("Transport")).toBeInTheDocument();
-    expect(screen.getByText("Auth Type")).toBeInTheDocument();
+    expect(screen.getByText("服务器名称")).toBeInTheDocument();
+    expect(screen.getByText("传输方式")).toBeInTheDocument();
+    expect(screen.getByText("认证类型")).toBeInTheDocument();
   });
 
   it("does not expose a URL column", () => {
     renderTable();
     expect(screen.queryByText("URL")).not.toBeInTheDocument();
-    const columns = getMCPHubTableColumns({ onServerClick: vi.fn() });
+    const columns = getMCPHubTableColumns({ onServerClick: vi.fn(), t });
     expect(columns.some((c) => c.header === "URL" || c.meta?.title === "URL")).toBe(false);
   });
 

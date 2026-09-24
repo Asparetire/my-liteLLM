@@ -80,23 +80,23 @@ describe("MakeMCPPublicForm", () => {
   it("should render the component", () => {
     render(<MakeMCPPublicForm {...mockProps} />);
 
-    expect(screen.getByText("Make MCP Servers Public")).toBeInTheDocument();
-    expect(screen.getByText("Select MCP Servers to Make Public")).toBeInTheDocument();
+    expect(screen.getByText("将MCP 服务器设为公开")).toBeInTheDocument();
+    expect(screen.getByText("选择MCP 服务器")).toBeInTheDocument();
   });
 
   it("should initialize with correct state", () => {
     render(<MakeMCPPublicForm {...mockProps} />);
 
     // Check that the component renders with the correct title and content
-    expect(screen.getByText("Make MCP Servers Public")).toBeInTheDocument();
-    expect(screen.getByText("Select MCP Servers to Make Public")).toBeInTheDocument();
+    expect(screen.getByText("将MCP 服务器设为公开")).toBeInTheDocument();
+    expect(screen.getByText("选择MCP 服务器")).toBeInTheDocument();
 
     // Check that all server checkboxes are present
     const checkboxes = screen.getAllByRole("checkbox");
     expect(checkboxes).toHaveLength(3); // Select all + 2 servers
 
     // Check that the Next button is enabled (servers are preselected)
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     expect(nextButton).toBeEnabled();
   });
 
@@ -104,16 +104,16 @@ describe("MakeMCPPublicForm", () => {
     render(<MakeMCPPublicForm {...mockProps} />);
 
     // Initially on step 1
-    expect(screen.getByText("Select MCP Servers to Make Public")).toBeInTheDocument();
+    expect(screen.getByText("选择MCP 服务器")).toBeInTheDocument();
 
     // Select all servers using the select all checkbox
-    const selectAllCheckbox = screen.getByRole("checkbox", { name: "Select All (2)" });
+    const selectAllCheckbox = screen.getByRole("checkbox", { name: "全选（2）" });
     await act(async () => {
       fireEvent.click(selectAllCheckbox);
     });
 
     // Verify Next button is enabled
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     expect(nextButton).toBeEnabled();
 
     // Click Next
@@ -123,7 +123,7 @@ describe("MakeMCPPublicForm", () => {
 
     // Should move to step 2
     await waitFor(() => {
-      expect(screen.getByText("Confirm Making MCP Servers Public")).toBeInTheDocument();
+      expect(screen.getByText("确认将MCP 服务器设为公开")).toBeInTheDocument();
     });
   });
 
@@ -133,22 +133,22 @@ describe("MakeMCPPublicForm", () => {
     render(<MakeMCPPublicForm {...mockProps} />);
 
     // Select all servers
-    const selectAllCheckbox = screen.getByRole("checkbox", { name: "Select All (2)" });
+    const selectAllCheckbox = screen.getByRole("checkbox", { name: "全选（2）" });
     await act(async () => {
       fireEvent.click(selectAllCheckbox);
     });
 
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     await act(async () => {
       fireEvent.click(nextButton);
     });
 
     // Wait for navigation to complete
     await waitFor(() => {
-      expect(screen.getByText("Confirm Making MCP Servers Public")).toBeInTheDocument();
+      expect(screen.getByText("确认将MCP 服务器设为公开")).toBeInTheDocument();
     });
 
-    const submitButton = screen.getByRole("button", { name: "Make Public" });
+    const submitButton = screen.getByRole("button", { name: "设为公开" });
     await act(async () => {
       fireEvent.click(submitButton);
     });
@@ -200,13 +200,13 @@ describe("MakeMCPPublicForm", () => {
     });
 
     // Try to go to next step
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     await act(async () => {
       fireEvent.click(nextButton);
     });
 
     // Should stay on same step
-    expect(screen.getByText("Select MCP Servers to Make Public")).toBeInTheDocument();
+    expect(screen.getByText("选择MCP 服务器")).toBeInTheDocument();
   });
 
   it("should display empty state when no servers are available", () => {
@@ -217,14 +217,14 @@ describe("MakeMCPPublicForm", () => {
 
     render(<MakeMCPPublicForm {...emptyProps} />);
 
-    expect(screen.getByText("No MCP servers available.")).toBeInTheDocument();
+    expect(screen.getByText("暂无可选的MCP 服务器")).toBeInTheDocument();
 
     // Select All checkbox should be disabled
-    const selectAllCheckbox = screen.getByRole("checkbox", { name: "Select All" });
+    const selectAllCheckbox = screen.getByRole("checkbox", { name: "全选（0）" });
     expectDisabledControl(selectAllCheckbox);
 
     // Next button should be disabled
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     expect(nextButton).toBeDisabled();
   });
 
@@ -232,7 +232,7 @@ describe("MakeMCPPublicForm", () => {
     render(<MakeMCPPublicForm {...mockProps} />);
 
     // Click Cancel button
-    const cancelButton = screen.getByRole("button", { name: "Cancel" });
+    const cancelButton = screen.getByRole("button", { name: "取消" });
     await act(async () => {
       fireEvent.click(cancelButton);
     });
@@ -245,24 +245,24 @@ describe("MakeMCPPublicForm", () => {
     render(<MakeMCPPublicForm {...mockProps} />);
 
     // Navigate to step 1
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     await act(async () => {
       fireEvent.click(nextButton);
     });
 
     // Verify we're on step 1
     await waitFor(() => {
-      expect(screen.getByText("Confirm Making MCP Servers Public")).toBeInTheDocument();
+      expect(screen.getByText("确认将MCP 服务器设为公开")).toBeInTheDocument();
     });
 
     // Click Previous button
-    const previousButton = screen.getByRole("button", { name: "Previous" });
+    const previousButton = screen.getByRole("button", { name: "上一步" });
     await act(async () => {
       fireEvent.click(previousButton);
     });
 
     // Should go back to step 0
-    expect(screen.getByText("Select MCP Servers to Make Public")).toBeInTheDocument();
+    expect(screen.getByText("选择MCP 服务器")).toBeInTheDocument();
   });
 
   it("should handle individual server selection", async () => {
@@ -317,8 +317,8 @@ describe("MakeMCPPublicForm", () => {
     expect(screen.getByText("tool-2")).toBeInTheDocument();
     expect(screen.getByText("tool-3")).toBeInTheDocument();
 
-    // Should show "+2 more" text for the remaining tools
-    expect(screen.getByText("+2 more")).toBeInTheDocument();
+    // Should show "还有 2 项" text for the remaining tools
+    expect(screen.getByText("还有 2 项")).toBeInTheDocument();
   });
 
   it("should handle submit error properly", async () => {
@@ -327,16 +327,16 @@ describe("MakeMCPPublicForm", () => {
 
     render(<MakeMCPPublicForm {...mockProps} />);
 
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     await act(async () => {
       fireEvent.click(nextButton);
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Confirm Making MCP Servers Public")).toBeInTheDocument();
+      expect(screen.getByText("确认将MCP 服务器设为公开")).toBeInTheDocument();
     });
 
-    const submitButton = screen.getByRole("button", { name: "Make Public" });
+    const submitButton = screen.getByRole("button", { name: "设为公开" });
     await act(async () => {
       fireEvent.click(submitButton);
     });
@@ -360,16 +360,16 @@ describe("MakeMCPPublicForm", () => {
 
     render(<MakeMCPPublicForm {...mockProps} />);
 
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     await act(async () => {
       fireEvent.click(nextButton);
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Confirm Making MCP Servers Public")).toBeInTheDocument();
+      expect(screen.getByText("确认将MCP 服务器设为公开")).toBeInTheDocument();
     });
 
-    const submitButton = screen.getByRole("button", { name: "Make Public" });
+    const submitButton = screen.getByRole("button", { name: "设为公开" });
     await act(async () => {
       fireEvent.click(submitButton);
     });
@@ -381,7 +381,7 @@ describe("MakeMCPPublicForm", () => {
     expect(mockMakeMCPPublicCall).toHaveBeenCalledTimes(1);
     expect(mockProps.onSuccess).not.toHaveBeenCalled();
     expect(mockProps.onClose).not.toHaveBeenCalled();
-    expect(screen.getByText("Confirm Making MCP Servers Public")).toBeInTheDocument();
+    expect(screen.getByText("确认将MCP 服务器设为公开")).toBeInTheDocument();
 
     resolvePromise({});
     await waitFor(() => {
@@ -400,7 +400,7 @@ describe("MakeMCPPublicForm", () => {
 
     // Modal should not be rendered
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(screen.queryByText("Make MCP Servers Public")).not.toBeInTheDocument();
+    expect(screen.queryByText("将MCP 服务器设为公开")).not.toBeInTheDocument();
   });
 
   it("should preselect already public servers when modal opens", () => {

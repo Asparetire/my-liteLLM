@@ -165,7 +165,7 @@ describe("ModelHubTable", () => {
 
     renderWithProviders(<ModelHubTable accessToken={null} publicPage={false} premiumUser={false} userRole={null} />);
 
-    expect(await screen.findByText("No models yet")).toBeInTheDocument();
+    expect(await screen.findByText("暂无模型")).toBeInTheDocument();
     expect(networking.modelHubCall).not.toHaveBeenCalled();
   });
 
@@ -224,8 +224,8 @@ describe("ModelHubTable", () => {
       const { user, search } = await renderHub();
 
       await user.type(search, "opus");
-      await user.click(screen.getByRole("tab", { name: "Agent Hub" }));
-      await user.click(screen.getByRole("tab", { name: "Model Hub" }));
+      await user.click(screen.getByRole("tab", { name: "智能体中心" }));
+      await user.click(screen.getByRole("tab", { name: "模型中心" }));
 
       expect(await screen.findByPlaceholderText("Search model names...")).toHaveValue("opus");
     });
@@ -246,19 +246,19 @@ describe("ModelHubTable", () => {
       const agentCount = (expected: string) =>
         screen.getByText((_, el) => el?.tagName === "P" && el.textContent === expected);
 
-      await user.click(screen.getByRole("tab", { name: "Agent Hub" }));
+      await user.click(screen.getByRole("tab", { name: "智能体中心" }));
       expect(await screen.findByText("Billing Router")).toBeInTheDocument();
 
-      const search = screen.getByPlaceholderText("Search agent names or descriptions...");
+      const search = screen.getByPlaceholderText("按名称或描述搜索智能体…");
       await user.type(search, "support tickets");
       expect(screen.queryByText("Billing Router")).not.toBeInTheDocument();
       expect(screen.getByText("Support Bot")).toBeInTheDocument();
-      expect(agentCount("Showing 1 of 2 agents")).toBeInTheDocument();
+      expect(agentCount("共 2 个智能体，已显示 1 个")).toBeInTheDocument();
 
       await user.clear(search);
       await user.type(search, "zzzz");
-      expect(screen.getByText("No matching agents")).toBeInTheDocument();
-      expect(agentCount("Showing 0 of 2 agents")).toBeInTheDocument();
+      expect(screen.getByText("没有匹配的智能体")).toBeInTheDocument();
+      expect(agentCount("共 2 个智能体，已显示 0 个")).toBeInTheDocument();
     });
 
     it("renders the hub strip as underlined tabs rather than a segmented pill", async () => {

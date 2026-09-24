@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Copy, Info, MoreHorizontal } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { DataTableSortHeader } from "@/components/shared/DataTable";
 import { IdentityCell, StatusBadge } from "@/components/shared/table_cells";
@@ -34,17 +35,38 @@ export interface ModelHubData {
   [key: string]: any;
 }
 
-const formatCapabilityName = (key: string) =>
+export const formatCapabilityName = (key: string) =>
   key
     .replace(/^supports_/, "")
     .split("_")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
+// Known capabilities resolve through the aiHub namespace; anything else stays as the
+// provider's raw supports_* name, which is a data value we don't translate.
+const CAPABILITY_LABEL_KEYS: Record<string, string> = {
+  supports_vision: "capabilityVision",
+  supports_function_calling: "capabilityFunctionCalling",
+  supports_parallel_function_calling: "capabilityParallelFunctionCalling",
+  supports_prompt_caching: "capabilityPromptCaching",
+  supports_reasoning: "capabilityReasoning",
+  supports_audio_input: "capabilityAudioInput",
+  supports_audio_output: "capabilityAudioOutput",
+  supports_web_search: "capabilityWebSearch",
+  supports_response_schema: "capabilityResponseSchema",
+};
+
 const getModelCapabilities = (model: ModelHubData) =>
   Object.entries(model)
     .filter(([key, value]) => key.startsWith("supports_") && value === true)
     .map(([key]) => key);
+
+type Translator = (key: string, values?: Record<string, string | number>) => string;
+
+export const capabilityLabel = (capability: string, t: Translator): string => {
+  const labelKey = CAPABILITY_LABEL_KEYS[capability];
+  return labelKey ? t(labelKey) : formatCapabilityName(capability);
+};
 
 const formatCost = (cost: number) => `$${(cost * 1_000_000).toFixed(2)}`;
 
@@ -60,10 +82,11 @@ interface ModelHubRowActionsProps {
 }
 
 function ModelHubRowActions({ model, onModelClick }: ModelHubRowActionsProps) {
+  const t = useTranslations("aiHub");
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label="Open model actions"
+        aria-label={t("openModelActionsAria")}
         data-testid={`model-hub-actions-${model.model_group}`}
         className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "text-muted-foreground")}
       >
@@ -72,14 +95,14 @@ function ModelHubRowActions({ model, onModelClick }: ModelHubRowActionsProps) {
       <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuItem data-testid="model-hub-action-details" onClick={() => onModelClick(model)}>
           <Info />
-          View details
+          {t("viewDetails")}
         </DropdownMenuItem>
         <DropdownMenuItem
           data-testid="model-hub-action-copy"
-          onClick={() => void copyToClipboard(model.model_group, "Model name copied")}
+          onClick={() => void copyToClipboard(model.model_group, t("modelNameCopiedToast"))}
         >
           <Copy />
-          Copy model name
+          {t("copyModelName")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -88,14 +111,15 @@ function ModelHubRowActions({ model, onModelClick }: ModelHubRowActionsProps) {
 
 interface ModelHubTableColumnsDeps {
   onModelClick: (model: ModelHubData) => void;
+  t: Translator;
 }
 
-export const getModelHubTableColumns = ({ onModelClick }: ModelHubTableColumnsDeps): ColumnDef<ModelHubData>[] => [
+export const getModelHubTableColumns = ({ onModelClick, t }: ModelHubTableColumnsDeps): ColumnDef<ModelHubData>[] => [
   {
     id: "model_group",
     accessorKey: "model_group",
-    meta: { title: "Public Model Name" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Public Model Name" />,
+    meta: { title: t("colPublicModelName") },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colPublicModelName")} />,
     size: 220,
     enableSorting: true,
     sortingFn: "alphanumeric",
@@ -106,8 +130,8 @@ export const getModelHubTableColumns = ({ onModelClick }: ModelHubTableColumnsDe
   {
     id: "providers",
     accessorKey: "providers",
-    meta: { title: "Provider", skeleton: "chips", className: "hidden md:table-cell" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Provider" />,
+    meta: { title: t("colProvider"), skeleton: "chips", className: "hidden md:table-cell" },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colProvider")} />,
     size: 150,
     enableSorting: true,
     sortingFn: (rowA, rowB) => rowA.original.providers.join(", ").localeCompare(rowB.original.providers.join(", ")),
@@ -128,8 +152,8 @@ export const getModelHubTableColumns = ({ onModelClick }: ModelHubTableColumnsDe
   {
     id: "mode",
     accessorKey: "mode",
-    meta: { title: "Mode", className: "hidden lg:table-cell" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Mode" />,
+    meta: { title: t("colMode"), className: "hidden lg:table-cell" },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colMode")} />,
     size: 110,
     enableSorting: true,
     sortingFn: "alphanumeric",
@@ -143,8 +167,8 @@ export const getModelHubTableColumns = ({ onModelClick }: ModelHubTableColumnsDe
   {
     id: "max_input_tokens",
     accessorKey: "max_input_tokens",
-    meta: { title: "Tokens", className: "hidden lg:table-cell" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Tokens" />,
+    meta: { title: t("colTokens"), className: "hidden lg:table-cell" },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colTokens")} />,
     size: 110,
     enableSorting: true,
     sortingFn: (rowA, rowB) => {
@@ -165,8 +189,8 @@ export const getModelHubTableColumns = ({ onModelClick }: ModelHubTableColumnsDe
   {
     id: "input_cost_per_token",
     accessorKey: "input_cost_per_token",
-    meta: { title: "Cost/1M", skeleton: "twoLine" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Cost/1M" />,
+    meta: { title: t("colCostPer1M"), skeleton: "twoLine" },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colCostPer1M")} />,
     size: 110,
     enableSorting: true,
     sortingFn: (rowA, rowB) => {
@@ -188,8 +212,8 @@ export const getModelHubTableColumns = ({ onModelClick }: ModelHubTableColumnsDe
   },
   {
     id: "capabilities",
-    meta: { title: "Features", skeleton: "chips" },
-    header: "Features",
+    meta: { title: t("colFeatures"), skeleton: "chips" },
+    header: t("colFeatures"),
     size: 220,
     enableSorting: false,
     cell: ({ row }) => {
@@ -201,7 +225,7 @@ export const getModelHubTableColumns = ({ onModelClick }: ModelHubTableColumnsDe
         <div className="flex flex-wrap gap-1">
           {capabilities.map((capability) => (
             <Badge key={capability} variant="outline">
-              {formatCapabilityName(capability)}
+              {capabilityLabel(capability, t)}
             </Badge>
           ))}
         </div>
@@ -211,8 +235,8 @@ export const getModelHubTableColumns = ({ onModelClick }: ModelHubTableColumnsDe
   {
     id: "is_public_model_group",
     accessorKey: "is_public_model_group",
-    meta: { title: "Public", skeleton: "badge", className: "hidden md:table-cell" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Public" />,
+    meta: { title: t("colPublic"), skeleton: "badge", className: "hidden md:table-cell" },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colPublic")} />,
     size: 100,
     enableSorting: true,
     sortingFn: (rowA, rowB) => {
@@ -222,15 +246,15 @@ export const getModelHubTableColumns = ({ onModelClick }: ModelHubTableColumnsDe
     },
     cell: ({ row }) =>
       row.original.is_public_model_group === true ? (
-        <StatusBadge tone="success" label="Yes" />
+        <StatusBadge tone="success" label={t("valueYes")} />
       ) : (
-        <StatusBadge tone="neutral" label="No" />
+        <StatusBadge tone="neutral" label={t("valueNo")} />
       ),
   },
   {
     id: "actions",
     meta: { className: "text-right", headerClassName: "text-right" },
-    header: () => <span className="sr-only">Actions</span>,
+    header: () => <span className="sr-only">{t("actionsSr")}</span>,
     size: 64,
     enableSorting: false,
     enableHiding: false,

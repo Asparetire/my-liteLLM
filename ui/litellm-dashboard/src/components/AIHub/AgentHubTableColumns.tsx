@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Copy, Info, MoreHorizontal } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { DataTableSortHeader } from "@/components/shared/DataTable";
 import { StatusBadge } from "@/components/shared/table_cells";
@@ -47,11 +48,14 @@ interface AgentHubRowActionsProps {
   onAgentClick: (agent: AgentHubData) => void;
 }
 
+type Translator = (key: string, values?: Record<string, string | number>) => string;
+
 function AgentHubRowActions({ agent, onAgentClick }: AgentHubRowActionsProps) {
+  const t = useTranslations("aiHub");
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label="Open agent actions"
+        aria-label={t("openAgentActionsAria")}
         data-testid={`agent-hub-actions-${agent.agent_id || agent.name}`}
         className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "text-muted-foreground")}
       >
@@ -60,14 +64,14 @@ function AgentHubRowActions({ agent, onAgentClick }: AgentHubRowActionsProps) {
       <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuItem data-testid="agent-hub-action-details" onClick={() => onAgentClick(agent)}>
           <Info />
-          View details
+          {t("viewDetails")}
         </DropdownMenuItem>
         <DropdownMenuItem
           data-testid="agent-hub-action-copy"
-          onClick={() => void copyToClipboard(agent.name, "Agent name copied")}
+          onClick={() => void copyToClipboard(agent.name, t("agentNameCopiedToast"))}
         >
           <Copy />
-          Copy agent name
+          {t("copyAgentName")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -76,14 +80,15 @@ function AgentHubRowActions({ agent, onAgentClick }: AgentHubRowActionsProps) {
 
 interface AgentHubTableColumnsDeps {
   onAgentClick: (agent: AgentHubData) => void;
+  t: Translator;
 }
 
-export const getAgentHubTableColumns = ({ onAgentClick }: AgentHubTableColumnsDeps): ColumnDef<AgentHubData>[] => [
+export const getAgentHubTableColumns = ({ onAgentClick, t }: AgentHubTableColumnsDeps): ColumnDef<AgentHubData>[] => [
   {
     id: "name",
     accessorKey: "name",
-    meta: { title: "Agent Name" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Agent Name" />,
+    meta: { title: t("colAgentName") },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colAgentName")} />,
     size: 200,
     enableSorting: true,
     sortingFn: "alphanumeric",
@@ -94,8 +99,8 @@ export const getAgentHubTableColumns = ({ onAgentClick }: AgentHubTableColumnsDe
   {
     id: "description",
     accessorKey: "description",
-    meta: { title: "Description", className: "hidden md:table-cell" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Description" />,
+    meta: { title: t("colDescription"), className: "hidden md:table-cell" },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colDescription")} />,
     size: 240,
     enableSorting: true,
     sortingFn: "alphanumeric",
@@ -108,8 +113,8 @@ export const getAgentHubTableColumns = ({ onAgentClick }: AgentHubTableColumnsDe
   {
     id: "version",
     accessorKey: "version",
-    meta: { title: "Version", skeleton: "badge", className: "hidden lg:table-cell" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Version" />,
+    meta: { title: t("colVersion"), skeleton: "badge", className: "hidden lg:table-cell" },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colVersion")} />,
     size: 100,
     enableSorting: true,
     sortingFn: "alphanumeric",
@@ -122,8 +127,8 @@ export const getAgentHubTableColumns = ({ onAgentClick }: AgentHubTableColumnsDe
   {
     id: "protocolVersion",
     accessorKey: "protocolVersion",
-    meta: { title: "Protocol", className: "hidden lg:table-cell" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Protocol" />,
+    meta: { title: t("colProtocol"), className: "hidden lg:table-cell" },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colProtocol")} />,
     size: 100,
     enableSorting: true,
     sortingFn: "alphanumeric",
@@ -131,17 +136,15 @@ export const getAgentHubTableColumns = ({ onAgentClick }: AgentHubTableColumnsDe
   },
   {
     id: "skills",
-    meta: { title: "Skills", skeleton: "chips" },
-    header: "Skills",
+    meta: { title: t("colSkills"), skeleton: "chips" },
+    header: t("colSkills"),
     size: 180,
     enableSorting: false,
     cell: ({ row }) => {
       const skills = row.original.skills || [];
       return (
         <div className="flex flex-col gap-1">
-          <span className="text-xs font-medium">
-            {skills.length} skill{skills.length !== 1 ? "s" : ""}
-          </span>
+          <span className="text-xs font-medium">{t("skillsCount", { count: skills.length })}</span>
           {skills.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {skills.slice(0, 2).map((skill) => (
@@ -158,8 +161,8 @@ export const getAgentHubTableColumns = ({ onAgentClick }: AgentHubTableColumnsDe
   },
   {
     id: "capabilities",
-    meta: { title: "Capabilities", skeleton: "chips" },
-    header: "Capabilities",
+    meta: { title: t("colCapabilities"), skeleton: "chips" },
+    header: t("colCapabilities"),
     size: 160,
     enableSorting: false,
     cell: ({ row }) => {
@@ -182,8 +185,8 @@ export const getAgentHubTableColumns = ({ onAgentClick }: AgentHubTableColumnsDe
   },
   {
     id: "io_modes",
-    meta: { title: "I/O Modes", skeleton: "twoLine", className: "hidden xl:table-cell" },
-    header: "I/O Modes",
+    meta: { title: t("colIOModes"), skeleton: "twoLine", className: "hidden xl:table-cell" },
+    header: t("colIOModes"),
     size: 150,
     enableSorting: false,
     cell: ({ row }) => {
@@ -192,10 +195,10 @@ export const getAgentHubTableColumns = ({ onAgentClick }: AgentHubTableColumnsDe
       return (
         <div className="flex flex-col gap-0.5 text-xs">
           <span>
-            <span className="font-medium">In:</span> {inputModes.join(", ") || "-"}
+            <span className="font-medium">{t("inputShortLabel")}</span> {inputModes.join(", ") || "-"}
           </span>
           <span>
-            <span className="font-medium">Out:</span> {outputModes.join(", ") || "-"}
+            <span className="font-medium">{t("outputShortLabel")}</span> {outputModes.join(", ") || "-"}
           </span>
         </div>
       );
@@ -204,8 +207,8 @@ export const getAgentHubTableColumns = ({ onAgentClick }: AgentHubTableColumnsDe
   {
     id: "is_public",
     accessorKey: "is_public",
-    meta: { title: "Public", skeleton: "badge", className: "hidden md:table-cell" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Public" />,
+    meta: { title: t("colPublic"), skeleton: "badge", className: "hidden md:table-cell" },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colPublic")} />,
     size: 100,
     enableSorting: true,
     sortingFn: (rowA, rowB) => {
@@ -215,13 +218,13 @@ export const getAgentHubTableColumns = ({ onAgentClick }: AgentHubTableColumnsDe
     },
     cell: ({ row }) => {
       const isPublic = row.original.is_public === true;
-      return <StatusBadge tone={isPublic ? "success" : "neutral"} label={isPublic ? "Yes" : "No"} />;
+      return <StatusBadge tone={isPublic ? "success" : "neutral"} label={isPublic ? t("valueYes") : t("valueNo")} />;
     },
   },
   {
     id: "actions",
     meta: { className: "text-right", headerClassName: "text-right" },
-    header: () => <span className="sr-only">Actions</span>,
+    header: () => <span className="sr-only">{t("actionsSr")}</span>,
     size: 64,
     enableSorting: false,
     enableHiding: false,

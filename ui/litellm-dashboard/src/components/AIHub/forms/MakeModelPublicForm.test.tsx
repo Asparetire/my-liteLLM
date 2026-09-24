@@ -96,23 +96,23 @@ describe("MakeModelPublicForm", () => {
   it("should render the component", () => {
     render(<MakeModelPublicForm {...mockProps} />);
 
-    expect(screen.getByText("Make Models Public")).toBeInTheDocument();
-    expect(screen.getByText("Select Models to Make Public")).toBeInTheDocument();
+    expect(screen.getByText("将模型设为公开")).toBeInTheDocument();
+    expect(screen.getByText("选择模型")).toBeInTheDocument();
   });
 
   it("should initialize with correct state", () => {
     render(<MakeModelPublicForm {...mockProps} />);
 
     // Check that the component renders with the correct title and content
-    expect(screen.getByText("Make Models Public")).toBeInTheDocument();
-    expect(screen.getByText("Select Models to Make Public")).toBeInTheDocument();
+    expect(screen.getByText("将模型设为公开")).toBeInTheDocument();
+    expect(screen.getByText("选择模型")).toBeInTheDocument();
 
     // Check that all model checkboxes are present
     const checkboxes = screen.getAllByRole("checkbox");
     expect(checkboxes).toHaveLength(3); // Select all + 2 models
 
     // Check that the Next button is enabled (models are preselected)
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     expect(nextButton).toBeEnabled();
   });
 
@@ -120,16 +120,16 @@ describe("MakeModelPublicForm", () => {
     render(<MakeModelPublicForm {...mockProps} />);
 
     // Initially on step 1
-    expect(screen.getByText("Select Models to Make Public")).toBeInTheDocument();
+    expect(screen.getByText("选择模型")).toBeInTheDocument();
 
     // Select all models using the select all checkbox
-    const selectAllCheckbox = screen.getByRole("checkbox", { name: "Select All (2)" });
+    const selectAllCheckbox = screen.getByRole("checkbox", { name: "全选（2）" });
     await act(async () => {
       fireEvent.click(selectAllCheckbox);
     });
 
     // Verify Next button is enabled
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     expect(nextButton).toBeEnabled();
 
     // Click Next
@@ -139,7 +139,7 @@ describe("MakeModelPublicForm", () => {
 
     // Should move to step 2
     await waitFor(() => {
-      expect(screen.getByText("Confirm Making Models Public")).toBeInTheDocument();
+      expect(screen.getByText("确认将模型设为公开")).toBeInTheDocument();
     });
   });
 
@@ -149,22 +149,22 @@ describe("MakeModelPublicForm", () => {
     render(<MakeModelPublicForm {...mockProps} />);
 
     // Select all models
-    const selectAllCheckbox = screen.getByRole("checkbox", { name: "Select All (2)" });
+    const selectAllCheckbox = screen.getByRole("checkbox", { name: "全选（2）" });
     await act(async () => {
       fireEvent.click(selectAllCheckbox);
     });
 
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     await act(async () => {
       fireEvent.click(nextButton);
     });
 
     // Wait for navigation to complete
     await waitFor(() => {
-      expect(screen.getByText("Confirm Making Models Public")).toBeInTheDocument();
+      expect(screen.getByText("确认将模型设为公开")).toBeInTheDocument();
     });
 
-    const submitButton = screen.getByRole("button", { name: "Make Public" });
+    const submitButton = screen.getByRole("button", { name: "设为公开" });
     await act(async () => {
       fireEvent.click(submitButton);
     });
@@ -216,13 +216,13 @@ describe("MakeModelPublicForm", () => {
     });
 
     // Try to go to next step
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     await act(async () => {
       fireEvent.click(nextButton);
     });
 
     // Should stay on same step
-    expect(screen.getByText("Select Models to Make Public")).toBeInTheDocument();
+    expect(screen.getByText("选择模型")).toBeInTheDocument();
   });
 
   it("should display empty state when no models are available", () => {
@@ -233,14 +233,14 @@ describe("MakeModelPublicForm", () => {
 
     render(<MakeModelPublicForm {...emptyProps} />);
 
-    expect(screen.getByText("No models match the current filters.")).toBeInTheDocument();
+    expect(screen.getByText("没有符合当前筛选条件的模型")).toBeInTheDocument();
 
     // Select All checkbox should be disabled
-    const selectAllCheckbox = screen.getByRole("checkbox", { name: "Select All" });
+    const selectAllCheckbox = screen.getByRole("checkbox", { name: "全选（0）" });
     expectDisabledControl(selectAllCheckbox);
 
     // Next button should be disabled
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     expect(nextButton).toBeDisabled();
   });
 
@@ -248,7 +248,7 @@ describe("MakeModelPublicForm", () => {
     render(<MakeModelPublicForm {...mockProps} />);
 
     // Click Cancel button
-    const cancelButton = screen.getByRole("button", { name: "Cancel" });
+    const cancelButton = screen.getByRole("button", { name: "取消" });
     await act(async () => {
       fireEvent.click(cancelButton);
     });
@@ -261,24 +261,24 @@ describe("MakeModelPublicForm", () => {
     render(<MakeModelPublicForm {...mockProps} />);
 
     // Navigate to step 1
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     await act(async () => {
       fireEvent.click(nextButton);
     });
 
     // Verify we're on step 1
     await waitFor(() => {
-      expect(screen.getByText("Confirm Making Models Public")).toBeInTheDocument();
+      expect(screen.getByText("确认将模型设为公开")).toBeInTheDocument();
     });
 
     // Click Previous button
-    const previousButton = screen.getByRole("button", { name: "Previous" });
+    const previousButton = screen.getByRole("button", { name: "上一步" });
     await act(async () => {
       fireEvent.click(previousButton);
     });
 
     // Should go back to step 0
-    expect(screen.getByText("Select Models to Make Public")).toBeInTheDocument();
+    expect(screen.getByText("选择模型")).toBeInTheDocument();
   });
 
   it("should handle individual model selection", async () => {
@@ -335,16 +335,16 @@ describe("MakeModelPublicForm", () => {
 
     render(<MakeModelPublicForm {...mockProps} />);
 
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     await act(async () => {
       fireEvent.click(nextButton);
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Confirm Making Models Public")).toBeInTheDocument();
+      expect(screen.getByText("确认将模型设为公开")).toBeInTheDocument();
     });
 
-    const submitButton = screen.getByRole("button", { name: "Make Public" });
+    const submitButton = screen.getByRole("button", { name: "设为公开" });
     await act(async () => {
       fireEvent.click(submitButton);
     });
@@ -368,16 +368,16 @@ describe("MakeModelPublicForm", () => {
 
     render(<MakeModelPublicForm {...mockProps} />);
 
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     await act(async () => {
       fireEvent.click(nextButton);
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Confirm Making Models Public")).toBeInTheDocument();
+      expect(screen.getByText("确认将模型设为公开")).toBeInTheDocument();
     });
 
-    const submitButton = screen.getByRole("button", { name: "Make Public" });
+    const submitButton = screen.getByRole("button", { name: "设为公开" });
     await act(async () => {
       fireEvent.click(submitButton);
     });
@@ -389,7 +389,7 @@ describe("MakeModelPublicForm", () => {
     expect(mockMakeModelGroupPublic).toHaveBeenCalledTimes(1);
     expect(mockProps.onSuccess).not.toHaveBeenCalled();
     expect(mockProps.onClose).not.toHaveBeenCalled();
-    expect(screen.getByText("Confirm Making Models Public")).toBeInTheDocument();
+    expect(screen.getByText("确认将模型设为公开")).toBeInTheDocument();
 
     resolvePromise({});
     await waitFor(() => {
@@ -408,7 +408,7 @@ describe("MakeModelPublicForm", () => {
 
     // Modal should not be rendered
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(screen.queryByText("Make Models Public")).not.toBeInTheDocument();
+    expect(screen.queryByText("将模型设为公开")).not.toBeInTheDocument();
   });
 
   it("should preselect already public models when modal opens", () => {
@@ -461,26 +461,26 @@ describe("MakeModelPublicForm", () => {
     render(<MakeModelPublicForm {...mockProps} />);
 
     // Should show that 1 model is selected (gpt-3.5-turbo is preselected)
-    expect(screen.getByText("model selected")).toHaveTextContent("1 model selected");
+    expect(screen.getByText("已选择 1 个模型")).toBeInTheDocument();
   });
 
   it("should show confirmation step with selected models", async () => {
     render(<MakeModelPublicForm {...mockProps} />);
 
-    const nextButton = screen.getByRole("button", { name: "Next" });
+    const nextButton = screen.getByRole("button", { name: "下一步" });
     await act(async () => {
       fireEvent.click(nextButton);
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Confirm Making Models Public")).toBeInTheDocument();
+      expect(screen.getByText("确认将模型设为公开")).toBeInTheDocument();
     });
 
     // Should show the selected model
     expect(screen.getByText("gpt-3.5-turbo")).toBeInTheDocument();
 
     // Should show the warning message
-    expect(screen.getByText(/Warning:/)).toBeInTheDocument();
+    expect(screen.getByText(/警告：一旦将这些模型设为公开/)).toBeInTheDocument();
     expect(screen.getByText(/model_hub_table/)).toBeInTheDocument();
 
     // Should show total count (already verified by checking the presence of the confirmation step)

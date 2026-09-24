@@ -2,7 +2,19 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { DataTable } from "@/components/shared/DataTable";
+import zhCN from "../../../messages/zh-CN.json";
 import { getModelHubTableColumns, ModelHubData } from "./ModelHubTableColumns";
+
+// Resolve through the real zh-CN messages so capability/status assertions pin the translated
+// output, mirroring the global next-intl mock that component-level hooks resolve through.
+const zhAiHub = (zhCN as { aiHub: Record<string, string> }).aiHub;
+const t = ((key: string, values?: Record<string, string | number>) => {
+  let message = zhAiHub[key] ?? key;
+  for (const [name, value] of Object.entries(values ?? {})) {
+    message = message.split(`{${name}}`).join(String(value));
+  }
+  return message;
+}) as unknown as Parameters<typeof getModelHubTableColumns>[0]["t"];
 
 const mockModel: ModelHubData = {
   model_group: "gpt-4o",
@@ -22,7 +34,7 @@ function renderTable(data: ModelHubData[], onModelClick = vi.fn()) {
   render(
     <DataTable
       data={data}
-      columns={getModelHubTableColumns({ onModelClick })}
+      columns={getModelHubTableColumns({ onModelClick, t })}
       getRowId={(model, index) => model.model_group || String(index)}
       sortingMode="client"
       size="compact"
@@ -54,16 +66,16 @@ describe("getModelHubTableColumns", () => {
 
   it("shows capability badges only for supported features", () => {
     renderTable([mockModel]);
-    expect(screen.getByText("Vision")).toBeInTheDocument();
-    expect(screen.getByText("Function Calling")).toBeInTheDocument();
-    expect(screen.queryByText("Parallel Function Calling")).not.toBeInTheDocument();
+    expect(screen.getByText("视觉")).toBeInTheDocument();
+    expect(screen.getByText("函数调用")).toBeInTheDocument();
+    expect(screen.queryByText("并行函数调用")).not.toBeInTheDocument();
   });
 
   it("shows the public status badge", () => {
     renderTable([mockModel]);
-    expect(screen.getByText("Yes")).toBeInTheDocument();
+    expect(screen.getByText("是")).toBeInTheDocument();
     renderTable([{ ...mockModel, model_group: "private-model", is_public_model_group: false }]);
-    expect(screen.getByText("No")).toBeInTheDocument();
+    expect(screen.getByText("否")).toBeInTheDocument();
   });
 
   it("opens the model details when the name is clicked", async () => {
