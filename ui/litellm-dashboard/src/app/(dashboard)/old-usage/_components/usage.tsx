@@ -532,7 +532,7 @@ const UsagePage: React.FC<UsagePageProps> = ({ accessToken, token, userRole, use
           </CardHeader>
           <CardContent className="flex flex-col items-start gap-4">
             <p className="text-sm text-muted-foreground">
-              {t("spendLogsRows", { rows: proxySettings.NUM_SPEND_LOGS_ROWS })}
+              {t("spendLogsRows", { rows: proxySettings.NUM_SPEND_LOGS_ROWS ?? "-" })}
               <br></br>
               {t("spendLogsGuideHint")}
             </p>

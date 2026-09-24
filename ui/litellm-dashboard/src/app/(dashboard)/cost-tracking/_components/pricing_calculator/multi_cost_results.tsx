@@ -327,7 +327,9 @@ const MultiCostResults: React.FC<MultiCostResultsProps> = ({ multiResult, timePe
                           size="icon-xs"
                           aria-expanded={isExpanded}
                           aria-label={
-                            isExpanded ? t("hideCostBreakdownAria", { model: record.model }) : t("showCostBreakdownAria", { model: record.model })
+                            isExpanded
+                              ? t("hideCostBreakdownAria", { model: record.model ?? "" })
+                              : t("showCostBreakdownAria", { model: record.model ?? "" })
                           }
                           onClick={() => toggleExpanded(record.id)}
                           className="text-muted-foreground hover:text-foreground"
