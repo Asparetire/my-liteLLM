@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -23,6 +24,7 @@ const createDefaultEntry = (): ModelEntry => ({
 });
 
 const PricingCalculator: React.FC<PricingCalculatorProps> = ({ accessToken, models }) => {
+  const t = useTranslations("costTracking");
   const [entries, setEntries] = useState<ModelEntry[]>([createDefaultEntry()]);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("month");
   const { debouncedFetchForEntry, removeEntry, getMultiModelResult } = useMultiCostEstimate(accessToken);
@@ -80,11 +82,11 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({ accessToken, mode
         >
           <label className="flex cursor-pointer items-center gap-2 text-sm">
             <RadioGroupItem value="day" />
-            Per Day
+            {t("perDayOption")}
           </label>
           <label className="flex cursor-pointer items-center gap-2 text-sm">
             <RadioGroupItem value="month" />
-            Per Month
+            {t("perMonthOption")}
           </label>
         </RadioGroup>
       </div>
@@ -92,12 +94,12 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({ accessToken, mode
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[35%]">Model</TableHead>
-            <TableHead className="w-[18%]">Input Tokens</TableHead>
-            <TableHead className="w-[18%]">Output Tokens</TableHead>
-            <TableHead className="w-[20%]">Requests/{timePeriod === "day" ? "Day" : "Month"}</TableHead>
+            <TableHead className="w-[35%]">{t("colModel")}</TableHead>
+            <TableHead className="w-[18%]">{t("colInputTokens")}</TableHead>
+            <TableHead className="w-[18%]">{t("colOutputTokens")}</TableHead>
+            <TableHead className="w-[20%]">{timePeriod === "day" ? t("colRequestsDay") : t("colRequestsMonth")}</TableHead>
             <TableHead className="w-[50px]">
-              <span className="sr-only">Actions</span>
+              <span className="sr-only">{t("colActionsSr")}</span>
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -109,7 +111,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({ accessToken, mode
                   options={modelOptions}
                   value={record.model || undefined}
                   onValueChange={(value) => handleEntryChange(record.id, "model", value)}
-                  placeholder="Select a model"
+                  placeholder={t("selectModelPlaceholder")}
                 />
               </TableCell>
               <TableCell>
@@ -154,7 +156,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({ accessToken, mode
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  aria-label={`Remove model row ${index + 1}`}
+                  aria-label={t("removeModelRowAria", { index: index + 1 })}
                   onClick={() => handleRemoveEntry(record.id)}
                   disabled={entries.length === 1}
                   className="text-destructive"
@@ -170,7 +172,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({ accessToken, mode
             <TableCell colSpan={5}>
               <Button variant="outline" onClick={handleAddEntry} className="w-full border-dashed">
                 <Plus className="size-3.5" />
-                Add Another Model
+                {t("addAnotherModel")}
               </Button>
             </TableCell>
           </TableRow>

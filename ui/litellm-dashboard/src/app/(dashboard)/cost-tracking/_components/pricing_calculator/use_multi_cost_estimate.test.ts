@@ -179,7 +179,7 @@ describe("useMultiCostEstimate", () => {
       expect(multiResult.entries[0].error).toBe("Bad request");
     });
 
-    it("should set 'Network error' when fetch throws", async () => {
+    it("should set the localized network error when fetch throws", async () => {
       vi.spyOn(global, "fetch").mockRejectedValue(new Error("connection refused"));
 
       const { result } = renderHook(() => useMultiCostEstimate("token123"));
@@ -191,7 +191,7 @@ describe("useMultiCostEstimate", () => {
       });
 
       const multiResult = result.current.getMultiModelResult([entry]);
-      expect(multiResult.entries[0].error).toBe("Network error");
+      expect(multiResult.entries[0].error).toBe("网络错误");
       expect(multiResult.entries[0].result).toBeNull();
     });
   });

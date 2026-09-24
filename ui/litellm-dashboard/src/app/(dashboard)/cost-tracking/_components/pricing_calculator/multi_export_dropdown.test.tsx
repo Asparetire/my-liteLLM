@@ -68,26 +68,26 @@ describe("MultiExportDropdown", () => {
 
   it("should render the Export button when at least one entry has a result", () => {
     renderWithProviders(<MultiExportDropdown multiResult={makeMultiResult(true)} />);
-    expect(screen.getByRole("button", { name: /^export$/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^导出$/ })).toBeInTheDocument();
   });
 
   it("should show the export menu when the Export button is clicked", async () => {
     const user = userEvent.setup();
     renderWithProviders(<MultiExportDropdown multiResult={makeMultiResult(true)} />);
 
-    await user.click(screen.getByRole("button", { name: /^export$/i }));
+    await user.click(screen.getByRole("button", { name: /^导出$/ }));
 
-    expect(await screen.findByRole("menuitem", { name: "Export as PDF" })).toBeInTheDocument();
-    expect(screen.getByRole("menuitem", { name: "Export as CSV" })).toBeInTheDocument();
+    expect(await screen.findByRole("menuitem", { name: "导出为 PDF" })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: "导出为 CSV" })).toBeInTheDocument();
   });
 
   it("should hide the export menu when the Export button is clicked again", async () => {
     const user = userEvent.setup();
     renderWithProviders(<MultiExportDropdown multiResult={makeMultiResult(true)} />);
 
-    const trigger = screen.getByRole("button", { name: /^export$/i });
+    const trigger = screen.getByRole("button", { name: /^导出$/ });
     await user.click(trigger);
-    await screen.findByRole("menuitem", { name: "Export as PDF" });
+    await screen.findByRole("menuitem", { name: "导出为 PDF" });
 
     await user.click(trigger);
     await waitFor(() => expect(trigger).toHaveAttribute("aria-expanded", "false"));
@@ -97,9 +97,9 @@ describe("MultiExportDropdown", () => {
     const user = userEvent.setup();
     renderWithProviders(<MultiExportDropdown multiResult={makeMultiResult(true)} />);
 
-    const trigger = screen.getByRole("button", { name: /^export$/i });
+    const trigger = screen.getByRole("button", { name: /^导出$/ });
     await user.click(trigger);
-    await user.click(await screen.findByRole("menuitem", { name: "Export as PDF" }));
+    await user.click(await screen.findByRole("menuitem", { name: "导出为 PDF" }));
 
     expect(exportMultiToPDF).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(trigger).toHaveAttribute("aria-expanded", "false"));
@@ -109,9 +109,9 @@ describe("MultiExportDropdown", () => {
     const user = userEvent.setup();
     renderWithProviders(<MultiExportDropdown multiResult={makeMultiResult(true)} />);
 
-    const trigger = screen.getByRole("button", { name: /^export$/i });
+    const trigger = screen.getByRole("button", { name: /^导出$/ });
     await user.click(trigger);
-    await user.click(await screen.findByRole("menuitem", { name: "Export as CSV" }));
+    await user.click(await screen.findByRole("menuitem", { name: "导出为 CSV" }));
 
     expect(exportMultiToCSV).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(trigger).toHaveAttribute("aria-expanded", "false"));
@@ -122,10 +122,10 @@ describe("MultiExportDropdown", () => {
     const multiResult = makeMultiResult(true);
     renderWithProviders(<MultiExportDropdown multiResult={multiResult} />);
 
-    await user.click(screen.getByRole("button", { name: /^export$/i }));
-    await user.click(await screen.findByRole("menuitem", { name: "Export as PDF" }));
+    await user.click(screen.getByRole("button", { name: /^导出$/ }));
+    await user.click(await screen.findByRole("menuitem", { name: "导出为 PDF" }));
 
-    expect(exportMultiToPDF).toHaveBeenCalledWith(multiResult);
+    expect(exportMultiToPDF).toHaveBeenCalledWith(multiResult, expect.any(Function));
   });
 
   it("should close the menu when clicking outside", async () => {
@@ -137,9 +137,9 @@ describe("MultiExportDropdown", () => {
       </div>,
     );
 
-    const trigger = screen.getByRole("button", { name: /^export$/i });
+    const trigger = screen.getByRole("button", { name: /^导出$/ });
     await user.click(trigger);
-    await screen.findByRole("menuitem", { name: "Export as PDF" });
+    await screen.findByRole("menuitem", { name: "导出为 PDF" });
 
     await user.click(screen.getByTestId("outside"));
     await waitFor(() => expect(trigger).toHaveAttribute("aria-expanded", "false"));
@@ -149,25 +149,25 @@ describe("MultiExportDropdown", () => {
     const user = userEvent.setup();
     renderWithProviders(<MultiExportDropdown multiResult={makeMultiResult(true)} />);
 
-    const trigger = screen.getByRole("button", { name: /^export$/i });
+    const trigger = screen.getByRole("button", { name: /^导出$/ });
     trigger.focus();
     await user.keyboard("{ArrowDown}");
 
-    const pdfOption = await screen.findByRole("menuitem", { name: "Export as PDF" });
+    const pdfOption = await screen.findByRole("menuitem", { name: "导出为 PDF" });
     await waitFor(() => expect(pdfOption).toHaveFocus());
 
     await user.keyboard("{ArrowDown}");
-    expect(screen.getByRole("menuitem", { name: "Export as CSV" })).toHaveFocus();
+    expect(screen.getByRole("menuitem", { name: "导出为 CSV" })).toHaveFocus();
   });
 
   it("should close the menu and restore trigger focus when Escape is pressed", async () => {
     const user = userEvent.setup();
     renderWithProviders(<MultiExportDropdown multiResult={makeMultiResult(true)} />);
 
-    const trigger = screen.getByRole("button", { name: /^export$/i });
+    const trigger = screen.getByRole("button", { name: /^导出$/ });
     trigger.focus();
     await user.keyboard("{ArrowDown}");
-    await screen.findByRole("menuitem", { name: "Export as PDF" });
+    await screen.findByRole("menuitem", { name: "导出为 PDF" });
 
     await user.keyboard("{Escape}");
 

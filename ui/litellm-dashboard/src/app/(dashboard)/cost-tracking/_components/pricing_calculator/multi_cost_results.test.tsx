@@ -85,10 +85,11 @@ function emptyMultiResult(): MultiModelResult {
   };
 }
 
-const expandToggle = (): HTMLElement => screen.getByRole("button", { name: /cost breakdown for / });
+const expandToggle = (): HTMLElement => screen.getByRole("button", { name: /的成本明细$/ });
 
 const shownBreakdown = (): HTMLElement | null => {
-  const label = screen.queryByText("Total/Request");
+  // The expanded breakdown is the only place rendering the localized "{period} input" label
+  const label = screen.queryByText("每日输入");
   if (label === null) return null;
   return label.closest("[style*='display: none']") === null ? label : null;
 };
@@ -101,7 +102,7 @@ describe("MultiCostResults", () => {
   describe("when no model has been selected", () => {
     it("should show a prompt to select models", () => {
       renderWithProviders(<MultiCostResults multiResult={emptyMultiResult()} timePeriod="month" />);
-      expect(screen.getByText(/select models above to see cost estimates/i)).toBeInTheDocument();
+      expect(screen.getByText("在上方选择模型以查看成本估算")).toBeInTheDocument();
     });
   });
 
@@ -127,7 +128,7 @@ describe("MultiCostResults", () => {
       };
 
       renderWithProviders(<MultiCostResults multiResult={multiResult} timePeriod="month" />);
-      expect(screen.getByText(/calculating costs/i)).toBeInTheDocument();
+      expect(screen.getByText(/正在计算成本/)).toBeInTheDocument();
     });
   });
 
@@ -161,17 +162,17 @@ describe("MultiCostResults", () => {
   describe("when valid results are available", () => {
     it("should show the Cost Estimates heading", () => {
       renderWithProviders(<MultiCostResults multiResult={makeMultiResult()} timePeriod="day" />);
-      expect(screen.getByText("Cost Estimates")).toBeInTheDocument();
+      expect(screen.getByText("成本估算")).toBeInTheDocument();
     });
 
     it("should display the Total Per Request statistic", () => {
       renderWithProviders(<MultiCostResults multiResult={makeMultiResult()} timePeriod="day" />);
-      expect(screen.getByText("Total Per Request")).toBeInTheDocument();
+      expect(screen.getByText("每请求总计")).toBeInTheDocument();
     });
 
     it("should display Total Daily statistic when timePeriod is day", () => {
       renderWithProviders(<MultiCostResults multiResult={makeMultiResult()} timePeriod="day" />);
-      expect(screen.getByText("Total Daily")).toBeInTheDocument();
+      expect(screen.getByText("每日总计")).toBeInTheDocument();
     });
 
     it("should display Total Monthly statistic when timePeriod is month", () => {
@@ -190,7 +191,7 @@ describe("MultiCostResults", () => {
           timePeriod="month"
         />,
       );
-      expect(screen.getByText("Total Monthly")).toBeInTheDocument();
+      expect(screen.getByText("每月总计")).toBeInTheDocument();
     });
 
     it("should show the model name in the summary table", () => {
@@ -205,16 +206,16 @@ describe("MultiCostResults", () => {
 
     it("should show the Export button when results are available", () => {
       renderWithProviders(<MultiCostResults multiResult={makeMultiResult()} timePeriod="day" />);
-      expect(screen.getByRole("button", { name: /export/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "导出" })).toBeInTheDocument();
     });
 
     it("should render a column header for each summary column", () => {
       renderWithProviders(<MultiCostResults multiResult={makeMultiResult()} timePeriod="day" />);
 
-      expect(screen.getByRole("columnheader", { name: "Model" })).toBeInTheDocument();
-      expect(screen.getByRole("columnheader", { name: "Per Request" })).toBeInTheDocument();
-      expect(screen.getByRole("columnheader", { name: "Margin Fee" })).toBeInTheDocument();
-      expect(screen.getByRole("columnheader", { name: "Daily" })).toBeInTheDocument();
+      expect(screen.getByRole("columnheader", { name: "模型" })).toBeInTheDocument();
+      expect(screen.getByRole("columnheader", { name: "每请求" })).toBeInTheDocument();
+      expect(screen.getByRole("columnheader", { name: "加价费用" })).toBeInTheDocument();
+      expect(screen.getByRole("columnheader", { name: "每日" })).toBeInTheDocument();
     });
 
     it("should not show the model breakdown before the row is expanded", () => {
@@ -229,7 +230,7 @@ describe("MultiCostResults", () => {
       await user.click(expandToggle());
 
       expect(shownBreakdown()).toBeVisible();
-      expect(screen.getByText("Daily Total (100 req)")).toBeInTheDocument();
+      expect(screen.getByText("每日总计（100 次请求）")).toBeInTheDocument();
     });
 
     it("should collapse the model breakdown again on a second click", async () => {
@@ -247,12 +248,12 @@ describe("MultiCostResults", () => {
       const user = userEvent.setup();
       renderWithProviders(<MultiCostResults multiResult={makeMultiResult()} timePeriod="day" />);
 
-      const toggle = screen.getByRole("button", { name: "Show cost breakdown for gpt-4" });
+      const toggle = screen.getByRole("button", { name: "展开查看 gpt-4 的成本明细" });
       expect(toggle).toHaveAttribute("aria-expanded", "false");
 
       await user.click(toggle);
 
-      const collapseToggle = screen.getByRole("button", { name: "Hide cost breakdown for gpt-4" });
+      const collapseToggle = screen.getByRole("button", { name: "收起 gpt-4 的成本明细" });
       expect(collapseToggle).toHaveAttribute("aria-expanded", "true");
     });
 
@@ -279,7 +280,7 @@ describe("MultiCostResults", () => {
         />,
       );
 
-      expect(screen.getAllByRole("button", { name: /cost breakdown for / })).toHaveLength(1);
+      expect(screen.getAllByRole("button", { name: /的成本明细$/ })).toHaveLength(1);
     });
   });
 
@@ -305,12 +306,12 @@ describe("MultiCostResults", () => {
       });
 
       renderWithProviders(<MultiCostResults multiResult={multiResult} timePeriod="day" />);
-      expect(screen.getByText("Margin Fee/Request")).toBeInTheDocument();
+      expect(screen.getByText("每请求加价费用")).toBeInTheDocument();
     });
 
     it("should not show margin fee details when margin per request is zero", () => {
       renderWithProviders(<MultiCostResults multiResult={makeMultiResult()} timePeriod="day" />);
-      expect(screen.queryByText("Margin Fee/Request")).not.toBeInTheDocument();
+      expect(screen.queryByText("每请求加价费用")).not.toBeInTheDocument();
     });
   });
 
@@ -328,7 +329,7 @@ describe("MultiCostResults", () => {
       });
 
       renderWithProviders(<MultiCostResults multiResult={multiResult} timePeriod="day" />);
-      expect(screen.getByText(/no pricing data found/i)).toBeInTheDocument();
+      expect(screen.getByText(/未找到该模型的定价数据/)).toBeInTheDocument();
     });
   });
 });

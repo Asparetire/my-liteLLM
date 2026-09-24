@@ -63,18 +63,18 @@ describe("PricingCalculator", () => {
 
   it("should render the time period toggle with Per Day and Per Month options", () => {
     renderWithProviders(<PricingCalculator {...DEFAULT_PROPS} />);
-    expect(screen.getByText("Per Day")).toBeInTheDocument();
-    expect(screen.getByText("Per Month")).toBeInTheDocument();
+    expect(screen.getByText("按天")).toBeInTheDocument();
+    expect(screen.getByText("按月")).toBeInTheDocument();
   });
 
   it("should render an Add Another Model button", () => {
     renderWithProviders(<PricingCalculator {...DEFAULT_PROPS} />);
-    expect(screen.getByRole("button", { name: /add another model/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "添加另一模型" })).toBeInTheDocument();
   });
 
   it("should show the Requests/Month column header by default", () => {
     renderWithProviders(<PricingCalculator {...DEFAULT_PROPS} />);
-    expect(screen.getByText("Requests/Month")).toBeInTheDocument();
+    expect(screen.getByText("每月请求数")).toBeInTheDocument();
   });
 
   it("should add a new row when Add Another Model is clicked", async () => {
@@ -84,7 +84,7 @@ describe("PricingCalculator", () => {
     const table = screen.getByRole("table");
     const initialRows = within(table).getAllByRole("row");
 
-    await user.click(screen.getByRole("button", { name: /add another model/i }));
+    await user.click(screen.getByRole("button", { name: "添加另一模型" }));
 
     const updatedRows = within(table).getAllByRole("row");
     // One new data row added (header row + data rows)
@@ -102,7 +102,7 @@ describe("PricingCalculator", () => {
     const user = userEvent.setup();
     renderWithProviders(<PricingCalculator {...DEFAULT_PROPS} />);
 
-    await user.click(screen.getByRole("button", { name: /add another model/i }));
+    await user.click(screen.getByRole("button", { name: "添加另一模型" }));
 
     // With two rows, no delete buttons should be disabled
     const allButtons = screen.getAllByRole("button");
@@ -111,32 +111,32 @@ describe("PricingCalculator", () => {
   });
 
   describe("time period toggle", () => {
-    it("should switch the column header to Requests/Day when Per Day is selected", async () => {
+    it("should switch the column header to the daily requests count when Per Day is selected", async () => {
       const user = userEvent.setup();
       renderWithProviders(<PricingCalculator {...DEFAULT_PROPS} />);
 
-      await user.click(screen.getByText("Per Day"));
+      await user.click(screen.getByText("按天"));
 
-      expect(screen.getByText("Requests/Day")).toBeInTheDocument();
+      expect(screen.getByText("每日请求数")).toBeInTheDocument();
     });
 
-    it("should switch the column header back to Requests/Month when Per Month is selected", async () => {
+    it("should switch the column header back to the monthly requests count when Per Month is selected", async () => {
       const user = userEvent.setup();
       renderWithProviders(<PricingCalculator {...DEFAULT_PROPS} />);
 
-      await user.click(screen.getByText("Per Day"));
-      expect(screen.getByText("Requests/Day")).toBeInTheDocument();
+      await user.click(screen.getByText("按天"));
+      expect(screen.getByText("每日请求数")).toBeInTheDocument();
 
-      await user.click(screen.getByText("Per Month"));
-      expect(screen.getByText("Requests/Month")).toBeInTheDocument();
+      await user.click(screen.getByText("按月"));
+      expect(screen.getByText("每月请求数")).toBeInTheDocument();
     });
   });
 
   it("should render column headers for Model, Input Tokens, and Output Tokens", () => {
     renderWithProviders(<PricingCalculator {...DEFAULT_PROPS} />);
-    expect(screen.getByRole("columnheader", { name: "Model" })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: "Input Tokens" })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: "Output Tokens" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "模型" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "输入 Tokens" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "输出 Tokens" })).toBeInTheDocument();
   });
 
   it("should render a numeric field for input tokens, output tokens and requests", () => {
@@ -153,7 +153,7 @@ describe("PricingCalculator", () => {
     const user = userEvent.setup();
     renderWithProviders(<PricingCalculator {...DEFAULT_PROPS} />);
 
-    await user.click(screen.getByRole("button", { name: /add another model/i }));
+    await user.click(screen.getByRole("button", { name: "添加另一模型" }));
     const withTwoRows = dataRows();
     expect(withTwoRows).toHaveLength(2);
 
