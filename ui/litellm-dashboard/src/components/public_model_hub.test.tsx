@@ -4,7 +4,19 @@ import { render, screen, waitFor, within, fireEvent } from "@testing-library/rea
 import userEvent from "@testing-library/user-event";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import PublicModelHub from "./public_model_hub";
+import zhCN from "../../messages/zh-CN.json";
 import { getPublicMCPHubColumns, MCPServerData, ModelGroupInfo } from "./PublicModelHubTableColumns";
+
+// Resolve through the real zh-CN messages so column assertions pin the translated output,
+// mirroring the global next-intl mock that component-level hooks resolve through.
+const zhAiHub = (zhCN as { aiHub: Record<string, string> }).aiHub;
+const t = ((key: string, values?: Record<string, string | number>) => {
+  let message = zhAiHub[key] ?? key;
+  for (const [name, value] of Object.entries(values ?? {})) {
+    message = message.split(`{${name}}`).join(String(value));
+  }
+  return message;
+}) as unknown as Parameters<typeof getPublicMCPHubColumns>[0]["t"];
 
 const { apiGetMock } = vi.hoisted(() => ({ apiGetMock: vi.fn() }));
 
@@ -247,7 +259,7 @@ describe("PublicModelHub", () => {
       "providers",
       "rpm",
     ]);
-    expect(screen.getByText("Health Status")).toBeInTheDocument();
+    expect(screen.getByText("健康状态")).toBeInTheDocument();
     expect(screen.queryByTestId("sort-header-health_status")).not.toBeInTheDocument();
   });
 
@@ -260,7 +272,7 @@ describe("PublicModelHub", () => {
     await user.click(screen.getByTestId("pagination-next"));
     await waitFor(() => expect(lastModelQuery().page).toBe(2));
 
-    await user.type(screen.getByPlaceholderText("Search model names..."), "claude");
+    await user.type(screen.getByPlaceholderText("搜索模型名称…"), "claude");
 
     await waitFor(() => expect(lastModelQuery().q).toBe("claude"));
     expect(lastModelQuery().page).toBe(1);
@@ -271,7 +283,7 @@ describe("PublicModelHub", () => {
     renderHub();
     await screen.findByText("gpt-4");
 
-    await user.click(screen.getByPlaceholderText("Select modes"));
+    await user.click(screen.getByPlaceholderText("选择模式"));
     await user.click(await screen.findByRole("option", { name: "embedding" }));
 
     await waitFor(() => expect(lastModelQuery()["filter[mode][in]"]).toBe("embedding"));
@@ -286,7 +298,7 @@ describe("PublicModelHub", () => {
     await user.click(screen.getByTestId("pagination-next"));
     await waitFor(() => expect(lastModelQuery().page).toBe(2));
 
-    await user.click(screen.getByPlaceholderText("Select providers"));
+    await user.click(screen.getByPlaceholderText("选择提供商"));
     await user.click(await screen.findByRole("option", { name: /anthropic/i }));
     await waitFor(() => expect(lastModelQuery()["filter[providers][in]"]).toBe("anthropic"));
     expect(lastModelQuery().page).toBe(1);
@@ -301,7 +313,7 @@ describe("PublicModelHub", () => {
     renderHub();
     await screen.findByText("gpt-4");
 
-    await user.click(screen.getByPlaceholderText("Select features"));
+    await user.click(screen.getByPlaceholderText("选择特性"));
     await user.click(await screen.findByRole("option", { name: "Vision" }));
 
     await waitFor(() => expect(lastModelQuery()["filter[features][in]"]).toBe("vision"));
@@ -366,12 +378,12 @@ describe("PublicModelHub", () => {
     expect(await screen.findByText("gpt-4")).toBeInTheDocument();
 
     respondWith([], 0);
-    fireEvent.change(screen.getByPlaceholderText("Search model names..."), { target: { value: "zzzz" } });
+    fireEvent.change(screen.getByPlaceholderText("搜索模型名称…"), { target: { value: "zzzz" } });
 
     await waitFor(() => {
       expect(screen.queryByText("gpt-4")).not.toBeInTheDocument();
       expect(screen.queryByText("claude-3")).not.toBeInTheDocument();
-      expect(screen.getByText("No matching models")).toBeInTheDocument();
+      expect(screen.getByText("没有匹配的模型")).toBeInTheDocument();
     });
   });
 
@@ -380,7 +392,7 @@ describe("PublicModelHub", () => {
 
     renderHub();
 
-    expect(await screen.findByText(/Service unavailable/)).toBeInTheDocument();
+    expect(await screen.findByText(/服务不可用/)).toBeInTheDocument();
   });
 
   it("keeps the page usable when the response carries no rows", async () => {
@@ -390,8 +402,8 @@ describe("PublicModelHub", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("navbar")).toBeInTheDocument();
-      expect(screen.getByText("Model Hub")).toBeInTheDocument();
-      expect(screen.getByText("No models available")).toBeInTheDocument();
+      expect(screen.getByText("模型中心")).toBeInTheDocument();
+      expect(screen.getByText("暂无模型")).toBeInTheDocument();
     });
   });
 });
@@ -409,7 +421,7 @@ const mockMcpServer: MCPServerData = {
 };
 
 function PublicMcpTestTable({ data }: { data: MCPServerData[] }) {
-  const columns = getPublicMCPHubColumns({ onServerClick: vi.fn() });
+  const columns = getPublicMCPHubColumns({ onServerClick: vi.fn(), t });
   const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });
 
   return (
@@ -439,15 +451,15 @@ function PublicMcpTestTable({ data }: { data: MCPServerData[] }) {
 describe("publicMCPHubColumns", () => {
   it("keeps the non-sensitive columns", () => {
     render(<PublicMcpTestTable data={[mockMcpServer]} />);
-    expect(screen.getByText("Server Name")).toBeInTheDocument();
-    expect(screen.getByText("Transport")).toBeInTheDocument();
-    expect(screen.getByText("Auth Type")).toBeInTheDocument();
+    expect(screen.getByText("服务器名称")).toBeInTheDocument();
+    expect(screen.getByText("传输方式")).toBeInTheDocument();
+    expect(screen.getByText("认证类型")).toBeInTheDocument();
   });
 
   it("does not expose a URL column header", () => {
     render(<PublicMcpTestTable data={[mockMcpServer]} />);
     expect(screen.queryByText("URL")).not.toBeInTheDocument();
-    const columns = getPublicMCPHubColumns({ onServerClick: vi.fn() });
+    const columns = getPublicMCPHubColumns({ onServerClick: vi.fn(), t });
     expect(columns.some((c) => c.header === "URL" || c.meta?.title === "URL")).toBe(false);
   });
 
@@ -464,12 +476,12 @@ describe("public hub MCP details modal", () => {
 
     renderHub();
 
-    fireEvent.click(await screen.findByRole("tab", { name: /MCP Hub/i }));
+    fireEvent.click(await screen.findByRole("tab", { name: "MCP 中心" }));
     fireEvent.click(await screen.findByRole("button", { name: "exa_test" }));
 
     // "Server Overview" only exists inside the opened MCP details modal,
     // so finding it proves the modal rendered and the url assertion is not vacuous.
-    await screen.findByText("Server Overview");
+    await screen.findByText("服务器概览");
     expect(screen.queryByText(PUBLIC_SERVER_URL)).not.toBeInTheDocument();
   });
 
@@ -479,12 +491,12 @@ describe("public hub MCP details modal", () => {
 
     renderHub();
 
-    fireEvent.click(await screen.findByRole("tab", { name: /MCP Hub/i }));
+    fireEvent.click(await screen.findByRole("tab", { name: "MCP 中心" }));
     fireEvent.click(await screen.findByRole("button", { name: "exa_test" }));
-    await screen.findByText("Server Overview");
+    await screen.findByText("服务器概览");
 
     fireEvent.click(screen.getByRole("button", { name: /close/i }));
 
-    await waitFor(() => expect(screen.queryByText("Server Overview")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText("服务器概览")).not.toBeInTheDocument());
   });
 });
