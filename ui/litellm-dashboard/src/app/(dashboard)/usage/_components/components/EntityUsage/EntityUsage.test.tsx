@@ -708,13 +708,13 @@ describe("EntityUsage", () => {
     expect(showingCount("metrics-source:model_groups")).toBeGreaterThan(0);
 
     act(() => {
-      fireEvent.click(showingText("Litellm Model Name"));
+      fireEvent.click(showingText("Litellm 模型名称"));
     });
 
     expect(showingCount("metrics-source:models")).toBeGreaterThan(0);
 
     act(() => {
-      fireEvent.click(showingText("Public Model Name"));
+      fireEvent.click(showingText("公共模型名称"));
     });
 
     expect(showingCount("metrics-source:model_groups")).toBeGreaterThan(0);

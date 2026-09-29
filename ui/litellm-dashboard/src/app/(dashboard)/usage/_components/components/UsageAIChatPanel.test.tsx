@@ -30,8 +30,8 @@ describe("UsageAIChatPanel", () => {
   it("should render the panel when open", () => {
     renderWithProviders(<UsageAIChatPanel {...defaultProps} />);
 
-    expect(screen.getByText("Ask AI")).toBeInTheDocument();
-    expect(screen.getByText("Ask about your spend, models, keys, and trends")).toBeInTheDocument();
+    expect(screen.getByText("向 AI 提问")).toBeInTheDocument();
+    expect(screen.getByText("询问你的消耗、模型、密钥与趋势")).toBeInTheDocument();
   });
 
   it("should render model selector", () => {
@@ -39,32 +39,32 @@ describe("UsageAIChatPanel", () => {
 
     // One library paints the prompt as its own text node and the other leaves it on the input's
     // placeholder attribute, so either one means the user is being told what to pick.
-    const prompt = "Select a model (optional, defaults to gpt-4o-mini)";
+    const prompt = "选择模型（可选，默认 gpt-4o-mini）";
     expect(screen.queryAllByText(prompt).length + screen.queryAllByPlaceholderText(prompt).length).toBeGreaterThan(0);
   });
 
   it("should render empty state message when no conversation", () => {
     renderWithProviders(<UsageAIChatPanel {...defaultProps} />);
 
-    expect(screen.getByText("Ask a question about your usage")).toBeInTheDocument();
+    expect(screen.getByText("询问你的用量问题")).toBeInTheDocument();
   });
 
   it("should render the send button", () => {
     renderWithProviders(<UsageAIChatPanel {...defaultProps} />);
 
-    expect(screen.getByText("Send")).toBeInTheDocument();
+    expect(screen.getByText("发送")).toBeInTheDocument();
   });
 
   it("should render input placeholder", () => {
     renderWithProviders(<UsageAIChatPanel {...defaultProps} />);
 
-    expect(screen.getByPlaceholderText("Ask about your usage...")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("询问你的用量…")).toBeInTheDocument();
   });
 
   it("should render clear chat button", () => {
     renderWithProviders(<UsageAIChatPanel {...defaultProps} />);
 
-    expect(screen.getByText("Clear chat")).toBeInTheDocument();
+    expect(screen.getByText("清空对话")).toBeInTheDocument();
   });
 
   it("should have the panel element even when closed (just off-screen)", () => {

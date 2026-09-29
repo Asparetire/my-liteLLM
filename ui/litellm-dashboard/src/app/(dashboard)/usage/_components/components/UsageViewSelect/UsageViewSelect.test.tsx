@@ -24,19 +24,19 @@ describe("UsageViewSelect", () => {
     const user = userEvent.setup();
     const { container } = render(<UsageViewSelect value="global" onChange={mockOnChange} userRole="Internal User" />);
 
-    expect(screen.getByText("Usage View")).toBeInTheDocument();
-    expect(screen.getByText("Select the usage data you want to view")).toBeInTheDocument();
+    expect(screen.getByText("用量视图")).toBeInTheDocument();
+    expect(screen.getByText("选择你要查看的用量数据")).toBeInTheDocument();
     expect(screen.getByRole("combobox")).toBeInTheDocument();
 
     await openMenu(user);
-    expect(offers(container, "Your Usage")).toBe(true);
+    expect(offers(container, "你的用量")).toBe(true);
   });
 
   it("should call onChange when value changes", async () => {
     const user = userEvent.setup();
     render(<UsageViewSelect value="global" onChange={mockOnChange} userRole="Admin" />);
 
-    await chooseSelectOption(user, screen.getByRole("combobox"), /^Team Usage/);
+    await chooseSelectOption(user, screen.getByRole("combobox"), /^团队用量/);
 
     expect(mockOnChange).toHaveBeenCalled();
     expect(mockOnChange.mock.calls[0][0]).toBe("team");
@@ -49,7 +49,7 @@ describe("UsageViewSelect", () => {
     );
 
     await openMenu(user);
-    expect(offers(container, "Tag Usage")).toBe(true);
+    expect(offers(container, "标签用量")).toBe(true);
   });
 
   it("should hide Tag Usage for non-admin users without tag usage permission", async () => {
@@ -57,10 +57,10 @@ describe("UsageViewSelect", () => {
     const { container } = render(<UsageViewSelect value="global" onChange={mockOnChange} userRole="Internal User" />);
 
     await openMenu(user);
-    expect(offers(container, "Tag Usage")).toBe(false);
+    expect(offers(container, "标签用量")).toBe(false);
   });
 
-  it.each(["Organization Usage", "Agent Usage (A2A)"])("should show %s to an admin", async (optionName) => {
+  it.each(["组织用量", "Agent 用量（A2A）"])("should show %s to an admin", async (optionName) => {
     const user = userEvent.setup();
     const { container } = render(<UsageViewSelect value="global" onChange={mockOnChange} userRole="Admin" />);
 
@@ -68,7 +68,7 @@ describe("UsageViewSelect", () => {
     expect(offers(container, optionName)).toBe(true);
   });
 
-  it.each(["Organization Usage", "Agent Usage (A2A)"])("should hide %s from an internal user", async (optionName) => {
+  it.each(["组织用量", "Agent 用量（A2A）"])("should hide %s from an internal user", async (optionName) => {
     const user = userEvent.setup();
     const { container } = render(
       <UsageViewSelect value="global" onChange={mockOnChange} userRole="Internal User" canViewTagUsage={true} />,
@@ -84,8 +84,8 @@ describe("UsageViewSelect", () => {
   // the proxy serves them /organization/daily/activity scoped to the orgs they
   // administer, but still refuses the agent usage route.
   it.each([
-    ["Organization Usage", true],
-    ["Agent Usage (A2A)", false],
+    ["组织用量", true],
+    ["Agent 用量（A2A）", false],
   ] as const)("should offer %s to an org admin: %s", async (optionName, expected) => {
     const user = userEvent.setup();
     const { container } = render(
@@ -96,7 +96,7 @@ describe("UsageViewSelect", () => {
     expect(offers(container, optionName)).toBe(expected);
   });
 
-  it.each(["Team Usage", "Tag Usage"])("should keep %s available to an internal user", async (optionName) => {
+  it.each(["团队用量", "标签用量"])("should keep %s available to an internal user", async (optionName) => {
     const user = userEvent.setup();
     const { container } = render(
       <UsageViewSelect value="global" onChange={mockOnChange} userRole="Internal User" canViewTagUsage={true} />,

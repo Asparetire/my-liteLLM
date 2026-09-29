@@ -1,9 +1,6 @@
-export type ModelViewType = "groups" | "individual";
+import { useTranslations } from "next-intl";
 
-const MODEL_VIEW_OPTIONS: readonly { value: ModelViewType; label: string }[] = [
-  { value: "groups", label: "Public Model Name" },
-  { value: "individual", label: "Litellm Model Name" },
-];
+export type ModelViewType = "groups" | "individual";
 
 interface ModelViewToggleProps {
   value: ModelViewType;
@@ -11,6 +8,12 @@ interface ModelViewToggleProps {
 }
 
 export default function ModelViewToggle({ value, onChange }: ModelViewToggleProps) {
+  const t = useTranslations("usage");
+  const MODEL_VIEW_OPTIONS: readonly { value: ModelViewType; label: string }[] = [
+    { value: "groups", label: t("publicModelName") },
+    { value: "individual", label: t("litellmModelName") },
+  ];
+
   return (
     <div className="flex bg-muted rounded-lg p-1">
       {MODEL_VIEW_OPTIONS.map((option) => (

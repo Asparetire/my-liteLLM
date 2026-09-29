@@ -1,4 +1,5 @@
 import { BarChart3, Bot, Building2, Globe, LineChart, ShoppingCart, Tags, User, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -26,80 +27,76 @@ export interface UsageViewSelectProps {
 }
 interface OptionConfig {
   value: UsageOption;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
+  nonAdminLabelKey?: string;
+  nonAdminDescriptionKey?: string;
   icon: React.ReactNode;
   capability?: Capability;
   adminOnly?: boolean;
-  showForAdmin?: string;
-  showForNonAdmin?: string;
-  descriptionForAdmin?: string;
-  descriptionForNonAdmin?: string;
   badgeText?: string;
 }
 const OPTIONS: OptionConfig[] = [
   {
     value: "global",
-    label: "Global Usage",
-    showForAdmin: "Global Usage",
-    showForNonAdmin: "Your Usage",
-    description: "View usage across all resources",
-    descriptionForAdmin: "View usage across all resources",
-    descriptionForNonAdmin: "View your usage",
+    labelKey: "viewGlobal",
+    nonAdminLabelKey: "viewYourUsage",
+    descriptionKey: "viewGlobalDesc",
+    nonAdminDescriptionKey: "viewYourUsageDesc",
     icon: <Globe className="size-4" />,
   },
   {
     value: "my-usage",
-    label: "Your Usage",
-    description: "View your own usage",
+    labelKey: "viewMyUsage",
+    descriptionKey: "viewMyUsageDesc",
     icon: <User className="size-4" />,
     adminOnly: true,
   },
   {
     value: "organization",
-    label: "Organization Usage",
-    description: "View usage across all organizations",
+    labelKey: "viewOrganization",
+    descriptionKey: "viewOrganizationDesc",
     icon: <Building2 className="size-4" />,
     capability: "viewOrganizationUsage",
   },
   {
     value: "team",
-    label: "Team Usage",
-    description: "View usage by team",
+    labelKey: "viewTeam",
+    descriptionKey: "viewTeamDesc",
     icon: <Users className="size-4" />,
   },
   {
     value: "customer",
-    label: "Customer Usage",
-    description: "View usage by customer accounts",
+    labelKey: "viewCustomer",
+    descriptionKey: "viewCustomerDesc",
     icon: <ShoppingCart className="size-4" />,
     adminOnly: true,
   },
   {
     value: "tag",
-    label: "Tag Usage",
-    description: "View usage grouped by tags",
+    labelKey: "viewTag",
+    descriptionKey: "viewTagDesc",
     icon: <Tags className="size-4" />,
     adminOnly: true,
   },
   {
     value: "agent",
-    label: "Agent Usage (A2A)",
-    description: "View usage by AI agents",
+    labelKey: "viewAgent",
+    descriptionKey: "viewAgentDesc",
     icon: <Bot className="size-4" />,
     capability: "viewAgentUsage",
   },
   {
     value: "user",
-    label: "User Usage",
-    description: "View usage by individual users",
+    labelKey: "viewUser",
+    descriptionKey: "viewUserDesc",
     icon: <User className="size-4" />,
     adminOnly: true,
   },
   {
     value: "user-agent-activity",
-    label: "User Agent Activity",
-    description: "View detailed user agent activity logs",
+    labelKey: "viewUserAgentActivity",
+    descriptionKey: "viewUserAgentActivityDesc",
     icon: <LineChart className="size-4" />,
     adminOnly: true,
   },
@@ -110,11 +107,14 @@ export const UsageViewSelect: React.FC<UsageViewSelectProps> = ({
   userRole,
   canViewTagUsage = false,
   isOrgAdmin = false,
-  title = "Usage View",
-  description = "Select the usage data you want to view",
+  title,
+  description,
   "data-id": dataId,
 }) => {
+  const t = useTranslations("usage");
   const isAdmin = all_admin_roles.includes(userRole ?? "");
+  const heading = title ?? t("usageViewTitle");
+  const subheading = description ?? t("usageViewDescription");
   const getFilteredOptions = () => {
     return OPTIONS.filter((option) => {
       if (option.capability) {
@@ -128,14 +128,11 @@ export const UsageViewSelect: React.FC<UsageViewSelectProps> = ({
       }
       return true;
     }).map((option) => {
-      let label = option.label;
-      let desc = option.description;
-      if (option.showForAdmin && option.showForNonAdmin) {
-        label = isAdmin ? option.showForAdmin : option.showForNonAdmin;
-      }
-      if (option.descriptionForAdmin && option.descriptionForNonAdmin) {
-        desc = isAdmin ? option.descriptionForAdmin : option.descriptionForNonAdmin;
-      }
+      const label = isAdmin || !option.nonAdminLabelKey ? t(option.labelKey) : t(option.nonAdminLabelKey);
+      const desc =
+        isAdmin || !option.nonAdminDescriptionKey
+          ? t(option.descriptionKey)
+          : t(option.nonAdminDescriptionKey);
       return {
         value: option.value,
         label,
@@ -155,8 +152,8 @@ export const UsageViewSelect: React.FC<UsageViewSelectProps> = ({
             <BarChart3 className="size-8" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-foreground mb-0.5 leading-tight">{title}</h3>
-            <p className="text-xs text-muted-foreground leading-tight">{description}</p>
+            <h3 className="text-sm font-semibold text-foreground mb-0.5 leading-tight">{heading}</h3>
+            <p className="text-xs text-muted-foreground leading-tight">{subheading}</p>
           </div>
         </div>
         <div className="shrink-0">
