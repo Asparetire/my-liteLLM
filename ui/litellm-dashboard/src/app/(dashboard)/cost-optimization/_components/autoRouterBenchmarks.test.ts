@@ -13,6 +13,7 @@ import {
   type AutoRouterBenchmarkGroup,
   type AutoRouterBenchmarksResponse,
   type AutoRouterCacheStats,
+  type BucketLabels,
 } from "./autoRouterBenchmarks";
 
 const cache = (overrides: Partial<AutoRouterCacheStats> = {}): AutoRouterCacheStats => ({
@@ -61,10 +62,16 @@ const response = (groups: AutoRouterBenchmarkGroup[]): AutoRouterBenchmarksRespo
   groups,
 });
 
+const bucketLabels: BucketLabels = {
+  same_model: { label: "Same model", sublabel: "previous turn on the same tier" },
+  first_visit: { label: "First visit", sublabel: "previous turn on a new tier" },
+  return_to_tier: { label: "Return to tier", sublabel: "previous turn on an earlier tier" },
+};
+
 describe("viewFor", () => {
   it("maps the all-routers selection to the server totals, never a client sum", () => {
     const data = response([group(), group({ router_name: "gpt-auto", sessions: 7 })]);
-    const view = viewFor(data, ALL_ROUTERS);
+    const view = viewFor(data, ALL_ROUTERS, "All auto-routers");
     expect(view.stats).toBe(data.totals);
     expect(view.label).toBe("All auto-routers");
   });
@@ -72,14 +79,14 @@ describe("viewFor", () => {
   it("maps a selected router to that group's slice with a scope of one", () => {
     const other = group({ router_name: "gpt-auto", sessions: 7, saved_spend: 12.5 });
     const data = response([group(), other]);
-    const view = viewFor(data, groupKey(other));
+    const view = viewFor(data, groupKey(other), "All auto-routers");
     expect(view.stats).toBe(other);
     expect(view.label).toBe("gpt-auto");
   });
 
   it("falls back to the all-routers view when the selected key no longer exists", () => {
     const data = response([group()]);
-    const view = viewFor(data, "vanished complexity");
+    const view = viewFor(data, "vanished complexity", "All auto-routers");
     expect(view.stats).toBe(data.totals);
     expect(view.label).toBe("All auto-routers");
   });
@@ -89,8 +96,8 @@ describe("viewFor", () => {
     const b = group({ router_type: "adaptive" });
     const data = response([a, b]);
     expect(groupKey(a)).not.toBe(groupKey(b));
-    expect(viewFor(data, groupKey(b)).stats).toBe(b);
-    expect(viewFor(data, groupKey(b)).label).toBe("claude-auto (adaptive)");
+    expect(viewFor(data, groupKey(b), "All auto-routers").stats).toBe(b);
+    expect(viewFor(data, groupKey(b), "All auto-routers").label).toBe("claude-auto (adaptive)");
   });
 });
 
@@ -110,22 +117,22 @@ describe("groupLabel", () => {
 describe("bucketRows", () => {
   it("keeps the three buckets summing to the bucketed turn total", () => {
     const stats = cache();
-    const rows = bucketRows(stats);
+    const rows = bucketRows(stats, bucketLabels);
     expect(rows.map((r) => r.turns)).toEqual([400, 37, 381]);
     expect(bucketTurnsTotal(stats)).toBe(818);
   });
 
   it("renders the server's per-bucket rates as-is", () => {
-    expect(bucketRows(cache()).map((r) => r.hitRatePct)).toEqual([97.7, 24.3, 81.6]);
+    expect(bucketRows(cache(), bucketLabels).map((r) => r.hitRatePct)).toEqual([97.7, 24.3, 81.6]);
   });
 
   it("derives each bucket's share of the measured turns", () => {
-    expect(bucketRows(cache()).map((r) => r.sharePct)).toEqual([49, 5, 47]);
+    expect(bucketRows(cache(), bucketLabels).map((r) => r.sharePct)).toEqual([49, 5, 47]);
   });
 
   it("reports zero shares instead of dividing by zero when nothing was bucketed", () => {
     const empty = { turns: 0, hits: 0, hit_rate_pct: 0 };
-    const rows = bucketRows(cache({ same_model: empty, first_visit: empty, return_to_tier: empty }));
+    const rows = bucketRows(cache({ same_model: empty, first_visit: empty, return_to_tier: empty }), bucketLabels);
     expect(rows.map((r) => r.sharePct)).toEqual([0, 0, 0]);
   });
 });

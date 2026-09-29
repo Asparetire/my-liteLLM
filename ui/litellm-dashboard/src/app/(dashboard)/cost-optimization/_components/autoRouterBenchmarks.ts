@@ -22,10 +22,10 @@ export const groupLabel = (group: AutoRouterBenchmarkGroup, groups: readonly Aut
   return duplicated ? `${group.router_name} (${group.router_type})` : group.router_name;
 };
 
-export const viewFor = (data: AutoRouterBenchmarksResponse, selectedKey: string): BenchmarkView => {
+export const viewFor = (data: AutoRouterBenchmarksResponse, selectedKey: string, allLabel: string): BenchmarkView => {
   const group = data.groups.find((g) => groupKey(g) === selectedKey);
   if (selectedKey === ALL_ROUTERS || !group) {
-    return { label: "All auto-routers", stats: data.totals };
+    return { label: allLabel, stats: data.totals };
   }
   return { label: groupLabel(group, data.groups), stats: group };
 };
@@ -45,37 +45,25 @@ export const bucketTurnsTotal = (cache: AutoRouterCacheStats): number =>
 
 const sharePctOf = (turns: number, total: number): number => (total > 0 ? Math.round((100 * turns) / total) : 0);
 
-export const bucketRows = (cache: AutoRouterCacheStats): BucketRow[] => {
+export type BucketLabels = Record<BucketRow["key"], { label: string; sublabel: string }>;
+
+const BUCKET_FILLS: Record<BucketRow["key"], string> = {
+  same_model: "bg-foreground",
+  first_visit: "bg-foreground/30",
+  return_to_tier: "bg-foreground/60",
+};
+
+export const bucketRows = (cache: AutoRouterCacheStats, labels: BucketLabels): BucketRow[] => {
   const total = bucketTurnsTotal(cache);
-  return [
-    {
-      key: "same_model",
-      label: "Same model",
-      sublabel: "previous turn → same tier",
-      turns: cache.same_model.turns,
-      sharePct: sharePctOf(cache.same_model.turns, total),
-      hitRatePct: cache.same_model.hit_rate_pct,
-      fill: "bg-foreground",
-    },
-    {
-      key: "first_visit",
-      label: "First visit",
-      sublabel: "previous turn → a tier not used yet",
-      turns: cache.first_visit.turns,
-      sharePct: sharePctOf(cache.first_visit.turns, total),
-      hitRatePct: cache.first_visit.hit_rate_pct,
-      fill: "bg-foreground/30",
-    },
-    {
-      key: "return_to_tier",
-      label: "Return to tier",
-      sublabel: "previous turn → a tier used earlier",
-      turns: cache.return_to_tier.turns,
-      sharePct: sharePctOf(cache.return_to_tier.turns, total),
-      hitRatePct: cache.return_to_tier.hit_rate_pct,
-      fill: "bg-foreground/60",
-    },
-  ];
+  return (Object.keys(labels) as BucketRow["key"][]).map((key) => ({
+    key,
+    label: labels[key].label,
+    sublabel: labels[key].sublabel,
+    turns: cache[key].turns,
+    sharePct: sharePctOf(cache[key].turns, total),
+    hitRatePct: cache[key].hit_rate_pct,
+    fill: BUCKET_FILLS[key],
+  }));
 };
 
 export const expiredMissShare = (cache: AutoRouterCacheStats): number | null => {

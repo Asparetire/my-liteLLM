@@ -90,9 +90,9 @@ describe("CacheLeakageCard", () => {
     expect(screen.getByText("0.0%")).toBeInTheDocument();
     expect(screen.getByText("90.0%")).toBeInTheDocument();
     [
-      "Input tokens you sent in this range that weren't served from or written to the cache",
-      "Share of your input tokens that were served from the cache",
-      "About how much you'd save if this uncached input used prompt caching. Estimated as uncached input tokens times what your cached traffic already nets per cached token (realized cache savings, after write premiums, ÷ cache read and write tokens). Blank when caching is not currently saving anything overall.",
+      "该时间段内你发送、但既未从缓存读取也未写入缓存的输入 token",
+      "你的输入 token 中由缓存服务的占比",
+      "假如这部分未缓存输入用上 prompt 缓存大约能省多少。估算方式为未缓存输入 token 数乘以缓存流量当前每个缓存 token 的净省额（已实现缓存节省，扣除写入溢价后，除以缓存读与写 token 数）。缓存整体没有节省时留空。",
     ].forEach((info) => expect(screen.getByLabelText(info)).toBeInTheDocument());
   });
 
@@ -115,10 +115,10 @@ describe("CacheLeakageCard", () => {
 
     expect(firstDataRow()).toHaveTextContent("alpha");
 
-    fireEvent.click(screen.getByText("Cache hit rate"));
+    fireEvent.click(screen.getByText("缓存命中率"));
     expect(firstDataRow()).toHaveTextContent("bravo");
 
-    fireEvent.click(screen.getByText("Cache hit rate"));
+    fireEvent.click(screen.getByText("缓存命中率"));
     expect(firstDataRow()).toHaveTextContent("alpha");
   });
 
@@ -130,9 +130,9 @@ describe("CacheLeakageCard", () => {
       }),
     ]);
 
-    fireEvent.click(screen.getByText("By model"));
+    fireEvent.click(screen.getByText("按模型"));
 
-    expect(screen.getByText("Cache leakage by model")).toBeInTheDocument();
+    expect(screen.getByText("按模型的缓存泄漏")).toBeInTheDocument();
     expect(screen.getByText("claude-sonnet-5")).toBeInTheDocument();
     expect(screen.queryByText("gpt-4o")).not.toBeInTheDocument();
   });
@@ -140,7 +140,7 @@ describe("CacheLeakageCard", () => {
   it("shows an empty state when no key used tokens in the range", () => {
     renderWith([dayWithKeys("2026-07-12", {})]);
 
-    expect(screen.getByText("No key usage in this range.")).toBeInTheDocument();
+    expect(screen.getByText("该时间段内没有密钥用量。")).toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
 
@@ -152,7 +152,7 @@ describe("CacheLeakageCard", () => {
 
     expect(screen.getByRole("table")).toBeInTheDocument();
     expect(
-      screen.getByText("Data is still loading; rows and totals will update as the rest of the range arrives."),
+      screen.getByText("数据仍在加载；随着其余数据到达，行与合计会更新。"),
     ).toBeInTheDocument();
   });
 
@@ -163,7 +163,7 @@ describe("CacheLeakageCard", () => {
     renderWith([day], { loading: true });
 
     expect(
-      screen.queryByText("Data is still loading; rows and totals will update as the rest of the range arrives."),
+      screen.queryByText("数据仍在加载；随着其余数据到达，行与合计会更新。"),
     ).not.toBeInTheDocument();
   });
 
@@ -174,7 +174,7 @@ describe("CacheLeakageCard", () => {
     renderWith([day]);
 
     expect(
-      screen.queryByText("Data is still loading; rows and totals will update as the rest of the range arrives."),
+      screen.queryByText("数据仍在加载；随着其余数据到达，行与合计会更新。"),
     ).not.toBeInTheDocument();
   });
 });

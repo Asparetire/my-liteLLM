@@ -159,15 +159,15 @@ describe("AutoRouterBenchmarksTab", () => {
 
     const labels = screen
       .getAllByText(
-        /Total estimated savings|Avg saved per session|Avg turns per session|Avg session length|Avg tokens per session/,
+        /预计节省总计|每会话平均节省|每会话平均轮数|平均会话时长|每会话平均 token/,
       )
       .map((node) => node.textContent);
     expect(labels).toEqual([
-      "Total estimated savings",
-      "Avg saved per session",
-      "Avg turns per session",
-      "Avg session length",
-      "Avg tokens per session",
+      "预计节省总计",
+      "每会话平均节省",
+      "每会话平均轮数",
+      "平均会话时长",
+      "每会话平均 token",
     ]);
   });
 
@@ -177,9 +177,9 @@ describe("AutoRouterBenchmarksTab", () => {
 
     expect(screen.getByText("2,175 tokens")).toBeInTheDocument();
     expect(screen.getByText("-86%")).toBeInTheDocument();
-    expect(screen.getByText("Actual auto-router spend")).toBeInTheDocument();
+    expect(screen.getByText("自动路由实际消耗")).toBeInTheDocument();
     expect(screen.getByText("360 tokens")).toBeInTheDocument();
-    expect(screen.getByText("Estimated spend at highest-tier model")).toBeInTheDocument();
+    expect(screen.getByText("按最高档模型估算的消耗")).toBeInTheDocument();
     expect(screen.getByText("2,534 tokens")).toBeInTheDocument();
     expect(screen.getByText("32.7")).toBeInTheDocument();
     expect(screen.getByText("2.1h")).toBeInTheDocument();
@@ -210,22 +210,22 @@ describe("AutoRouterBenchmarksTab", () => {
     mockHook({ data: response([group(stats)], stats) });
     renderTab();
 
-    expect(screen.getAllByText("Unavailable")).toHaveLength(2);
+    expect(screen.getAllByText("不可用")).toHaveLength(2);
     expect(screen.queryByText(/\/ 1K turns/)).not.toBeInTheDocument();
     expect(screen.getByText("360 tokens")).toBeInTheDocument();
     expect(screen.getByText("2,175 tokens")).toBeInTheDocument();
-    expect(screen.getByText(/some usage predates classification-cost tracking/)).toBeInTheDocument();
+    expect(screen.getByText(/部分用量早于分类成本统计/)).toBeInTheDocument();
   });
 
   it("pairs the savings with the session count it was earned over, in its own tile", () => {
     mockHook({ data: response([group(), group({ router_name: "gpt-auto" })]) });
     renderTab();
 
-    const tile = screen.getByText("Avg saved per session").closest('[data-slot="card"]');
+    const tile = screen.getByText("每会话平均节省").closest('[data-slot="card"]');
     if (!tile) throw new Error("expected avg saved per session to render as a metric tile");
 
     expect(within(tile).getByText("23 tokens")).toBeInTheDocument();
-    expect(within(tile).getByText("· 94 sessions")).toBeInTheDocument();
+    expect(within(tile).getByText("· 94 个会话")).toBeInTheDocument();
   });
 
   it("exposes each spend row as a term and its value, not as loose text", () => {
@@ -235,10 +235,10 @@ describe("AutoRouterBenchmarksTab", () => {
     const terms = screen.getAllByRole("term").map((node) => node.textContent);
     const values = screen.getAllByRole("definition").map((node) => node.textContent);
     expect(terms).toEqual([
-      "Actual auto-router spend",
-      "LLM spend",
-      "Classification cost($2.00 / 1K turns)",
-      "Estimated spend at highest-tier model",
+      "自动路由实际消耗",
+      "LLM 消耗",
+      "分类成本($2.00 / 1K turns)",
+      "按最高档模型估算的消耗",
     ]);
     expect(values).toEqual(["360 tokens", "354 tokens", "$6.15", "2,534 tokens"]);
   });
@@ -266,12 +266,12 @@ describe("AutoRouterBenchmarksTab", () => {
     mockHook({ data: response([group()]) });
     renderTab();
 
-    expect(screen.getByText("Same model")).toBeInTheDocument();
-    expect(screen.getByText("previous turn → same tier")).toBeInTheDocument();
-    expect(screen.getByText("First visit")).toBeInTheDocument();
-    expect(screen.getByText("previous turn → a tier not used yet")).toBeInTheDocument();
-    expect(screen.getByText("Return to tier")).toBeInTheDocument();
-    expect(screen.getByText("previous turn → a tier used earlier")).toBeInTheDocument();
+    expect(screen.getByText("同一模型")).toBeInTheDocument();
+    expect(screen.getByText("上一轮请求同一档位")).toBeInTheDocument();
+    expect(screen.getByText("首次访问")).toBeInTheDocument();
+    expect(screen.getByText("上一轮请求未用过的新档位")).toBeInTheDocument();
+    expect(screen.getByText("回到某档位")).toBeInTheDocument();
+    expect(screen.getByText("上一轮请求用过较早的档位")).toBeInTheDocument();
     expect(screen.getByText("400")).toBeInTheDocument();
     expect(screen.getByText("37")).toBeInTheDocument();
     expect(screen.getByText("381")).toBeInTheDocument();
@@ -281,7 +281,7 @@ describe("AutoRouterBenchmarksTab", () => {
     expect(screen.getByText("97.7%")).toBeInTheDocument();
     expect(screen.getByText("24.3%")).toBeInTheDocument();
     expect(screen.getByText("81.6%")).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "Share of turns by bucket" })).not.toHaveClass("bg-muted");
+    expect(screen.getByRole("img", { name: "各桶轮数占比" })).not.toHaveClass("bg-muted");
   });
 
   it("summarizes the cache column from the bucketed turns, not the session turns", () => {
@@ -289,15 +289,14 @@ describe("AutoRouterBenchmarksTab", () => {
     renderTab();
 
     expect(screen.getByText("93.3%")).toBeInTheDocument();
-    expect(screen.getByText("818")).toBeInTheDocument();
-    expect(screen.getByText(/turns measured/)).toBeInTheDocument();
+    expect(screen.getByText(/共测量 818 轮/)).toBeInTheDocument();
   });
 
   it("computes the expired-miss share over every measured turn, not just return-to-tier misses", () => {
     mockHook({ data: response([group()]) });
     renderTab();
 
-    expect(screen.getByText("Expired-miss")).toBeInTheDocument();
+    expect(screen.getByText("过期未命中")).toBeInTheDocument();
     expect(screen.getByText("2.3%")).toBeInTheDocument();
   });
 
@@ -305,7 +304,7 @@ describe("AutoRouterBenchmarksTab", () => {
     mockHook({ data: response([group()]) });
     renderTab();
 
-    const trigger = screen.getByRole("button", { name: /Expired-miss/ });
+    const trigger = screen.getByRole("button", { name: /过期未命中/ });
     expect(trigger).toHaveTextContent("2.3%");
   });
 
@@ -316,7 +315,7 @@ describe("AutoRouterBenchmarksTab", () => {
     mockHook({ data: response([group(allHits)], allHits) });
     renderTab();
 
-    const trigger = screen.getByRole("button", { name: /Expired-miss/ });
+    const trigger = screen.getByRole("button", { name: /过期未命中/ });
     expect(trigger).toHaveTextContent("0.0%");
   });
 
@@ -332,7 +331,7 @@ describe("AutoRouterBenchmarksTab", () => {
     mockHook({ data: response([group(noTurns)], noTurns) });
     renderTab();
 
-    expect(screen.queryByText("Expired-miss")).not.toBeInTheDocument();
+    expect(screen.queryByText("过期未命中")).not.toBeInTheDocument();
   });
 
   it("mentions out-of-order turns only when there are any", () => {
@@ -340,14 +339,14 @@ describe("AutoRouterBenchmarksTab", () => {
     mockHook({ data: response([group(unordered)], unordered) });
     renderTab();
 
-    expect(screen.getByText(/12 turns arrived out of order across pods and are not bucketed/)).toBeInTheDocument();
+    expect(screen.getByText(/12 轮在多个 pod 间乱序到达，未计入分桶/)).toBeInTheDocument();
   });
 
   it("labels the default selection instead of leaking the __all__ sentinel", () => {
     mockHook({ data: response([group()]) });
     renderTab();
 
-    expect(screen.getByText("All auto-routers")).toBeInTheDocument();
+    expect(screen.getByText("所有自动路由")).toBeInTheDocument();
     expect(screen.queryByText("__all__")).not.toBeInTheDocument();
   });
 
@@ -355,35 +354,35 @@ describe("AutoRouterBenchmarksTab", () => {
     mockHook({ isPending: true });
     renderTab();
 
-    expect(screen.getByText("Loading auto-router usage...")).toBeInTheDocument();
+    expect(screen.getByText("加载自动路由用量中...")).toBeInTheDocument();
   });
 
   it("names the admin requirement when the proxy answers 403", () => {
     mockHook({ error: new ApiError("forbidden", 403, {}) });
     renderTab();
 
-    expect(screen.getByText("Auto-router usage is visible to proxy admin roles only")).toBeInTheDocument();
+    expect(screen.getByText("自动路由用量仅代理管理员角色可见")).toBeInTheDocument();
   });
 
   it("degrades to a message when the endpoint is unavailable", () => {
     mockHook({ error: new ApiError("boom", 500, {}) });
     renderTab();
 
-    expect(screen.getByText("Auto-router usage is unavailable right now")).toBeInTheDocument();
+    expect(screen.getByText("自动路由用量当前不可用")).toBeInTheDocument();
   });
 
   it("renders the full dashboard with zeroed stats when the window has no sessions", () => {
     mockHook({ data: response([], zeroTotals) });
     renderTab();
 
-    expect(screen.getByText("Total estimated savings")).toBeInTheDocument();
+    expect(screen.getByText("预计节省总计")).toBeInTheDocument();
     expect(screen.getAllByText("0 tokens")).toHaveLength(5);
     expect(screen.getAllByText("$0.00")).toHaveLength(1);
-    expect(screen.getByText("· 0 sessions")).toBeInTheDocument();
+    expect(screen.getByText("· 0 个会话")).toBeInTheDocument();
     expect(screen.getByText("0s")).toBeInTheDocument();
-    expect(screen.getByText(/turns measured/)).toBeInTheDocument();
+    expect(screen.getByText(/共测量 \d+ 轮/)).toBeInTheDocument();
     expect(screen.getAllByText("0.0%").length).toBeGreaterThan(0);
-    expect(screen.getByRole("img", { name: "Share of turns by bucket" })).toHaveClass("bg-muted");
+    expect(screen.getByRole("img", { name: "各桶轮数占比" })).toHaveClass("bg-muted");
   });
 
   it("shows the savings delta as an unsigned zero when nothing was saved", () => {
@@ -399,7 +398,7 @@ describe("AutoRouterBenchmarksTab", () => {
     const { dateValue, onDateChange } = renderTab();
 
     expect(vi.mocked(useAutoRouterBenchmarks)).toHaveBeenCalledWith("sk-test", dateValue, undefined);
-    expect(screen.getByText("Jul 6 – Aug 5 (UTC)")).toBeInTheDocument();
+    expect(screen.getByText("7月6日 – 8月5日 (UTC)")).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("date-picker"));
     expect(onDateChange).toHaveBeenCalledWith({ from: new Date(2026, 7, 1), to: new Date(2026, 7, 5) });
@@ -425,24 +424,24 @@ describe("AutoRouterBenchmarksTab", () => {
     );
 
     expect(vi.mocked(useAutoRouterBenchmarks)).toHaveBeenCalledWith("sk-test", dateValue, "key-hash-1");
-    expect(screen.getByText("Total estimated savings")).toBeInTheDocument();
-    expect(screen.queryByRole("tab", { name: "Shadow Evals" })).not.toBeInTheDocument();
+    expect(screen.getByText("预计节省总计")).toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "影子评测" })).not.toBeInTheDocument();
   });
 
   it("shows usage by default and mounts shadow evals only when its sub-tab is selected", () => {
     mockHook({ data: response([group()]) });
     renderTab();
 
-    expect(screen.getByRole("tab", { name: "Usage" })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText("Total estimated savings")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "用量" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText("预计节省总计")).toBeInTheDocument();
     expect(screen.queryByTestId("shadow-eval-section")).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("tab", { name: "Shadow Evals" }));
-    expect(screen.getByRole("tab", { name: "Shadow Evals" })).toHaveAttribute("aria-selected", "true");
+    fireEvent.click(screen.getByRole("tab", { name: "影子评测" }));
+    expect(screen.getByRole("tab", { name: "影子评测" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByTestId("shadow-eval-section")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("tab", { name: "Usage" }));
-    expect(screen.getByText("Total estimated savings")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "用量" }));
+    expect(screen.getByText("预计节省总计")).toBeInTheDocument();
     expect(screen.getByTestId("shadow-eval-section")).toBeInTheDocument();
   });
 
@@ -450,9 +449,9 @@ describe("AutoRouterBenchmarksTab", () => {
     mockHook({ error: new ApiError("boom", 500, {}) });
     renderTab();
 
-    expect(screen.getByText("Auto-router usage is unavailable right now")).toBeInTheDocument();
+    expect(screen.getByText("自动路由用量当前不可用")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("tab", { name: "Shadow Evals" }));
+    fireEvent.click(screen.getByRole("tab", { name: "影子评测" }));
     expect(screen.getByTestId("shadow-eval-section")).toBeInTheDocument();
   });
 
@@ -461,6 +460,6 @@ describe("AutoRouterBenchmarksTab", () => {
     renderTab();
 
     expect(screen.getByTestId("date-picker")).toBeInTheDocument();
-    expect(screen.getByText("All auto-routers")).toBeInTheDocument();
+    expect(screen.getByText("所有自动路由")).toBeInTheDocument();
   });
 });
