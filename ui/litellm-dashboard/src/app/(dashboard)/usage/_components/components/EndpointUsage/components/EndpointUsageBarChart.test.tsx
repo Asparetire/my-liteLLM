@@ -29,7 +29,7 @@ describe("EndpointUsageBarChart", () => {
   it("renders the title and the header legend labels", () => {
     renderWithProviders(<EndpointUsageBarChart endpointData={endpointData} />);
 
-    expect(screen.getByText("Success vs Failed Requests by Endpoint")).toBeInTheDocument();
+    expect(screen.getByText("各端点成功与失败请求数")).toBeInTheDocument();
     expect(screen.getByText("Successful Requests")).toBeInTheDocument();
     expect(screen.getByText("Failed Requests")).toBeInTheDocument();
   });
@@ -64,7 +64,7 @@ describe("EndpointUsageBarChart", () => {
   it("renders an empty chart without bars when endpointData is absent", () => {
     const { container } = renderWithProviders(<EndpointUsageBarChart />);
 
-    expect(screen.getByText("Success vs Failed Requests by Endpoint")).toBeInTheDocument();
+    expect(screen.getByText("各端点成功与失败请求数")).toBeInTheDocument();
     expect(container.querySelectorAll("path.recharts-rectangle")).toHaveLength(0);
   });
 });

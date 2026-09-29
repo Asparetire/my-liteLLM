@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { LineChart, type ChartColor } from "@/components/shared/charts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +22,7 @@ function transformDailyDataToChart(dailyData: DailyData[]): Array<Record<string,
 
   dailyData.forEach((day) => {
     const date = new Date(day.date);
-    const dateStr = date.toLocaleDateString("en-US", {
+    const dateStr = date.toLocaleDateString("zh-CN", {
       month: "short",
       day: "numeric",
     });
@@ -43,6 +44,7 @@ function transformDailyDataToChart(dailyData: DailyData[]): Array<Record<string,
 }
 
 export function EndpointUsageLineChart({ dailyData }: EndpointUsageLineChartProps) {
+  const t = useTranslations("usage");
   const chartData = useMemo(() => {
     if (!dailyData?.results || dailyData.results.length === 0) {
       return [];
@@ -75,7 +77,7 @@ export function EndpointUsageLineChart({ dailyData }: EndpointUsageLineChartProp
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle className="text-base font-semibold">Endpoint Usage Trends</CardTitle>
+        <CardTitle className="text-base font-semibold">{t("endpointTrends")}</CardTitle>
       </CardHeader>
       <CardContent>
         <LineChart

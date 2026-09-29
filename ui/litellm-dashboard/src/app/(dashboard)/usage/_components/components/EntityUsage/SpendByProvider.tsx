@@ -3,6 +3,7 @@ import { DataTable } from "@/components/shared/DataTable";
 import { MoneyCell } from "@/components/shared/table_cells";
 import { formatNumberWithCommas } from "@/utils/dataUtils";
 import { Info } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -26,46 +27,47 @@ interface SpendByProviderProps {
   providerSpend: ProviderSpendData[];
 }
 
-const columns: ColumnDef<ProviderSpendData>[] = [
-  {
-    header: "Provider",
-    accessorKey: "provider",
-    cell: ({ row }) => (
-      <div className="flex items-center space-x-2">
-        {row.original.provider && <ProviderLogo provider={row.original.provider} className="size-4" />}
-        <span>{row.original.provider}</span>
-      </div>
-    ),
-  },
-  {
-    header: "Spend",
-    accessorKey: "spend",
-    meta: { numeric: true },
-    cell: ({ row }) => <MoneyCell value={row.original.spend} decimals={2} />,
-  },
-  {
-    header: "Successful",
-    accessorKey: "successful_requests",
-    meta: { numeric: true, className: "text-success" },
-    cell: ({ row }) => row.original.successful_requests.toLocaleString(),
-  },
-  {
-    header: "Failed",
-    accessorKey: "failed_requests",
-    meta: { numeric: true, className: "text-destructive" },
-    cell: ({ row }) => row.original.failed_requests.toLocaleString(),
-  },
-  {
-    header: "Tokens",
-    accessorKey: "tokens",
-    meta: { numeric: true },
-    cell: ({ row }) => row.original.tokens.toLocaleString(),
-  },
-];
-
 const SpendByProvider: React.FC<SpendByProviderProps> = ({ loading, isDateChanging, providerSpend }) => {
+  const t = useTranslations("usage");
   const [includeZeroSpend, setIncludeZeroSpend] = useState(false);
   const [includeUnknown, setIncludeUnknown] = useState(false);
+
+  const columns: ColumnDef<ProviderSpendData>[] = [
+    {
+      header: t("colProvider"),
+      accessorKey: "provider",
+      cell: ({ row }) => (
+        <div className="flex items-center space-x-2">
+          {row.original.provider && <ProviderLogo provider={row.original.provider} className="size-4" />}
+          <span>{row.original.provider}</span>
+        </div>
+      ),
+    },
+    {
+      header: t("colSpend"),
+      accessorKey: "spend",
+      meta: { numeric: true },
+      cell: ({ row }) => <MoneyCell value={row.original.spend} decimals={2} />,
+    },
+    {
+      header: t("colSuccessful"),
+      accessorKey: "successful_requests",
+      meta: { numeric: true, className: "text-success" },
+      cell: ({ row }) => row.original.successful_requests.toLocaleString(),
+    },
+    {
+      header: t("colFailed"),
+      accessorKey: "failed_requests",
+      meta: { numeric: true, className: "text-destructive" },
+      cell: ({ row }) => row.original.failed_requests.toLocaleString(),
+    },
+    {
+      header: t("colTokens"),
+      accessorKey: "tokens",
+      meta: { numeric: true },
+      cell: ({ row }) => row.original.tokens.toLocaleString(),
+    },
+  ];
 
   const filteredProviderSpend = providerSpend.filter((provider) => {
     const isUnknown = provider.provider?.toLowerCase() === "unknown";
@@ -87,18 +89,18 @@ const SpendByProvider: React.FC<SpendByProviderProps> = ({ loading, isDateChangi
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>Spend by Provider</CardTitle>
+        <CardTitle>{t("spendByProvider")}</CardTitle>
         <CardAction className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <label className="text-sm text-foreground">Show Zero Spend</label>
+            <label className="text-sm text-foreground">{t("showZeroSpend")}</label>
             <Switch checked={includeZeroSpend} onCheckedChange={setIncludeZeroSpend} />
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
-              <label className="text-sm text-foreground">Show Unknown</label>
+              <label className="text-sm text-foreground">{t("showUnknown")}</label>
               <Tooltip>
                 <TooltipTrigger render={<Info className="size-4 text-muted-foreground hover:text-foreground" />} />
-                <TooltipContent>Requests that failed to route to a provider</TooltipContent>
+                <TooltipContent>{t("unknownProviderInfo")}</TooltipContent>
               </Tooltip>
             </div>
             <Switch checked={includeUnknown} onCheckedChange={setIncludeUnknown} />
@@ -125,7 +127,7 @@ const SpendByProvider: React.FC<SpendByProviderProps> = ({ loading, isDateChangi
               columns={columns}
               data={filteredProviderSpend}
               getRowId={(row) => row.provider}
-              noDataMessage="No provider usage data"
+              noDataMessage={t("noProviderUsage")}
               size="compact"
             />
           </div>

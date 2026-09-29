@@ -54,33 +54,33 @@ describe("SpendByProvider", () => {
 
   it("should render", () => {
     render(<SpendByProvider loading={false} isDateChanging={false} providerSpend={[]} />);
-    expect(screen.getByText("Spend by Provider")).toBeInTheDocument();
+    expect(screen.getByText("按提供商统计支出")).toBeInTheDocument();
   });
 
   it("should display the title", () => {
     render(<SpendByProvider loading={false} isDateChanging={false} providerSpend={[]} />);
-    expect(screen.getByText("Spend by Provider")).toBeInTheDocument();
+    expect(screen.getByText("按提供商统计支出")).toBeInTheDocument();
   });
 
   it("should display Show Zero Spend toggle", () => {
     render(<SpendByProvider loading={false} isDateChanging={false} providerSpend={[]} />);
-    expect(screen.getByText("Show Zero Spend")).toBeInTheDocument();
+    expect(screen.getByText("显示零支出")).toBeInTheDocument();
     expect(screen.getAllByRole("switch")[0]).toBeInTheDocument();
   });
 
   it("should display Show Unknown toggle", () => {
     render(<SpendByProvider loading={false} isDateChanging={false} providerSpend={[]} />);
-    expect(screen.getByText("Show Unknown")).toBeInTheDocument();
+    expect(screen.getByText("显示未知提供商")).toBeInTheDocument();
     expect(screen.getAllByRole("switch")[1]).toBeInTheDocument();
   });
 
   it("should display table headers", () => {
     render(<SpendByProvider loading={false} isDateChanging={false} providerSpend={mockProviderSpend} />);
-    expect(screen.getByText("Provider")).toBeInTheDocument();
-    expect(screen.getByText("Spend")).toBeInTheDocument();
-    expect(screen.getByText("Successful")).toBeInTheDocument();
-    expect(screen.getByText("Failed")).toBeInTheDocument();
-    expect(screen.getByText("Tokens")).toBeInTheDocument();
+    expect(screen.getByText("提供商")).toBeInTheDocument();
+    expect(screen.getByText("支出")).toBeInTheDocument();
+    expect(screen.getByText("成功")).toBeInTheDocument();
+    expect(screen.getByText("失败")).toBeInTheDocument();
+    expect(screen.getByText("Token 数")).toBeInTheDocument();
   });
 
   it("should display provider data in table", () => {
@@ -146,13 +146,13 @@ describe("SpendByProvider", () => {
 
   it("should not display table when loading is true", () => {
     render(<SpendByProvider loading={true} isDateChanging={false} providerSpend={mockProviderSpend} />);
-    expect(screen.queryByText("Provider")).not.toBeInTheDocument();
+    expect(screen.queryByText("提供商")).not.toBeInTheDocument();
   });
 
   it("should handle empty provider spend array", () => {
     render(<SpendByProvider loading={false} isDateChanging={false} providerSpend={[]} />);
-    expect(screen.getByText("Provider")).toBeInTheDocument();
-    expect(screen.getByText("Spend")).toBeInTheDocument();
+    expect(screen.getByText("提供商")).toBeInTheDocument();
+    expect(screen.getByText("支出")).toBeInTheDocument();
   });
 
   it("should handle provider with null provider name", () => {

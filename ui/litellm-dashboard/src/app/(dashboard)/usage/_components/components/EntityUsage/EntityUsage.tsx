@@ -1,4 +1,5 @@
 import useTeams from "@/app/(dashboard)/hooks/useTeams";
+import { useTranslations } from "next-intl";
 import { BarChart, DonutChart } from "@/components/shared/charts";
 import { DataTable } from "@/components/shared/DataTable";
 import {
@@ -110,6 +111,15 @@ const ENTITY_CAPABILITIES: Partial<Record<EntityType, Capability>> = {
   agent: "viewAgentUsage",
 };
 
+const ENTITY_LABEL_KEYS: Record<EntityType, string> = {
+  tag: "entityTag",
+  team: "entityTeam",
+  organization: "entityOrganization",
+  customer: "entityCustomer",
+  agent: "entityAgent",
+  user: "entityUser",
+};
+
 const EntityUsage: React.FC<EntityUsageProps> = ({
   accessToken,
   entityType,
@@ -119,6 +129,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
   dateValue,
   isOrgAdmin = false,
 }) => {
+  const t = useTranslations("usage");
   const { teams } = useTeams();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [modelViewType, setModelViewType] = useState<ModelViewType>("groups");
@@ -259,12 +270,12 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
     }));
   };
 
-  const getFilterLabel = (entityType: string) => {
-    return `Filter by ${entityType}`;
+  const getFilterLabel = (entity: string) => {
+    return t("filterByEntity", { entity });
   };
 
-  const getFilterPlaceholder = (entityType: string) => {
-    return `Select ${entityType} to filter...`;
+  const getFilterPlaceholder = (entity: string) => {
+    return t("filterEntityPlaceholder", { entity });
   };
 
   const entityFilterSlots: Partial<Record<EntityType, ReactNode>> = {
@@ -275,7 +286,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
   };
   const filterSlot = entityFilterSlots[entityType];
 
-  const capitalizedEntityLabel = entityType.charAt(0).toUpperCase() + entityType.slice(1);
+  const capitalizedEntityLabel = t(ENTITY_LABEL_KEYS[entityType]);
   const showFlatCost = entityType === "team" && hasFlatCost(spendData.metadata);
   const userSpendTeamIds = useMemo(
     () =>
@@ -293,25 +304,25 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
         cell: ({ row }) => row.original.metadata.alias,
       },
       {
-        header: "Spend",
+        header: t("colSpend"),
         accessorKey: "metrics.spend",
         meta: { numeric: true },
         cell: ({ row }) => <MoneyCell value={row.original.metrics.spend} decimals={4} />,
       },
       {
-        header: "Successful",
+        header: t("colSuccessful"),
         accessorKey: "metrics.successful_requests",
         meta: { numeric: true, className: "text-success" },
         cell: ({ row }) => row.original.metrics.successful_requests.toLocaleString(),
       },
       {
-        header: "Failed",
+        header: t("colFailed"),
         accessorKey: "metrics.failed_requests",
         meta: { numeric: true, className: "text-destructive" },
         cell: ({ row }) => row.original.metrics.failed_requests.toLocaleString(),
       },
       {
-        header: "Tokens",
+        header: t("colTokens"),
         accessorKey: "metrics.total_tokens",
         meta: { numeric: true },
         cell: ({ row }) => row.original.metrics.total_tokens.toLocaleString(),
@@ -322,7 +333,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
   const providerSpendColumns = useMemo<ColumnDef<ProviderSpendRow>[]>(
     () => [
       {
-        header: "Provider",
+        header: t("colProvider"),
         accessorKey: "provider",
         cell: ({ row }) => (
           <div className="flex items-center space-x-2">
@@ -332,25 +343,25 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
         ),
       },
       {
-        header: "Spend",
+        header: t("colSpend"),
         accessorKey: "spend",
         meta: { numeric: true },
         cell: ({ row }) => <MoneyCell value={row.original.spend} decimals={2} />,
       },
       {
-        header: "Successful",
+        header: t("colSuccessful"),
         accessorKey: "successful_requests",
         meta: { numeric: true, className: "text-success" },
         cell: ({ row }) => row.original.successful_requests.toLocaleString(),
       },
       {
-        header: "Failed",
+        header: t("colFailed"),
         accessorKey: "failed_requests",
         meta: { numeric: true, className: "text-destructive" },
         cell: ({ row }) => row.original.failed_requests.toLocaleString(),
       },
       {
-        header: "Tokens",
+        header: t("colTokens"),
         accessorKey: "tokens",
         meta: { numeric: true },
         cell: ({ row }) => row.original.tokens.toLocaleString(),
@@ -384,17 +395,30 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
     </ShadcnCard>
   );
 
-  const breakdownTiles = showFlatCost && showCostBreakdown ? buildCostBreakdownTiles(spendData.metadata) : [];
-  const summaryTiles = [...buildSummaryTiles(spendData.metadata, showFlatCost), ...breakdownTiles];
+  const summaryLabels = {
+    totalCost: t("totalCost"),
+    totalSpend: t("totalSpendTile"),
+    totalRequests: t("totalRequests"),
+    successfulRequests: t("successfulRequests"),
+    failedRequests: t("failedRequests"),
+    totalTokens: t("totalTokens"),
+    requestCost: t("requestCostTile"),
+    flatCost: t("flatCostTile"),
+    totalCostTooltip: t("totalCostTooltip"),
+    requestCostTooltip: t("requestCostTooltip"),
+    flatCostTooltip: t("flatCostTooltip"),
+  };
+  const breakdownTiles = showFlatCost && showCostBreakdown ? buildCostBreakdownTiles(spendData.metadata, summaryLabels) : [];
+  const summaryTiles = [...buildSummaryTiles(spendData.metadata, showFlatCost, summaryLabels), ...breakdownTiles];
 
-  const modelViewTitle = modelViewType === "groups" ? "Top Public Model Names" : "Top Litellm Models";
+  const modelViewTitle = modelViewType === "groups" ? t("topPublicModelNames") : t("topLitellmModels");
 
   const costPanel = (
     <div className="grid grid-cols-2 gap-2 w-full">
       <div className="col-span-2">
         <ShadcnCard>
           <CardContent>
-            <h3 className="text-lg font-medium text-foreground">{capitalizedEntityLabel} Spend Overview</h3>
+            <h3 className="text-lg font-medium text-foreground">{t("spendOverview", { entity: capitalizedEntityLabel })}</h3>
             <div className="grid grid-cols-5 gap-4 mt-4">{summaryTiles.map(renderSummaryTile)}</div>
           </CardContent>
         </ShadcnCard>
@@ -404,7 +428,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
       <div className="col-span-2">
         <ShadcnCard>
           <CardHeader>
-            <CardTitle className="text-base font-semibold">Daily Spend</CardTitle>
+            <CardTitle className="text-base font-semibold">{t("dailySpend")}</CardTitle>
           </CardHeader>
           <CardContent>
             <BarChart
@@ -433,24 +457,28 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                     <p className="font-bold">{data.date}</p>
                     {showFlatCost ? (
                       <>
-                        <p className="text-info">Request cost: {formatNumberWithCommas(requestSpend, 0)} tokens</p>
-                        <p className="text-violet-500">Flat cost: {formatNumberWithCommas(flatCost, 0)} tokens</p>
+                        <p className="text-info">{t("requestCostLine", { count: formatNumberWithCommas(requestSpend, 0) })}</p>
+                        <p className="text-violet-500">{t("flatCostLine", { count: formatNumberWithCommas(flatCost, 0) })}</p>
                         <p className="font-semibold">
-                          Total cost: {formatNumberWithCommas(requestSpend + flatCost, 0)} tokens
+                          {t("totalCostLine", { count: formatNumberWithCommas(requestSpend + flatCost, 0) })}
                         </p>
                       </>
                     ) : (
-                      <p className="text-info">Total Spend: {formatNumberWithCommas(data.metrics.spend, 0)} tokens</p>
+                      <p className="text-info">
+                        {t("tooltipTotalSpend", { count: formatNumberWithCommas(data.metrics.spend, 0) })}
+                      </p>
                     )}
-                    <p className="text-muted-foreground">Total Requests: {data.metrics.api_requests}</p>
-                    <p className="text-muted-foreground">Successful: {data.metrics.successful_requests}</p>
-                    <p className="text-muted-foreground">Failed: {data.metrics.failed_requests}</p>
-                    <p className="text-muted-foreground">Total Tokens: {data.metrics.total_tokens}</p>
+                    <p className="text-muted-foreground">{t("tooltipRequests", { count: data.metrics.api_requests })}</p>
                     <p className="text-muted-foreground">
-                      Total {capitalizedEntityLabel}s: {entityCount}
+                      {t("tooltipSuccessful", { count: data.metrics.successful_requests })}
+                    </p>
+                    <p className="text-muted-foreground">{t("tooltipFailed", { count: data.metrics.failed_requests })}</p>
+                    <p className="text-muted-foreground">{t("tooltipTokens", { count: data.metrics.total_tokens })}</p>
+                    <p className="text-muted-foreground">
+                      {t("tooltipEntityCount", { entity: capitalizedEntityLabel, count: entityCount })}
                     </p>
                     <div className="mt-2 border-t pt-2">
-                      <p className="font-semibold">Spend by {capitalizedEntityLabel}:</p>
+                      <p className="font-semibold">{t("spendByEntity", { entity: capitalizedEntityLabel })}</p>
                       {Object.entries(data.breakdown.entities || {})
                         .sort(([, a], [, b]) => {
                           const spendA = (a as EntityMetrics).metrics.spend;
@@ -462,13 +490,15 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                           const metrics = entityData as EntityMetrics;
                           return (
                             <p key={entity} className="text-sm text-muted-foreground">
-                              {getEntityLabel(entity, metrics.metadata)}:{" "}
-                              {formatNumberWithCommas(metrics.metrics.spend, 0)} tokens
+                              {t("entitySpendLine", {
+                                label: getEntityLabel(entity, metrics.metadata),
+                                count: formatNumberWithCommas(metrics.metrics.spend, 0),
+                              })}
                             </p>
                           );
                         })}
                       {entityCount > 5 && (
-                        <p className="text-sm text-muted-foreground italic">...and {entityCount - 5} more</p>
+                        <p className="text-sm text-muted-foreground italic">{t("andMore", { count: entityCount - 5 })}</p>
                       )}
                     </div>
                   </div>
@@ -484,16 +514,22 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
         <ShadcnCard>
           <CardContent className="flex flex-col space-y-4">
             <div className="flex flex-col space-y-2">
-              <h3 className="text-lg font-medium text-foreground">Spend Per {capitalizedEntityLabel}</h3>
-              <p className="text-xs text-muted-foreground">Showing Top 5 by Spend</p>
+              <h3 className="text-lg font-medium text-foreground">
+                {t("spendPerEntity", { entity: capitalizedEntityLabel })}
+              </h3>
+              <p className="text-xs text-muted-foreground">{t("showingTop5BySpend")}</p>
               <div className="flex items-center text-sm text-muted-foreground">
-                <span>Get Started by Tracking cost per {capitalizedEntityLabel} </span>
-                <a
-                  href="https://docs.litellm.ai/docs/proxy/enterprise#spend-tracking"
-                  className="text-info hover:text-info/80 ml-1"
-                >
-                  here
-                </a>
+                {t.rich("trackEntityHint", {
+                  entity: capitalizedEntityLabel,
+                  docsLink: (chunks) => (
+                    <a
+                      href="https://docs.litellm.ai/docs/proxy/enterprise#spend-tracking"
+                      className="text-info hover:text-info/80 ml-1"
+                    >
+                      {chunks}
+                    </a>
+                  ),
+                })}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6">
@@ -514,11 +550,21 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                     return (
                       <div className="bg-card p-4 shadow-lg rounded-lg border">
                         <p className="font-bold">{data.metadata.alias}</p>
-                        <p className="text-info">Spend: {formatNumberWithCommas(data.metrics.spend, 0)} tokens</p>
-                        <p className="text-muted-foreground">Requests: {data.metrics.api_requests.toLocaleString()}</p>
-                        <p className="text-success">Successful: {data.metrics.successful_requests.toLocaleString()}</p>
-                        <p className="text-destructive">Failed: {data.metrics.failed_requests.toLocaleString()}</p>
-                        <p className="text-muted-foreground">Tokens: {data.metrics.total_tokens.toLocaleString()}</p>
+                        <p className="text-info">
+                          {t("tooltipSpend", { count: formatNumberWithCommas(data.metrics.spend, 0) })}
+                        </p>
+                        <p className="text-muted-foreground">
+                          {t("tooltipRequests", { count: data.metrics.api_requests.toLocaleString() })}
+                        </p>
+                        <p className="text-success">
+                          {t("tooltipSuccessful", { count: data.metrics.successful_requests.toLocaleString() })}
+                        </p>
+                        <p className="text-destructive">
+                          {t("tooltipFailed", { count: data.metrics.failed_requests.toLocaleString() })}
+                        </p>
+                        <p className="text-muted-foreground">
+                          {t("tooltipTokens", { count: data.metrics.total_tokens.toLocaleString() })}
+                        </p>
                       </div>
                     );
                   }}
@@ -530,7 +576,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                   data={getEntityBreakdown().filter((entity) => entity.metrics.spend > 0)}
                   getRowId={(row) => row.metadata.id}
                   maxBodyHeight={208}
-                  noDataMessage={`No ${entityType} spend data`}
+                  noDataMessage={t("noEntitySpendData", { entity: capitalizedEntityLabel })}
                   size="compact"
                 />
               </div>
@@ -554,7 +600,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
       <div>
         <ShadcnCard>
           <CardContent>
-            <h3 className="text-lg font-medium text-foreground">Top Virtual Keys</h3>
+            <h3 className="text-lg font-medium text-foreground">{t("topVirtualKeys")}</h3>
             <TopKeyView
               topKeys={getTopAPIKeys(spendData.results, topKeysLimit)}
               teams={null}
@@ -572,7 +618,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
           <CardContent>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium text-foreground">
-                {entityType === "agent" ? "Top Agents" : modelViewTitle}
+                {entityType === "agent" ? t("topAgents") : modelViewTitle}
               </h3>
               <ModelViewToggle value={modelViewType} onChange={setModelViewType} />
             </div>
@@ -589,7 +635,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
         <div className="col-span-2">
           <ShadcnCard>
             <CardContent>
-              <h3 className="text-lg font-medium text-foreground">Top Agents Driving Spend</h3>
+              <h3 className="text-lg font-medium text-foreground">{t("topAgentsDrivingSpend")}</h3>
               <TopModelView
                 topModels={getTopAgents(agentSpendData.results, topAgentsLimit)}
                 topModelsLimit={topAgentsLimit}
@@ -604,7 +650,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
       <div className="col-span-2">
         <ShadcnCard>
           <CardContent className="flex flex-col space-y-4">
-            <h3 className="text-lg font-medium text-foreground">Provider Usage</h3>
+            <h3 className="text-lg font-medium text-foreground">{t("providerUsage")}</h3>
             <div className="grid grid-cols-2">
               <div>
                 <DonutChart
@@ -624,7 +670,7 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
                   columns={providerSpendColumns}
                   data={providerSpend}
                   getRowId={(row) => row.provider}
-                  noDataMessage="No provider usage data"
+                  noDataMessage={t("noProviderUsage")}
                   size="compact"
                 />
               </div>
@@ -636,10 +682,10 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
   );
 
   const tabs: readonly { key: string; label: string; content: ReactNode }[] = [
-    { key: "cost", label: "Cost", content: costPanel },
+    { key: "cost", label: t("tabCost"), content: costPanel },
     {
       key: "models",
-      label: entityType === "agent" ? "Request / Token Consumption" : "Model Activity",
+      label: entityType === "agent" ? t("tabRequestToken") : t("tabModelActivity"),
       content: (
         <>
           <div className="flex justify-end mt-2 mb-4">
@@ -650,14 +696,14 @@ const EntityUsage: React.FC<EntityUsageProps> = ({
       ),
     },
     ...(showAgentBreakdown
-      ? [{ key: "agents", label: "Agent Activity", content: <ActivityMetrics modelMetrics={agentMetrics} /> }]
+      ? [{ key: "agents", label: t("tabAgentActivity"), content: <ActivityMetrics modelMetrics={agentMetrics} /> }]
       : []),
     {
       key: "keys",
-      label: "Key Activity",
+      label: t("tabKeyActivity"),
       content: <KeyActivityPanel keyMetrics={keyMetrics} hidePromptCachingMetrics={entityType === "agent"} />,
     },
-    { key: "endpoints", label: "Endpoint Activity", content: <EndpointUsage userSpendData={spendData} /> },
+    { key: "endpoints", label: t("tabEndpointActivity"), content: <EndpointUsage userSpendData={spendData} /> },
   ];
 
   return (

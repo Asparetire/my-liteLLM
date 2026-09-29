@@ -8,6 +8,20 @@ export interface SummaryTile {
   expandable?: boolean;
 }
 
+export interface SummaryLabels {
+  totalCost: string;
+  totalSpend: string;
+  totalRequests: string;
+  successfulRequests: string;
+  failedRequests: string;
+  totalTokens: string;
+  requestCost: string;
+  flatCost: string;
+  totalCostTooltip: string;
+  requestCostTooltip: string;
+  flatCostTooltip: string;
+}
+
 interface SpendSummaryMetadata {
   total_spend: number;
   total_flat_cost?: number;
@@ -17,50 +31,45 @@ interface SpendSummaryMetadata {
   total_tokens: number;
 }
 
-export const TOTAL_COST_TOOLTIP =
-  "Request cost plus flat cost for reserved capacity. Select this tile to see the breakdown.";
-
-export const REQUEST_COST_TOOLTIP =
-  "Usage-based cost of the requests this entity sent during the selected period, priced per token.";
-
-export const FLAT_COST_TOOLTIP =
-  "Reserved provisioned throughput, billed per hour whether or not requests are sent. Reported here only; it does not count toward team, key, user, or organization budgets.";
-
 export const hasFlatCost = (metadata: SpendSummaryMetadata): boolean => (metadata.total_flat_cost ?? 0) > 0;
 
-export const buildSummaryTiles = (metadata: SpendSummaryMetadata, showFlatCost: boolean): SummaryTile[] => {
+export const buildSummaryTiles = (
+  metadata: SpendSummaryMetadata,
+  showFlatCost: boolean,
+  labels: SummaryLabels,
+): SummaryTile[] => {
   const flatCost = metadata.total_flat_cost ?? 0;
   return [
     showFlatCost
       ? {
-          title: "Total Cost",
+          title: labels.totalCost,
           value: `${formatNumberWithCommas(metadata.total_spend + flatCost, 0)} tokens`,
-          tooltip: TOTAL_COST_TOOLTIP,
+          tooltip: labels.totalCostTooltip,
           expandable: true,
         }
-      : { title: "Total Spend", value: `${formatNumberWithCommas(metadata.total_spend, 0)} tokens` },
-    { title: "Total Requests", value: metadata.total_api_requests.toLocaleString() },
+      : { title: labels.totalSpend, value: `${formatNumberWithCommas(metadata.total_spend, 0)} tokens` },
+    { title: labels.totalRequests, value: metadata.total_api_requests.toLocaleString() },
     {
-      title: "Successful Requests",
+      title: labels.successfulRequests,
       value: metadata.total_successful_requests.toLocaleString(),
       className: "text-success",
     },
-    { title: "Failed Requests", value: metadata.total_failed_requests.toLocaleString(), className: "text-destructive" },
-    { title: "Total Tokens", value: metadata.total_tokens.toLocaleString() },
+    { title: labels.failedRequests, value: metadata.total_failed_requests.toLocaleString(), className: "text-destructive" },
+    { title: labels.totalTokens, value: metadata.total_tokens.toLocaleString() },
   ];
 };
 
-export const buildCostBreakdownTiles = (metadata: SpendSummaryMetadata): SummaryTile[] => [
+export const buildCostBreakdownTiles = (metadata: SpendSummaryMetadata, labels: SummaryLabels): SummaryTile[] => [
   {
-    title: "Request Cost",
+    title: labels.requestCost,
     value: `${formatNumberWithCommas(metadata.total_spend, 0)} tokens`,
     className: "text-info",
-    tooltip: REQUEST_COST_TOOLTIP,
+    tooltip: labels.requestCostTooltip,
   },
   {
-    title: "Flat Cost",
+    title: labels.flatCost,
     value: `${formatNumberWithCommas(metadata.total_flat_cost ?? 0, 0)} tokens`,
     className: "text-violet-600",
-    tooltip: FLAT_COST_TOOLTIP,
+    tooltip: labels.flatCostTooltip,
   },
 ];
