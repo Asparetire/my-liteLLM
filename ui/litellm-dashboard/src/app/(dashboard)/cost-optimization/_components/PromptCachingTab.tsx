@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { getGeneralSettingsCall } from "@/components/networking";
 import { toast } from "@/lib/toast";
@@ -17,6 +18,7 @@ interface PromptCachingTabProps {
 }
 
 const PromptCachingTab: React.FC<PromptCachingTabProps> = ({ accessToken, activity }) => {
+  const t = useTranslations("costOptimization");
   const [settings, setSettings] = useState<generalSettingsItem[]>([]);
 
   const loadSettings = useCallback(() => {
@@ -27,9 +29,9 @@ const PromptCachingTab: React.FC<PromptCachingTabProps> = ({ accessToken, activi
       .then((data: generalSettingsItem[]) => setSettings(data))
       .catch((error) => {
         console.error("Failed to load prompt caching settings:", error);
-        toast.fromError("Failed to load prompt caching settings");
+        toast.fromError(t("cachingSettingsLoadFailed"));
       });
-  }, [accessToken]);
+  }, [accessToken, t]);
 
   useEffect(() => {
     loadSettings();

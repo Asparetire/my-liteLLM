@@ -64,7 +64,7 @@ describe("CostOptimizationView daily activity", () => {
 
     await waitFor(() => expect(mockUserDailyActivityAggregatedCall).toHaveBeenCalledTimes(1));
 
-    fireEvent.click(screen.getByRole("tab", { name: "Prompt Caching" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Prompt 缓存" }));
     await screen.findByTestId("caching-settings");
 
     expect(mockUserDailyActivityAggregatedCall).toHaveBeenCalledTimes(1);

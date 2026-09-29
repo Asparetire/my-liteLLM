@@ -26,7 +26,7 @@ export const classificationRatePer1kTurns = (classifierCost: number, turns: numb
 export const pct = (ratio: number): string => `${formatNumberWithCommas(ratio * 100, 1)}%`;
 
 export const shortDate = (iso: string): string =>
-  new Date(`${iso}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  new Date(`${iso}T00:00:00`).toLocaleDateString("zh-CN", { month: "short", day: "numeric" });
 
 export const compressionOf = (m: SpendMetrics): number => m.compression_savings_spend ?? 0;
 export const cachingOf = (m: SpendMetrics): number => m.prompt_caching_savings_spend ?? 0;
@@ -269,10 +269,10 @@ export const withStartAnchor = (cumulative: readonly SavingsPoint[], startLabel:
     ? [...cumulative]
     : [{ date: startLabel, Compression: 0, "Prompt caching": 0, "Auto-router": 0 }, ...cumulative];
 
-/** "Jul 16 – Jul 23", collapsing to a single date when the range is one day. */
+/** "7月16日 – 7月23日", collapsing to a single date when the range is one day. */
 export const formatRangeLabel = (from: Date | undefined, to: Date | undefined): string => {
   if (!from || !to) return "";
-  const short = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const short = (d: Date) => d.toLocaleDateString("zh-CN", { month: "short", day: "numeric" });
   const start = short(from);
   const end = short(to);
   return start === end ? start : `${start} – ${end}`;

@@ -85,7 +85,7 @@ describe("savingsSeriesOf", () => {
 
     const series = savingsSeriesOf(newestFirst);
 
-    expect(series.map((p) => p.date)).toEqual(["Jul 1", "Jul 2"]);
+    expect(series.map((p) => p.date)).toEqual(["7月1日", "7月2日"]);
     expect(series[0]).toMatchObject({ Compression: 0.1, "Prompt caching": 0.3, "Auto-router": 0.05 });
     expect(series[1]).toMatchObject({ Compression: 0.1, "Prompt caching": 0.2, "Auto-router": 0.05 });
   });
@@ -374,11 +374,11 @@ describe("withStartAnchor", () => {
 
 describe("formatRangeLabel", () => {
   it("reads as a range across days", () => {
-    expect(formatRangeLabel(new Date(2026, 6, 16), new Date(2026, 6, 23))).toBe("Jul 16 \u2013 Jul 23");
+    expect(formatRangeLabel(new Date(2026, 6, 16), new Date(2026, 6, 23))).toBe("7月16日 – 7月23日");
   });
 
   it("collapses to one date when both ends are the same day", () => {
-    expect(formatRangeLabel(new Date(2026, 6, 23), new Date(2026, 6, 23))).toBe("Jul 23");
+    expect(formatRangeLabel(new Date(2026, 6, 23), new Date(2026, 6, 23))).toBe("7月23日");
   });
 
   it("is empty until both ends are picked", () => {

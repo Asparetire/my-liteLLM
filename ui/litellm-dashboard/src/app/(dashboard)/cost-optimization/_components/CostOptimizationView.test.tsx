@@ -47,30 +47,30 @@ describe("CostOptimizationView", () => {
   it("renders the standard page header with the sidebar's Cost Optimization icon", () => {
     const { container } = renderView();
 
-    expect(screen.getByRole("heading", { level: 1, name: "Cost Optimization" })).toBeInTheDocument();
-    expect(screen.getByText(/Track and configure the mechanisms that save you money/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "成本优化" })).toBeInTheDocument();
+    expect(screen.getByText(/跟踪并配置为你省钱的两项机制/)).toBeInTheDocument();
     expect(container.querySelector(".lucide-piggy-bank")).not.toBeNull();
   });
 
   it("renders the four cost-optimization tabs", () => {
     renderView();
 
-    expect(screen.getByText("Overall")).toBeInTheDocument();
-    expect(screen.getByText("Prompt Compression")).toBeInTheDocument();
-    expect(screen.getByText("Prompt Caching")).toBeInTheDocument();
-    expect(screen.getByText("Auto-Router")).toBeInTheDocument();
+    expect(screen.getByText("总览")).toBeInTheDocument();
+    expect(screen.getByText("Prompt 压缩")).toBeInTheDocument();
+    expect(screen.getByText("Prompt 缓存")).toBeInTheDocument();
+    expect(screen.getByText("自动路由")).toBeInTheDocument();
   });
 
   it("defaults to the Overall tab and switches the active tab on click", () => {
     renderView();
 
-    expect(screen.getByRole("tab", { name: "Overall" })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByRole("tab", { name: "Prompt Compression" })).toHaveAttribute("aria-selected", "false");
+    expect(screen.getByRole("tab", { name: "总览" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "Prompt 压缩" })).toHaveAttribute("aria-selected", "false");
 
-    fireEvent.click(screen.getByRole("tab", { name: "Prompt Compression" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Prompt 压缩" }));
 
-    expect(screen.getByRole("tab", { name: "Overall" })).toHaveAttribute("aria-selected", "false");
-    expect(screen.getByRole("tab", { name: "Prompt Compression" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "总览" })).toHaveAttribute("aria-selected", "false");
+    expect(screen.getByRole("tab", { name: "Prompt 压缩" })).toHaveAttribute("aria-selected", "true");
   });
 
   // Unlike the other three pages in this cleanup, Cost Optimization keeps its
@@ -82,10 +82,10 @@ describe("CostOptimizationView", () => {
     it.each(["Internal User", "Internal Viewer", "Org Admin"])("shows %s the Overall tab only", (userRole) => {
       renderView(userRole);
 
-      expect(screen.getByRole("tab", { name: "Overall" })).toBeInTheDocument();
-      expect(screen.queryByRole("tab", { name: "Prompt Compression" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("tab", { name: "Prompt Caching" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("tab", { name: "Auto-Router" })).not.toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "总览" })).toBeInTheDocument();
+      expect(screen.queryByRole("tab", { name: "Prompt 压缩" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("tab", { name: "Prompt 缓存" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("tab", { name: "自动路由" })).not.toBeInTheDocument();
     });
 
     it("never mounts the panels behind the admin-only endpoints for an internal user", () => {

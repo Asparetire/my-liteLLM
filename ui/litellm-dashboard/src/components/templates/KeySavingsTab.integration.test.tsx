@@ -93,14 +93,14 @@ describe("KeySavingsTab", () => {
 
     renderTab();
 
-    expect(screen.getByTestId("summary-card-total-saved")).toHaveTextContent("$5.40");
-    expect(screen.getByTestId("summary-card-compression-savings")).toHaveTextContent("$2.00");
-    expect(screen.getByTestId("summary-card-compression-savings")).toHaveTextContent("1,000 tokens compressed");
+    expect(screen.getByTestId("summary-card-节省总计")).toHaveTextContent("$5.40");
+    expect(screen.getByTestId("summary-card-压缩节省")).toHaveTextContent("$2.00");
+    expect(screen.getByTestId("summary-card-压缩节省")).toHaveTextContent("已压缩 1,000 tokens");
     // the card leads with what LiteLLM's own injection earned and carries the total beneath it,
     // so a key whose caching came mostly from its own cache_control does not read as gateway-earned
-    expect(screen.getByTestId("summary-card-prompt-caching-savings")).toHaveTextContent("$0.40");
-    expect(screen.getByTestId("summary-card-prompt-caching-savings")).toHaveTextContent("$1.00Total");
-    expect(screen.getByTestId("summary-card-auto-router-savings")).toHaveTextContent("$3.00");
+    expect(screen.getByTestId("summary-card-prompt-缓存节省")).toHaveTextContent("$0.40");
+    expect(screen.getByTestId("summary-card-prompt-缓存节省")).toHaveTextContent("$1.00总计");
+    expect(screen.getByTestId("summary-card-自动路由节省")).toHaveTextContent("$3.00");
   });
 
   it("separates a key with no traffic from one still loading", () => {
