@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { useInfiniteKeys } from "@/app/(dashboard)/hooks/keys/useKeys";
 import { useInfiniteUsers } from "@/app/(dashboard)/hooks/users/useUsers";
@@ -31,25 +32,11 @@ const MAX_ROUTERS = 4;
 const MAX_MODELS = 100;
 const RECOMMENDED_JUDGE_MODELS = ["anthropic/claude-sonnet-5", "openai/gpt-4o", "gemini/gemini-2.5-pro"] as const;
 
-const DIRECTION_OPTIONS: readonly { value: ShadowEvalDirection; label: string }[] = [
-  { value: "forward", label: "Adoption check: key's traffic vs the router" },
-  { value: "reverse", label: "Regression check: router's picks vs a baseline" },
-] as const;
+// Option labels resolve through the costOptimization namespace at render time:
+// directionForward/directionReverse and durationDays ("{count} days")
+const DIRECTION_OPTIONS: readonly ShadowEvalDirection[] = ["forward", "reverse"] as const;
 
-const START_FORM_DESCRIPTION: Record<ShadowEvalDirection, string> = {
-  forward:
-    "Duplicates a sampled slice of the selected targets' traffic (keys, teams, or users) through the auto-router and has an LLM judge compare both answers blind. Each target gets its own spend budget. The router's answers are never served to users; judge calls bill to the sampled traffic's own identity.",
-  reverse:
-    "Duplicates a sampled slice of the traffic the auto-router already serves against a fixed baseline model and has an LLM judge compare both answers blind. Each target gets its own spend budget. The baseline's answers are never served to users; judge calls bill to the sampled traffic's own identity.",
-};
-
-const DURATION_OPTIONS = [
-  { value: "1", label: "1 day" },
-  { value: "3", label: "3 days" },
-  { value: "7", label: "7 days" },
-  { value: "14", label: "14 days" },
-  { value: "30", label: "30 days" },
-] as const;
+const DURATION_OPTIONS = ["1", "3", "7", "14", "30"] as const;
 
 const Field: React.FC<{ label: string; htmlFor?: string; className?: string; children: React.ReactNode }> = ({
   label,
@@ -66,6 +53,7 @@ const Field: React.FC<{ label: string; htmlFor?: string; className?: string; chi
 );
 
 const KeySelect: React.FC<{ value: string[]; onChange: (tokens: string[]) => void }> = ({ value, onChange }) => {
+  const t = useTranslations("costOptimization");
   const [search, setSearch] = useState("");
   const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteKeys(50, {
     selectedKeyAlias: search || null,
@@ -92,14 +80,15 @@ const KeySelect: React.FC<{ value: string[]; onChange: (tokens: string[]) => voi
       hasNextPage={hasNextPage}
       isFetchingNextPage={isFetchingNextPage}
       isLoading={isPending}
-      placeholder="Search keys by alias"
-      emptyText="No matching keys"
-      errorText={isError ? "Keys could not be loaded. Refresh the page to retry." : undefined}
+      placeholder={t("keysPlaceholder")}
+      emptyText={t("noMatchingKeys")}
+      errorText={isError ? t("keysLoadFailed") : undefined}
     />
   );
 };
 
 const UserSelect: React.FC<{ value: string[]; onChange: (ids: string[]) => void }> = ({ value, onChange }) => {
+  const t = useTranslations("costOptimization");
   const [search, setSearch] = useState("");
   const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteUsers(
     50,
@@ -127,9 +116,9 @@ const UserSelect: React.FC<{ value: string[]; onChange: (ids: string[]) => void 
       hasNextPage={hasNextPage}
       isFetchingNextPage={isFetchingNextPage}
       isLoading={isPending}
-      placeholder="Search users by email"
-      emptyText="No matching users"
-      errorText={isError ? "Users could not be loaded. Refresh the page to retry." : undefined}
+      placeholder={t("usersPlaceholder")}
+      emptyText={t("noMatchingUsers")}
+      errorText={isError ? t("usersLoadFailed") : undefined}
     />
   );
 };
@@ -139,28 +128,29 @@ const RouterField: React.FC<{
   routerNames: string[];
   onChange: (names: string[]) => void;
   direction: ShadowEvalDirection;
-}> = ({ options, routerNames, onChange, direction }) => (
-  <Field label="Auto-routers">
-    <MultiSelect
-      options={options}
-      value={routerNames}
-      onValueChange={onChange}
-      placeholder="Select up to 4 auto-routers"
-      emptyText="No auto-routers configured"
-    />
-    {routerNames.length > MAX_ROUTERS && (
-      <p className="text-xs text-destructive">Pick at most {MAX_ROUTERS} auto-routers</p>
-    )}
-    {direction === "reverse" && routerNames.length > 1 && (
-      <p className="text-xs text-destructive">A regression check compares one router to its baseline</p>
-    )}
-    {direction === "forward" && routerNames.length > 1 && (
-      <p className="text-xs text-muted-foreground">
-        Every router sees the same sampled requests, judged against the same live responses
-      </p>
-    )}
-  </Field>
-);
+}> = ({ options, routerNames, onChange, direction }) => {
+  const t = useTranslations("costOptimization");
+  return (
+    <Field label={t("routersLabel")}>
+      <MultiSelect
+        options={options}
+        value={routerNames}
+        onValueChange={onChange}
+        placeholder={t("routersPlaceholder")}
+        emptyText={t("noAutoRouters")}
+      />
+      {routerNames.length > MAX_ROUTERS && (
+        <p className="text-xs text-destructive">{t("tooManyRouters", { max: MAX_ROUTERS })}</p>
+      )}
+      {direction === "reverse" && routerNames.length > 1 && (
+        <p className="text-xs text-destructive">{t("reverseSingleRouter")}</p>
+      )}
+      {direction === "forward" && routerNames.length > 1 && (
+        <p className="text-xs text-muted-foreground">{t("forwardMultiRouter")}</p>
+      )}
+    </Field>
+  );
+};
 
 interface StartFormValidityInputs {
   accessToken: string | null | undefined;
@@ -223,6 +213,7 @@ const buildStartBody = (inputs: StartBodyInputs) => ({
 });
 
 export const StartForm: React.FC = () => {
+  const t = useTranslations("costOptimization");
   const { accessToken } = useAuthorized();
   const [apiKeyIds, setApiKeyIds] = useState<string[]>([]);
   const [teamIds, setTeamIds] = useState<string[]>([]);
@@ -258,9 +249,9 @@ export const StartForm: React.FC = () => {
   const judgeOptions = useMemo(
     () =>
       chatOptions.map((option) =>
-        recommendedJudgeModels.has(option.value) ? { ...option, sublabel: "Recommended" } : option,
+        recommendedJudgeModels.has(option.value) ? { ...option, sublabel: t("recommended") } : option,
       ),
-    [chatOptions, recommendedJudgeModels],
+    [chatOptions, recommendedJudgeModels, t],
   );
   const start = useStartShadowEval();
 
@@ -306,50 +297,50 @@ export const StartForm: React.FC = () => {
   return (
     <Card size="sm">
       <CardHeader>
-        <CardTitle className="text-sm font-medium text-foreground">Start a shadow eval</CardTitle>
-        <p className="text-xs text-muted-foreground">{START_FORM_DESCRIPTION[direction]}</p>
+        <CardTitle className="text-sm font-medium text-foreground">{t("startTitle")}</CardTitle>
+        <p className="text-xs text-muted-foreground">{direction === "forward" ? t("descForward") : t("descReverse")}</p>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="grid gap-3 sm:grid-cols-3">
-          <Field label="Direction">
+          <Field label={t("directionLabel")}>
             <Select
               value={direction}
               onValueChange={(v: string | null) => setDirection(v === "reverse" ? "reverse" : "forward")}
             >
               <SelectTrigger className="w-full">
-                <SelectValue>{DIRECTION_OPTIONS.find((o) => o.value === direction)?.label}</SelectValue>
+                <SelectValue>{direction === "forward" ? t("directionForward") : t("directionReverse")}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {DIRECTION_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+                {DIRECTION_OPTIONS.map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {value === "forward" ? t("directionForward") : t("directionReverse")}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </Field>
-          <Field label="Keys to shadow" htmlFor="shadow-eval-key">
+          <Field label={t("keysToShadow")} htmlFor="shadow-eval-key">
             <KeySelect value={apiKeyIds} onChange={setApiKeyIds} />
           </Field>
-          <Field label="Teams to shadow">
-            <TeamMultiSelect value={teamIds} onChange={setTeamIds} placeholder="Search teams by alias" />
+          <Field label={t("teamsToShadow")}>
+            <TeamMultiSelect value={teamIds} onChange={setTeamIds} placeholder={t("teamsPlaceholder")} />
           </Field>
-          <Field label="Users to shadow" htmlFor="shadow-eval-user">
+          <Field label={t("usersToShadow")} htmlFor="shadow-eval-user">
             <UserSelect value={userIds} onChange={setUserIds} />
           </Field>
           {direction === "forward" && (
-            <Field label="Only on models">
+            <Field label={t("onlyOnModels")}>
               <MultiSelect
                 options={modelOptions}
                 value={models}
                 onValueChange={setModels}
-                placeholder="Every model the targets use"
-                emptyText="No models configured"
+                placeholder={t("modelsPlaceholder")}
+                emptyText={t("noModels")}
               />
               {models.length > MAX_MODELS ? (
-                <p className="text-xs text-destructive">Pick at most {MAX_MODELS} models</p>
+                <p className="text-xs text-destructive">{t("tooManyModels", { max: MAX_MODELS })}</p>
               ) : (
-                <p className="text-xs text-muted-foreground">Narrows every target above to requests for these models</p>
+                <p className="text-xs text-muted-foreground">{t("modelsNarrowHint")}</p>
               )}
             </Field>
           )}
@@ -359,7 +350,7 @@ export const StartForm: React.FC = () => {
             onChange={setRouterNames}
             direction={direction}
           />
-          <Field label="Traffic sampled" htmlFor="shadow-eval-pct">
+          <Field label={t("trafficSampled")} htmlFor="shadow-eval-pct">
             <div className="flex items-center gap-2">
               <Input
                 id="shadow-eval-pct"
@@ -371,29 +362,29 @@ export const StartForm: React.FC = () => {
                 value={percentage}
                 onChange={(e) => setPercentage(e.target.value)}
               />
-              <span className="text-sm text-muted-foreground">% of traffic</span>
+              <span className="text-sm text-muted-foreground">{t("pctOfTraffic")}</span>
             </div>
             <div>
               {percentage.trim() !== "" && !percentageValid && (
-                <p className="text-xs text-destructive">Enter a value from 0.1 to 100</p>
+                <p className="text-xs text-destructive">{t("pctRangeError")}</p>
               )}
             </div>
           </Field>
-          <Field label="Duration">
+          <Field label={t("durationLabel")}>
             <Select value={durationDays} onValueChange={(v: string | null) => setDurationDays(v ?? "7")}>
               <SelectTrigger className="w-full">
-                <SelectValue>{DURATION_OPTIONS.find((o) => o.value === durationDays)?.label}</SelectValue>
+                <SelectValue>{t("durationDays", { count: durationDays })}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {DURATION_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+                {DURATION_OPTIONS.map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {t("durationDays", { count: value })}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </Field>
-          <Field label="Spend budget">
+          <Field label={t("spendBudgetLabel")}>
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">tokens</span>
               <Input
@@ -405,35 +396,35 @@ export const StartForm: React.FC = () => {
                 value={maxBudget}
                 onChange={(e) => setMaxBudget(e.target.value)}
               />
-              <span className="text-sm text-muted-foreground">max shadow + judge spend, per target</span>
+              <span className="text-sm text-muted-foreground">{t("maxSpendHint")}</span>
             </div>
             {maxBudget.trim() !== "" && !maxBudgetValid && (
-              <p className="text-xs text-destructive">Enter a value from 0.01 to 10000</p>
+              <p className="text-xs text-destructive">{t("budgetRangeError")}</p>
             )}
           </Field>
           {direction === "reverse" && (
-            <Field label="Baseline model">
+            <Field label={t("baselineModelLabel")}>
               <SearchSelect
                 options={chatOptions}
                 value={baselineModel}
                 onValueChange={setBaselineModel}
-                placeholder="Select a baseline model"
-                emptyText="No chat models available"
+                placeholder={t("selectBaseline")}
+                emptyText={t("noChatModels")}
               />
             </Field>
           )}
-          <Field label="Judge model" className="sm:col-span-2">
+          <Field label={t("judgeModelLabel")} className="sm:col-span-2">
             <SearchSelect
               options={judgeOptions}
               value={judgeModel}
               onValueChange={setJudgeModel}
-              placeholder="Select a judge model"
-              emptyText="No chat models available"
+              placeholder={t("selectJudge")}
+              emptyText={t("noChatModels")}
             />
           </Field>
         </div>
         <Button disabled={!valid || start.isPending} onClick={handleStart}>
-          {start.isPending ? "Starting..." : "Start shadow eval"}
+          {start.isPending ? t("starting") : t("startBtn")}
         </Button>
       </CardContent>
     </Card>

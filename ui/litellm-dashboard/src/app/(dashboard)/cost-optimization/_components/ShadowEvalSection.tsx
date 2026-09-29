@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
 import { Badge } from "@/components/ui/badge";
@@ -23,14 +24,16 @@ import {
   type ShadowEvalSlice,
 } from "./useShadowEval";
 
+type Translator = ReturnType<typeof useTranslations>;
+
 const pct = (value: number): string => `${value.toFixed(1)}%`;
 
 const MIN_TURNS_FOR_CONFIDENCE = 30;
 
 type ShadowEvalDirection = ShadowEvalJob["direction"];
 
-const otherArmLabel = (direction: ShadowEvalDirection): string =>
-  direction === "reverse" ? "Baseline" : "Current model";
+const otherArmLabel = (direction: ShadowEvalDirection, t: Translator): string =>
+  direction === "reverse" ? t("baselineArm") : t("currentModelArm");
 
 const routerWinRate = (direction: ShadowEvalDirection, slice: ShadowEvalSlice): number =>
   direction === "reverse" ? slice.real_win_rate_pct : slice.shadow_win_rate_pct;
@@ -63,8 +66,8 @@ export const shadowedTargetLabel = (target: ShadowEvalJobTarget): string =>
   target.key_name ||
   (target.target_type === "key" ? `${target.target_id.slice(0, 10)}…` : target.target_id);
 
-const shadowedTargetsLabel = (job: ShadowEvalJob): string =>
-  job.targets.length === 1 ? shadowedTargetLabel(job.targets[0]) : `${job.targets.length} targets`;
+const shadowedTargetsLabel = (job: ShadowEvalJob, t: Translator): string =>
+  job.targets.length === 1 ? shadowedTargetLabel(job.targets[0]) : t("nTargets", { count: job.targets.length });
 
 const totalBudget = (job: ShadowEvalJob): number | null =>
   job.targets.reduce<number | null>(
@@ -87,37 +90,54 @@ const targetStatus = (job: ShadowEvalJob, target: ShadowEvalJobTarget): string =
 
 const jobRouters = (job: ShadowEvalJob): string => (job.router_names ?? [job.router_name]).join(", ");
 
-const jobModelScope = (job: ShadowEvalJob): React.ReactNode =>
+const jobModelScope = (job: ShadowEvalJob, t: Translator): React.ReactNode =>
   job.models && job.models.length > 0 ? (
-    <>
-      {" "}
-      on <span className="font-mono text-xs">{job.models.join(", ")}</span>
-    </>
+    <span className="text-xs">
+      {t.rich("modelScopeOn", {
+        models: job.models.join(", "),
+        mono: (chunks) => <span className="font-mono">{chunks}</span>,
+      })}
+    </span>
   ) : null;
 
-const jobHeadline = (job: ShadowEvalJob): React.ReactNode =>
-  job.direction === "reverse" ? (
+const monoChunk = (chunks: React.ReactNode): React.ReactNode => <span className="font-mono text-xs">{chunks}</span>;
+
+const jobHeadline = (job: ShadowEvalJob, t: Translator): React.ReactNode => {
+  const comparingParams = {
+    router: jobRouters(job),
+    baseline: job.baseline_model,
+    pct: job.shadow_percentage,
+    targets: shadowedTargetsLabel(job, t),
+    mono: monoChunk,
+  };
+  const shadowingParams = {
+    pct: job.shadow_percentage,
+    targets: shadowedTargetsLabel(job, t),
+    routers: jobRouters(job),
+    mono: monoChunk,
+  };
+  return job.direction === "reverse" ? (
     <>
-      Comparing <span className="font-mono text-xs">{jobRouters(job)}</span> to{" "}
-      <span className="font-mono text-xs">{job.baseline_model}</span> on {job.shadow_percentage}% of{" "}
-      <span className="font-mono text-xs">{shadowedTargetsLabel(job)}</span> traffic{jobModelScope(job)}
+      {t.rich("headlineComparing", comparingParams)}
+      {jobModelScope(job, t)}
     </>
   ) : (
     <>
-      Shadowing {job.shadow_percentage}% of <span className="font-mono text-xs">{shadowedTargetsLabel(job)}</span>{" "}
-      traffic{jobModelScope(job)} via <span className="font-mono text-xs">{jobRouters(job)}</span>
+      {t.rich("headlineShadowing", shadowingParams)}
+      {jobModelScope(job, t)}
     </>
   );
+};
 
 const isActive = (job: ShadowEvalJob): boolean => job.status === "running";
 
-const endsIn = (endsAt: string | null | undefined): string | null => {
+const endsIn = (endsAt: string | null | undefined, t: Translator): string | null => {
   if (!endsAt) return null;
   const remainingMs = new Date(endsAt).getTime() - Date.now();
   if (!Number.isFinite(remainingMs)) return null;
-  if (remainingMs <= 0) return "ending now";
+  if (remainingMs <= 0) return t("endingNow");
   const days = Math.round(remainingMs / 86_400_000);
-  return days >= 2 ? `ends in ${days} days` : "ends within a day";
+  return days >= 2 ? t("endsInDays", { days }) : t("endsWithinDay");
 };
 
 const STATUS_STYLES: Record<string, string> = {
@@ -136,58 +156,63 @@ const SliceTable: React.FC<{
   groupHeader: string;
   direction: ShadowEvalDirection;
   slices: readonly ShadowEvalSlice[];
-}> = ({ groupHeader, direction, slices }) => (
-  <Table>
-    <TableHeader>
-      <TableRow>
-        <TableHead>{groupHeader}</TableHead>
-        {[
-          "Judged turns",
-          "Router wins",
-          `${otherArmLabel(direction)} wins`,
-          "Ties",
-          "Judge confidence",
-          "Router cost",
-          `${otherArmLabel(direction)} cost`,
-        ].map((label) => (
-          <TableHead key={label} className="text-right">
-            {label}
-          </TableHead>
-        ))}
-      </TableRow>
-    </TableHeader>
-    <TableBody>
-      {slices.map((slice) => (
-        <TableRow key={slice.group}>
-          <TableCell className="font-medium text-foreground">
-            {slice.group}
-            {slice.turn_count < MIN_TURNS_FOR_CONFIDENCE && (
-              <span className="ml-2 text-xs font-normal text-muted-foreground">(low sample)</span>
-            )}
-          </TableCell>
-          <TableCell className="text-right tabular-nums">{slice.turn_count.toLocaleString()}</TableCell>
-          <TableCell className="text-right font-medium tabular-nums text-foreground">
-            {pct(routerWinRate(direction, slice))}
-          </TableCell>
-          <TableCell className="text-right tabular-nums">{pct(otherArmWinRate(direction, slice))}</TableCell>
-          <TableCell className="text-right tabular-nums">{pct(slice.tie_rate_pct)}</TableCell>
-          <TableCell className="text-right tabular-nums">{slice.avg_judge_confidence.toFixed(2)}</TableCell>
-          <TableCell className="text-right tabular-nums">
-            {routerSliceSpend(direction, slice) > 0 ? tokenSpend(routerSliceSpend(direction, slice)) : "-"}
-          </TableCell>
-          <TableCell className="text-right tabular-nums">
-            {otherSliceSpend(direction, slice) > 0 ? tokenSpend(otherSliceSpend(direction, slice)) : "-"}
-          </TableCell>
+}> = ({ groupHeader, direction, slices }) => {
+  const t = useTranslations("costOptimization");
+  const arm = otherArmLabel(direction, t);
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>{groupHeader}</TableHead>
+          {[
+            t("sliceColJudged"),
+            t("sliceColRouterWins"),
+            t("sliceColOtherWins", { arm }),
+            t("sliceColTies"),
+            t("sliceColConfidence"),
+            t("sliceColRouterCost"),
+            t("sliceColOtherCost", { arm }),
+          ].map((label) => (
+            <TableHead key={label} className="text-right">
+              {label}
+            </TableHead>
+          ))}
         </TableRow>
-      ))}
-    </TableBody>
-  </Table>
-);
+      </TableHeader>
+      <TableBody>
+        {slices.map((slice) => (
+          <TableRow key={slice.group}>
+            <TableCell className="font-medium text-foreground">
+              {slice.group}
+              {slice.turn_count < MIN_TURNS_FOR_CONFIDENCE && (
+                <span className="ml-2 text-xs font-normal text-muted-foreground">{t("lowSample")}</span>
+              )}
+            </TableCell>
+            <TableCell className="text-right tabular-nums">{slice.turn_count.toLocaleString()}</TableCell>
+            <TableCell className="text-right font-medium tabular-nums text-foreground">
+              {pct(routerWinRate(direction, slice))}
+            </TableCell>
+            <TableCell className="text-right tabular-nums">{pct(otherArmWinRate(direction, slice))}</TableCell>
+            <TableCell className="text-right tabular-nums">{pct(slice.tie_rate_pct)}</TableCell>
+            <TableCell className="text-right tabular-nums">{slice.avg_judge_confidence.toFixed(2)}</TableCell>
+            <TableCell className="text-right tabular-nums">
+              {routerSliceSpend(direction, slice) > 0 ? tokenSpend(routerSliceSpend(direction, slice)) : "-"}
+            </TableCell>
+            <TableCell className="text-right tabular-nums">
+              {otherSliceSpend(direction, slice) > 0 ? tokenSpend(otherSliceSpend(direction, slice)) : "-"}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
 
 const CostComparison: React.FC<{
   direction: ShadowEvalDirection;
   results: NonNullable<ShadowEvalJob["results"]>;
 }> = ({ direction, results }) => {
+  const t = useTranslations("costOptimization");
   const routerSpend = routerArmSpend(direction, results);
   const otherSpend = otherArmSpend(direction, results);
   if (routerSpend <= 0 || otherSpend <= 0) return null;
@@ -196,14 +221,11 @@ const CostComparison: React.FC<{
   return (
     <div className="flex min-w-[240px] flex-1 flex-col gap-1 border-t px-6 py-4 sm:border-l sm:border-t-0">
       <p className="flex items-center gap-1 text-[11px] uppercase tracking-wide text-muted-foreground">
-        Router cost vs {direction === "reverse" ? "the baseline" : "your current model"}
+        {direction === "reverse" ? t("routerCostVsBaseline") : t("routerCostVsCurrent")}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger render={<CircleHelp className="size-3.5 shrink-0 cursor-help" />} />
-            <TooltipContent>
-              Each arm is priced as its completion plus its own routing classifier call, measured on the same judged
-              turns; the judge&apos;s cost is excluded from both arms
-            </TooltipContent>
+            <TooltipContent>{t("costComparisonHint")}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </p>
@@ -213,8 +235,8 @@ const CostComparison: React.FC<{
         {savingsPct != null ? `${savingsPct > 0 ? "-" : "+"}${Math.abs(savingsPct).toFixed(1)}%` : "n/a"}
       </p>
       <p className="text-xs text-muted-foreground">
-        {tokenSpend(routerSpend)} vs {tokenSpend(otherSpend)} on the same judged turns
-        {cacheHits > 0 ? `; ${cacheHits.toLocaleString()} cache-served turns excluded` : ""}
+        {t("costComparisonDetail", { router: tokenSpend(routerSpend), other: tokenSpend(otherSpend) })}
+        {cacheHits > 0 ? t("cacheServedExcluded", { count: cacheHits.toLocaleString() }) : ""}
       </p>
     </div>
   );
@@ -224,23 +246,24 @@ const VerdictBar: React.FC<{ direction: ShadowEvalDirection; results: NonNullabl
   direction,
   results,
 }) => {
+  const t = useTranslations("costOptimization");
   const ties = results.overall_tie_rate_pct;
   const routerWins =
     direction === "reverse"
       ? Math.max(0, 100 - results.overall_shadow_win_rate_pct - ties)
       : results.overall_shadow_win_rate_pct;
   const segments = [
-    { label: "Router won", value: routerWins, fill: "bg-success" },
-    { label: "Tie", value: ties, fill: "bg-success/20" },
+    { label: t("routerWon"), value: routerWins, fill: "bg-success" },
+    { label: t("tie"), value: ties, fill: "bg-success/20" },
     {
-      label: `${otherArmLabel(direction)} won`,
+      label: t("otherWon", { arm: otherArmLabel(direction, t) }),
       value: Math.max(0, 100 - routerWins - ties),
       fill: "bg-muted-foreground/30",
     },
   ];
   return (
     <div className="space-y-2 border-b px-6 py-4">
-      <div className="flex h-2 w-full overflow-hidden rounded-full" role="img" aria-label="Verdict breakdown">
+      <div className="flex h-2 w-full overflow-hidden rounded-full" role="img" aria-label={t("verdictAria")}>
         {segments
           .filter((segment) => segment.value > 0)
           .map((segment) => (
@@ -260,13 +283,18 @@ const VerdictBar: React.FC<{ direction: ShadowEvalDirection; results: NonNullabl
 };
 
 const TargetTable: React.FC<{ job: ShadowEvalJob }> = ({ job }) => {
+  const t = useTranslations("costOptimization");
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Target</TableHead>
-          <TableHead>Status</TableHead>
-          {["Budget used", "Router wins", `${otherArmLabel(job.direction)} wins`].map((label) => (
+          <TableHead>{t("targetCol")}</TableHead>
+          <TableHead>{t("statusCol")}</TableHead>
+          {[
+            t("budgetUsedCol"),
+            t("sliceColRouterWins"),
+            t("sliceColOtherWins", { arm: otherArmLabel(job.direction, t) }),
+          ].map((label) => (
             <TableHead key={label} className="text-right">
               {label}
             </TableHead>
@@ -290,7 +318,10 @@ const TargetTable: React.FC<{ job: ShadowEvalJob }> = ({ job }) => {
               <TableCell className="text-right tabular-nums">
                 {target.max_budget != null
                   ? `${tokenSpend(target.spend ?? 0)} / ${tokenSpend(target.max_budget)}`
-                  : `${(target.attempt_count ?? slice?.turn_count ?? 0).toLocaleString()} / ${target.max_turns.toLocaleString()} turns`}
+                  : t("turnsOfTurns", {
+                      used: (target.attempt_count ?? slice?.turn_count ?? 0).toLocaleString(),
+                      max: target.max_turns.toLocaleString(),
+                    })}
               </TableCell>
               {slice ? (
                 <>
@@ -303,7 +334,7 @@ const TargetTable: React.FC<{ job: ShadowEvalJob }> = ({ job }) => {
                 </>
               ) : (
                 <TableCell colSpan={2} className="text-right text-muted-foreground">
-                  No verdicts yet
+                  {t("noVerdicts")}
                 </TableCell>
               )}
             </TableRow>
@@ -314,14 +345,15 @@ const TargetTable: React.FC<{ job: ShadowEvalJob }> = ({ job }) => {
   );
 };
 
-const emptyResultsText = (job: ShadowEvalJob, resultsError: boolean): string => {
-  if (resultsError) return "Results could not be loaded. Retrying.";
-  if (isActive(job)) return "Collecting verdicts. Results appear as sampled requests are judged.";
-  if (job.judged_count === 0) return "No verdicts were recorded for this job.";
-  return "Loading results...";
+const emptyResultsText = (job: ShadowEvalJob, resultsError: boolean, t: Translator): string => {
+  if (resultsError) return t("resultsLoadFailed");
+  if (isActive(job)) return t("collectingVerdicts");
+  if (job.judged_count === 0) return t("noVerdictsRecorded");
+  return t("loadingResults");
 };
 
 const ResultsBody: React.FC<{ job: ShadowEvalJob; resultsError?: boolean }> = ({ job, resultsError = false }) => {
+  const t = useTranslations("costOptimization");
   const results = job.results;
   const hasVerdicts = results != null && (results.by_tier.length > 0 || results.by_current_model.length > 0);
   return (
@@ -333,19 +365,21 @@ const ResultsBody: React.FC<{ job: ShadowEvalJob; resultsError?: boolean }> = ({
       )}
       {/* results == null re-stated for TS narrowing; hasVerdicts alone cannot narrow it */}
       {!hasVerdicts || results == null ? (
-        <p className="px-6 py-8 text-center text-sm text-muted-foreground">{emptyResultsText(job, resultsError)}</p>
+        <p className="px-6 py-8 text-center text-sm text-muted-foreground">
+          {emptyResultsText(job, resultsError, t)}
+        </p>
       ) : (
         <>
           <div className="flex flex-wrap border-b">
             <div className="flex min-w-[240px] flex-1 flex-col gap-1 px-6 py-4">
               <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                Router matched or beat {job.direction === "reverse" ? "the baseline" : "your current model"}
+                {job.direction === "reverse" ? t("matchedOrBeatBaseline") : t("matchedOrBeatCurrent")}
               </p>
               <p className="text-3xl font-semibold text-foreground">
                 {pct(routerMatchedOrBeatPct(job.direction, results))}
               </p>
               <p className="text-xs text-muted-foreground">
-                of {(job.judged_count ?? 0).toLocaleString()} judged responses
+                {t("ofJudgedResponses", { count: (job.judged_count ?? 0).toLocaleString() })}
               </p>
             </div>
             <CostComparison direction={job.direction} results={results} />
@@ -353,19 +387,19 @@ const ResultsBody: React.FC<{ job: ShadowEvalJob; resultsError?: boolean }> = ({
           <VerdictBar direction={job.direction} results={results} />
           {(results.by_router ?? []).length > 1 && (
             <div className="border-b">
-              <SliceTable groupHeader="Router" direction={job.direction} slices={results.by_router ?? []} />
+              <SliceTable groupHeader={t("groupRouter")} direction={job.direction} slices={results.by_router ?? []} />
             </div>
           )}
           {results.by_current_model.length > 0 && (
             <SliceTable
-              groupHeader={job.direction === "reverse" ? "Router pick" : "Compared against"}
+              groupHeader={job.direction === "reverse" ? t("groupRouterPick") : t("groupComparedAgainst")}
               direction={job.direction}
               slices={results.by_current_model}
             />
           )}
           {results.by_tier.length > 0 && (
             <div className={results.by_current_model.length > 0 ? "border-t" : ""}>
-              <SliceTable groupHeader="Prompt difficulty" direction={job.direction} slices={results.by_tier} />
+              <SliceTable groupHeader={t("groupPromptDifficulty")} direction={job.direction} slices={results.by_tier} />
             </div>
           )}
         </>
@@ -381,32 +415,38 @@ const JobResults: React.FC<{
   resultsError?: boolean;
   readOnly?: boolean;
 }> = ({ job, onStop, stopPending, resultsError = false, readOnly = false }) => {
+  const t = useTranslations("costOptimization");
   const active = isActive(job);
-  const remaining = endsIn(job.ends_at);
+  const remaining = endsIn(job.ends_at, t);
   return (
     <Card className="overflow-hidden py-0">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b px-6 py-4">
         <div className="flex items-center gap-3">
           <StatusBadge status={job.status} />
           <div>
-            <p className="text-sm font-medium text-foreground">{jobHeadline(job)}</p>
+            <p className="text-sm font-medium text-foreground">{jobHeadline(job, t)}</p>
             <p className="text-xs text-muted-foreground">
-              {(job.judged_count ?? 0).toLocaleString()} turns judged · {(job.error_count ?? 0).toLocaleString()}{" "}
-              errored · {tokenSpend(totalSpend(job))}
-              {totalBudget(job) !== null ? ` of ${tokenSpend(totalBudget(job) ?? 0)}` : ""} eval spend
+              {t("summaryTurnsJudged", { judged: (job.judged_count ?? 0).toLocaleString() })} ·{" "}
+              {t("summaryErrored", { count: (job.error_count ?? 0).toLocaleString() })} ·{" "}
+              {totalBudget(job) !== null
+                ? t("evalSpendOf", {
+                    spend: tokenSpend(totalSpend(job)),
+                    budget: tokenSpend(totalBudget(job) ?? 0),
+                  })
+                : t("evalSpend", { spend: tokenSpend(totalSpend(job)) })}
               {active && remaining ? ` · ${remaining}` : ""}
             </p>
           </div>
         </div>
         {active && !readOnly && (
           <Button variant="outline" size="sm" onClick={onStop} disabled={stopPending}>
-            {stopPending ? "Stopping..." : "Stop"}
+            {stopPending ? t("stopping") : t("stopBtn")}
           </Button>
         )}
       </div>
       {(job.error_count ?? 0) > 0 && job.last_error != null && (
         <p className="border-b bg-destructive/10 px-6 py-2 text-xs text-destructive">
-          Last failure: <span className="font-mono">{job.last_error}</span>
+          {t("lastFailure")}<span className="font-mono">{job.last_error}</span>
         </p>
       )}
       <ResultsBody job={job} resultsError={resultsError} />
@@ -414,13 +454,14 @@ const JobResults: React.FC<{
   );
 };
 
-const previousSummary = (job: ShadowEvalJob): string => {
+const previousSummary = (job: ShadowEvalJob, t: Translator): string => {
   const results = job.results;
   if (results) return pct(routerMatchedOrBeatPct(job.direction, results));
-  return job.judged_count === 0 ? "no verdicts" : "view results";
+  return job.judged_count === 0 ? t("previousSummaryNoVerdicts") : t("previousSummaryViewResults");
 };
 
 const PreviousJob: React.FC<{ job: ShadowEvalJob }> = ({ job }) => {
+  const t = useTranslations("costOptimization");
   const [expanded, setExpanded] = useState(false);
   const { data: detail, isError } = useShadowEvalJob(expanded ? job.job_id : null);
   const shown = detail ?? job;
@@ -435,15 +476,15 @@ const PreviousJob: React.FC<{ job: ShadowEvalJob }> = ({ job }) => {
         <div className="flex items-center gap-3">
           <StatusBadge status={shown.status} />
           <div>
-            <p className="text-sm font-medium text-foreground">{jobHeadline(shown)}</p>
+            <p className="text-sm font-medium text-foreground">{jobHeadline(shown, t)}</p>
             <p className="text-xs text-muted-foreground">
               {shown.judged_count != null &&
-                `${shown.judged_count.toLocaleString()} judged · ${(shown.error_count ?? 0).toLocaleString()} errored · ${tokenSpend(totalSpend(shown))} eval spend · `}
+                `${t("summaryTurnsJudged", { judged: shown.judged_count.toLocaleString() })} · ${t("summaryErrored", { count: (shown.error_count ?? 0).toLocaleString() })} · ${t("evalSpend", { spend: tokenSpend(totalSpend(shown)) })} · `}
               {new Date(shown.created_at).toLocaleDateString()}
             </p>
           </div>
         </div>
-        <span className="text-sm font-medium text-foreground">{previousSummary(shown)}</span>
+        <span className="text-sm font-medium text-foreground">{previousSummary(shown, t)}</span>
       </button>
       {expanded && (
         <div className="border-t">
@@ -455,6 +496,7 @@ const PreviousJob: React.FC<{ job: ShadowEvalJob }> = ({ job }) => {
 };
 
 const PreviousJobs: React.FC<{ jobs: readonly ShadowEvalJob[] }> = ({ jobs }) => {
+  const t = useTranslations("costOptimization");
   const [open, setOpen] = useState(false);
   if (jobs.length === 0) return null;
   return (
@@ -465,8 +507,8 @@ const PreviousJobs: React.FC<{ jobs: readonly ShadowEvalJob[] }> = ({ jobs }) =>
         onClick={() => setOpen((prev) => !prev)}
         className="flex w-full items-center justify-between gap-3 px-6 py-3 text-left hover:bg-muted/50"
       >
-        <span className="text-sm font-medium text-foreground">Previous evaluations ({jobs.length})</span>
-        <span className="text-xs text-muted-foreground">{open ? "Hide" : "Show"}</span>
+        <span className="text-sm font-medium text-foreground">{t("previousEvaluations", { count: jobs.length })}</span>
+        <span className="text-xs text-muted-foreground">{open ? t("hide") : t("show")}</span>
       </button>
       {open && (
         <div className="border-t">
@@ -495,6 +537,7 @@ const JobCard: React.FC<{ job: ShadowEvalJob; readOnly: boolean }> = ({ job, rea
 };
 
 const ShadowEvalSection: React.FC = () => {
+  const t = useTranslations("costOptimization");
   const { data: jobs, error, isPending } = useShadowEvalJobs();
   const { isViewOnly } = useAuthorized();
   const { showcased, listed } = useMemo(() => {
@@ -509,19 +552,13 @@ const ShadowEvalSection: React.FC = () => {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-baseline gap-2">
-        <h2 className="text-xl font-semibold text-foreground">Shadow eval</h2>
-        <p className="text-sm text-muted-foreground">
-          Blind-judge the auto-router on the real traffic of a key, team, or user (teams and users cover
-          JWT-authenticated traffic): against the models they use today before switching, or against a fixed baseline
-          after they have switched.
-        </p>
+        <h2 className="text-xl font-semibold text-foreground">{t("shadowEvalTitle")}</h2>
+        <p className="text-sm text-muted-foreground">{t("shadowEvalDescription")}</p>
       </div>
 
-      {error != null && (
-        <p className="text-sm text-destructive">Existing evaluations could not be loaded. Refresh the page to retry.</p>
-      )}
+      {error != null && <p className="text-sm text-destructive">{t("evaluationsLoadFailed")}</p>}
 
-      {isPending && error == null && <p className="text-sm text-muted-foreground">Loading evaluations...</p>}
+      {isPending && error == null && <p className="text-sm text-muted-foreground">{t("loadingEvaluations")}</p>}
 
       {showcased.map((job) => (
         <JobCard key={job.job_id} job={job} readOnly={isViewOnly} />

@@ -166,9 +166,22 @@ vi.mock("next-intl", async (importOriginal) => {
     return translator;
   };
 
+  // Real next-intl returns a referentially stable t per namespace, and components put t in
+  // useCallback/useMemo dependency arrays; the mock must cache one translator per namespace
+  // or every render would invalidate those callbacks and re-fire their effects.
+  const translatorCache = new Map<string, ReturnType<typeof createTranslator>>();
+  const stableUseTranslations = (namespace?: string): ReturnType<typeof createTranslator> => {
+    const key = namespace ?? "";
+    const cached = translatorCache.get(key);
+    if (cached) return cached;
+    const translator = createTranslator(key);
+    translatorCache.set(key, translator);
+    return translator;
+  };
+
   return {
     ...actual,
-    useTranslations: ((namespace?: string) => createTranslator(namespace ?? "")) as unknown as typeof actual.useTranslations,
+    useTranslations: stableUseTranslations as unknown as typeof actual.useTranslations,
   };
 });
 

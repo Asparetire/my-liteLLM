@@ -252,9 +252,9 @@ describe("ShadowEvalSection", () => {
     mockHooks({});
     render(<ShadowEvalSection />);
 
-    await user.click(screen.getByPlaceholderText("Search keys by alias"));
-    expect(await screen.findByText("Keys could not be loaded. Refresh the page to retry.")).toBeInTheDocument();
-    expect(screen.queryByText("No matching keys")).not.toBeInTheDocument();
+    await user.click(screen.getByPlaceholderText("按别名搜索密钥"));
+    expect(await screen.findByText("密钥加载失败，请刷新页面重试。")).toBeInTheDocument();
+    expect(screen.queryByText("没有匹配的密钥")).not.toBeInTheDocument();
     if (defaultKeysImpl) vi.mocked(useInfiniteKeys).mockImplementation(defaultKeysImpl);
   });
 
@@ -263,19 +263,19 @@ describe("ShadowEvalSection", () => {
     mockHooks({});
     render(<ShadowEvalSection />);
 
-    await user.click(screen.getByPlaceholderText("Select a judge model"));
-    expect(screen.getByRole("option", { name: /prod-judge.*Recommended/ })).toBeInTheDocument();
+    await user.click(screen.getByPlaceholderText("选择评审模型"));
+    expect(screen.getByRole("option", { name: /prod-judge.*推荐/ })).toBeInTheDocument();
     expect(screen.queryByRole("option", { name: /openai\/gpt-4o/ })).not.toBeInTheDocument();
 
     await user.keyboard("{Escape}");
     await chooseSelectOption(
       user,
-      screen.getByText("Adoption check: key's traffic vs the router"),
-      "Regression check: router's picks vs a baseline",
+      screen.getByText("采用检查：密钥流量对比路由"),
+      "回归检查：路由选择对比基线",
     );
-    await user.click(screen.getByPlaceholderText("Select a baseline model"));
+    await user.click(screen.getByPlaceholderText("选择基线模型"));
     expect(screen.getByRole("option", { name: "prod-judge", exact: true })).toBeInTheDocument();
-    expect(screen.queryByText("Recommended")).not.toBeInTheDocument();
+    expect(screen.queryByText("推荐")).not.toBeInTheDocument();
   });
 
   it("keeps custom models selectable through the real model hooks without widening chat choices to traffic filters", async () => {
@@ -308,27 +308,27 @@ describe("ShadowEvalSection", () => {
             <ShadowEvalSection />
           </QueryClientProvider>,
         );
-        await chooseSelectOption(user, screen.getByPlaceholderText("Every model the targets use"), "responses-only");
-        await chooseSelectOption(user, screen.getByPlaceholderText("Every model the targets use"), "custom-chat");
+        await chooseSelectOption(user, screen.getByPlaceholderText("目标使用的所有模型"), "responses-only");
+        await chooseSelectOption(user, screen.getByPlaceholderText("目标使用的所有模型"), "custom-chat");
         await chooseSelectOption(
           user,
-          screen.getByText("Adoption check: key's traffic vs the router"),
-          "Regression check: router's picks vs a baseline",
+          screen.getByText("采用检查：密钥流量对比路由"),
+          "回归检查：路由选择对比基线",
         );
-        await user.click(screen.getByPlaceholderText("Search keys by alias"));
+        await user.click(screen.getByPlaceholderText("按别名搜索密钥"));
         await user.click(within(await screen.findByTestId("paginated-multi-select-list")).getByText("prod-alpha"));
-        await chooseSelectOption(user, screen.getByPlaceholderText("Select up to 4 auto-routers"), "gpt-auto");
-        await user.click(screen.getByPlaceholderText("Select a judge model"));
+        await chooseSelectOption(user, screen.getByPlaceholderText("最多选择 4 个自动路由"), "gpt-auto");
+        await user.click(screen.getByPlaceholderText("选择评审模型"));
         expect(screen.getAllByRole("option")).toHaveLength(2);
         expect(screen.getByRole("option", { name: "custom-chat", exact: true })).toBeInTheDocument();
         expect(screen.getByRole("option", { name: "custom-judge", exact: true })).toBeInTheDocument();
         await user.click(screen.getByRole("option", { name: "custom-judge", exact: true }));
-        await user.click(screen.getByPlaceholderText("Select a baseline model"));
+        await user.click(screen.getByPlaceholderText("选择基线模型"));
         expect(screen.getAllByRole("option")).toHaveLength(2);
         expect(screen.getByRole("option", { name: "custom-chat", exact: true })).toBeInTheDocument();
         expect(screen.getByRole("option", { name: "custom-judge", exact: true })).toBeInTheDocument();
         await user.click(screen.getByRole("option", { name: "custom-chat", exact: true }));
-        await user.click(screen.getByText("Start shadow eval"));
+        await user.click(screen.getByText("开始评测"));
         expect(start.mutate).toHaveBeenCalledWith(
           expect.objectContaining({ judge_model: "custom-judge", baseline_model: "custom-chat", models: [] }),
         );
@@ -340,8 +340,8 @@ describe("ShadowEvalSection", () => {
   it("offers the start form while the list is still loading", () => {
     mockHooks({ isPending: true });
     render(<ShadowEvalSection />);
-    expect(screen.getByText("Loading evaluations...")).toBeInTheDocument();
-    expect(screen.getByText("Start a shadow eval")).toBeInTheDocument();
+    expect(screen.getByText("加载评测中...")).toBeInTheDocument();
+    expect(screen.getByText("发起影子评测")).toBeInTheDocument();
   });
 
   it("re-offers the start form when the polled detail sees the job finish before the list does", () => {
@@ -350,7 +350,7 @@ describe("ShadowEvalSection", () => {
       detailsById: { "job-1": job({ status: "completed" }) },
     });
     render(<ShadowEvalSection />);
-    expect(screen.getByText("Start a shadow eval")).toBeInTheDocument();
+    expect(screen.getByText("发起影子评测")).toBeInTheDocument();
   });
 
   it("gives every active job its own card with a stop button, with the form still offered", () => {
@@ -361,23 +361,23 @@ describe("ShadowEvalSection", () => {
       ],
     });
     render(<ShadowEvalSection />);
-    expect(screen.getAllByRole("button", { name: "Stop" })).toHaveLength(2);
-    expect(screen.getByText("Start a shadow eval")).toBeInTheDocument();
-    expect(screen.queryByText(/Previous evaluations/)).not.toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "停止" })).toHaveLength(2);
+    expect(screen.getByText("发起影子评测")).toBeInTheDocument();
+    expect(screen.queryByText(/历史评测/)).not.toBeInTheDocument();
   });
 
   it("renders the active card from the list row while its detail is still loading", () => {
     mockHooks({ jobs: [job({ status: "running" })], detailsById: {} });
     render(<ShadowEvalSection />);
-    expect(screen.getByRole("button", { name: "Stop" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "停止" })).toBeInTheDocument();
   });
 
   it("hides the start form and stop button from view-only admins", () => {
     authorizedRoleMock.mockReturnValue({ accessToken: "token", isViewOnly: true });
     mockHooks({ jobs: [job({ status: "running" })] });
     render(<ShadowEvalSection />);
-    expect(screen.queryByText("Start a shadow eval")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Stop" })).not.toBeInTheDocument();
+    expect(screen.queryByText("发起影子评测")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "停止" })).not.toBeInTheDocument();
     expect(screen.getByText("running")).toBeInTheDocument();
   });
 
@@ -392,17 +392,17 @@ describe("ShadowEvalSection", () => {
     };
     mockHooks({ jobs: [job({ status: "running" }), job(countlessListRow)] });
     render(<ShadowEvalSection />);
-    fireEvent.click(screen.getByRole("button", { name: /Previous evaluations/ }));
-    expect(screen.getByText("view results")).toBeInTheDocument();
-    expect(screen.queryByText("no verdicts")).not.toBeInTheDocument();
-    expect(screen.queryByText(/0 judged/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /历史评测/ }));
+    expect(screen.getByText("查看结果")).toBeInTheDocument();
+    expect(screen.queryByText("无判定结果")).not.toBeInTheDocument();
+    expect(screen.queryByText(/已判定 0 轮/)).not.toBeInTheDocument();
   });
 
   it("surfaces a non-403 list failure instead of posing as an empty state", () => {
     mockHooks({ error: new Error("boom") });
     render(<ShadowEvalSection />);
-    expect(screen.getByText(/Existing evaluations could not be loaded/)).toBeInTheDocument();
-    expect(screen.getByText("Start a shadow eval")).toBeInTheDocument();
+    expect(screen.getByText(/已有评测加载失败/)).toBeInTheDocument();
+    expect(screen.getByText("发起影子评测")).toBeInTheDocument();
   });
 
   it("shows a failure line instead of loading forever when the detail fetch errors", () => {
@@ -412,29 +412,29 @@ describe("ShadowEvalSection", () => {
       detailError: true,
     });
     render(<ShadowEvalSection />);
-    expect(screen.getByText(/Results could not be loaded/)).toBeInTheDocument();
-    expect(screen.queryByText("Loading results...")).not.toBeInTheDocument();
+    expect(screen.getByText(/结果加载失败/)).toBeInTheDocument();
+    expect(screen.queryByText("加载结果中...")).not.toBeInTheDocument();
   });
 
   it("shows the failure line over the collecting copy when an active job's detail errors", () => {
     mockHooks({ jobs: [job({ status: "running", results: null })], detailsById: {}, detailError: true });
     render(<ShadowEvalSection />);
-    expect(screen.getByText(/Results could not be loaded/)).toBeInTheDocument();
-    expect(screen.queryByText(/Collecting verdicts/)).not.toBeInTheDocument();
+    expect(screen.getByText(/结果加载失败/)).toBeInTheDocument();
+    expect(screen.queryByText(/正在收集判定结果/)).not.toBeInTheDocument();
   });
 
   it("never claims no verdicts for a judged job whose results have not loaded yet", () => {
     mockHooks({ jobs: [job({ status: "completed", judged_count: 12, results: null })], detailsById: {} });
     render(<ShadowEvalSection />);
-    expect(screen.getByText("Loading results...")).toBeInTheDocument();
-    expect(screen.queryByText(/No verdicts were recorded/)).not.toBeInTheDocument();
+    expect(screen.getByText("加载结果中...")).toBeInTheDocument();
+    expect(screen.queryByText(/没有记录任何判定结果/)).not.toBeInTheDocument();
   });
 
   it("shows the start form when there are no jobs", () => {
     mockHooks({});
     render(<ShadowEvalSection />);
-    expect(screen.getByText("Start a shadow eval")).toBeInTheDocument();
-    expect(screen.getByText("Start shadow eval")).toBeInTheDocument();
+    expect(screen.getByText("发起影子评测")).toBeInTheDocument();
+    expect(screen.getByText("开始评测")).toBeInTheDocument();
   });
 
   it("renders the latest job's results with the headline stat, verdict split, and both stratifications", () => {
@@ -442,11 +442,11 @@ describe("ShadowEvalSection", () => {
     mockHooks({ jobs: [j], detailsById: { "job-1": j } });
     render(<ShadowEvalSection />);
 
-    expect(screen.getByText("Router matched or beat your current model")).toBeInTheDocument();
+    expect(screen.getByText("路由持平或跑赢当前模型")).toBeInTheDocument();
     expect(screen.getByText("70.0%")).toBeInTheDocument();
-    expect(screen.getByText("of 42 judged responses")).toBeInTheDocument();
-    expect(screen.getByText(/Tie 22.0%/)).toBeInTheDocument();
-    expect(screen.getByText(/Current model won 30.0%/)).toBeInTheDocument();
+    expect(screen.getByText("（共 42 条已判定响应）")).toBeInTheDocument();
+    expect(screen.getByText(/平局 22.0%/)).toBeInTheDocument();
+    expect(screen.getByText(/当前模型 胜出 30.0%/)).toBeInTheDocument();
     expect(screen.getByText("gpt-4o")).toBeInTheDocument();
     expect(screen.getByText("SIMPLE")).toBeInTheDocument();
     expect(screen.getByText("REASONING")).toBeInTheDocument();
@@ -457,29 +457,29 @@ describe("ShadowEvalSection", () => {
     const j = job({ ends_at: new Date(Date.now() + 3 * 86_400_000).toISOString() });
     mockHooks({ jobs: [j], detailsById: { "job-1": j } });
     render(<ShadowEvalSection />);
-    expect(screen.getByText(/ends in 3 days/)).toBeInTheDocument();
+    expect(screen.getByText(/3 天后结束/)).toBeInTheDocument();
   });
 
   it("shows recorded eval spend against the job's token budget", () => {
     const j = job();
     mockHooks({ jobs: [j], detailsById: { "job-1": j } });
     render(<ShadowEvalSection />);
-    expect(screen.getByText(/3 tokens of 10 tokens eval spend/)).toBeInTheDocument();
+    expect(screen.getByText(/评测消耗 3 tokens，共 10 tokens/)).toBeInTheDocument();
   });
 
   it("shows spend without a budget cap for a job from before spend budgets existed", () => {
     const j = job({ targets: [targetEntry("hashed-key-abc", { max_budget: null, spend: 3.21 })] });
     mockHooks({ jobs: [j], detailsById: { "job-1": j } });
     render(<ShadowEvalSection />);
-    expect(screen.getByText(/3 tokens eval spend/)).toBeInTheDocument();
-    expect(screen.queryByText(/of \d+ tokens eval/)).not.toBeInTheDocument();
+    expect(screen.getByText(/评测消耗 3 tokens/)).toBeInTheDocument();
+    expect(screen.queryByText(/共 \d+ tokens/)).not.toBeInTheDocument();
   });
 
-  it("flags rows with fewer than 30 judged turns as low sample", () => {
+  it("flags rows with fewer than 3已判定 0 轮 turns as low sample", () => {
     const j = job();
     mockHooks({ jobs: [j], detailsById: { "job-1": j } });
     render(<ShadowEvalSection />);
-    expect(screen.getAllByText("(low sample)")).toHaveLength(1);
+    expect(screen.getAllByText("（样本量少）")).toHaveLength(1);
   });
 
   it("surfaces the last failure so a growing error_count is diagnosable", () => {
@@ -495,7 +495,7 @@ describe("ShadowEvalSection", () => {
     const { stop } = mockHooks({ jobs: [j], detailsById: { "job-1": j } });
     render(<ShadowEvalSection />);
 
-    await user.click(screen.getByText("Stop"));
+    await user.click(screen.getByText("停止"));
 
     expect(stop.mutate).toHaveBeenCalledWith("job-1");
   });
@@ -504,8 +504,8 @@ describe("ShadowEvalSection", () => {
     const done = job({ status: "completed" });
     mockHooks({ jobs: [done], detailsById: { "job-1": done } });
     render(<ShadowEvalSection />);
-    expect(screen.queryByText("Stop")).not.toBeInTheDocument();
-    expect(screen.getByText("Start a shadow eval")).toBeInTheDocument();
+    expect(screen.queryByText("停止")).not.toBeInTheDocument();
+    expect(screen.getByText("发起影子评测")).toBeInTheDocument();
   });
 
   it("renders nothing for non-admins when the proxy answers 403", () => {
@@ -519,22 +519,22 @@ describe("ShadowEvalSection", () => {
     const { start } = mockHooks({});
     render(<ShadowEvalSection />);
 
-    expect(screen.getByText("Start shadow eval")).toBeDisabled();
+    expect(screen.getByText("开始评测")).toBeDisabled();
 
-    const keyInput = screen.getByPlaceholderText("Search keys by alias");
+    const keyInput = screen.getByPlaceholderText("按别名搜索密钥");
     await user.click(keyInput);
     const keyList = await screen.findByTestId("paginated-multi-select-list");
     await user.click(within(keyList).getByText("prod-alpha"));
     await user.click(keyInput);
     await user.click(within(keyList).getByText("staging-beta"));
-    await chooseSelectOption(user, screen.getByPlaceholderText("Select up to 4 auto-routers"), "gpt-auto");
+    await chooseSelectOption(user, screen.getByPlaceholderText("最多选择 4 个自动路由"), "gpt-auto");
 
-    expect(screen.getByText("Start shadow eval")).toBeDisabled();
+    expect(screen.getByText("开始评测")).toBeDisabled();
 
-    await user.click(screen.getByPlaceholderText("Select a judge model"));
+    await user.click(screen.getByPlaceholderText("选择评审模型"));
     expect(screen.queryByRole("option", { name: /openai\/gpt-4o/ })).not.toBeInTheDocument();
     await user.click(await screen.findByRole("option", { name: /prod-judge/ }));
-    await user.click(screen.getByText("Start shadow eval"));
+    await user.click(screen.getByText("开始评测"));
 
     const expectedBody = {
       api_key_ids: ["hash-alpha", "hash-beta"],
@@ -556,15 +556,15 @@ describe("ShadowEvalSection", () => {
     const { start } = mockHooks({});
     render(<ShadowEvalSection />);
 
-    expect(screen.getByText("Start shadow eval")).toBeDisabled();
+    expect(screen.getByText("开始评测")).toBeDisabled();
 
-    await user.click(screen.getByPlaceholderText("Search teams by alias"));
+    await user.click(screen.getByPlaceholderText("按别名搜索团队"));
     const teamList = await screen.findByTestId("paginated-multi-select-list");
     await user.click(within(teamList).getByText("engineering"));
-    await chooseSelectOption(user, screen.getByPlaceholderText("Select up to 4 auto-routers"), "gpt-auto");
-    await user.click(screen.getByPlaceholderText("Select a judge model"));
+    await chooseSelectOption(user, screen.getByPlaceholderText("最多选择 4 个自动路由"), "gpt-auto");
+    await user.click(screen.getByPlaceholderText("选择评审模型"));
     await user.click(await screen.findByRole("option", { name: /prod-judge/ }));
-    await user.click(screen.getByText("Start shadow eval"));
+    await user.click(screen.getByText("开始评测"));
 
     const expectedBody = {
       api_key_ids: [],
@@ -586,14 +586,14 @@ describe("ShadowEvalSection", () => {
     const { start } = mockHooks({});
     render(<ShadowEvalSection />);
 
-    await user.click(screen.getByPlaceholderText("Search teams by alias"));
+    await user.click(screen.getByPlaceholderText("按别名搜索团队"));
     const teamList = await screen.findByTestId("paginated-multi-select-list");
     await user.click(within(teamList).getByText("engineering"));
-    await chooseSelectOption(user, screen.getByPlaceholderText("Every model the targets use"), "prod-claude");
-    await chooseSelectOption(user, screen.getByPlaceholderText("Select up to 4 auto-routers"), "gpt-auto");
-    await user.click(screen.getByPlaceholderText("Select a judge model"));
+    await chooseSelectOption(user, screen.getByPlaceholderText("目标使用的所有模型"), "prod-claude");
+    await chooseSelectOption(user, screen.getByPlaceholderText("最多选择 4 个自动路由"), "gpt-auto");
+    await user.click(screen.getByPlaceholderText("选择评审模型"));
     await user.click(await screen.findByRole("option", { name: /prod-judge/ }));
-    await user.click(screen.getByText("Start shadow eval"));
+    await user.click(screen.getByText("开始评测"));
 
     expect(start.mutate).toHaveBeenCalledWith(
       expect.objectContaining({ team_ids: ["team-eng"], models: ["prod-claude"] }),
@@ -602,7 +602,7 @@ describe("ShadowEvalSection", () => {
     const scoped = job({ models: ["prod-claude", "prod-haiku"] });
     mockHooks({ jobs: [scoped], detailsById: { "job-1": scoped } });
     render(<ShadowEvalSection />);
-    expect(screen.getByText("prod-claude, prod-haiku")).toBeInTheDocument();
+    expect(screen.getByText(/仅限模型 prod-claude, prod-haiku/)).toBeInTheDocument();
   });
 
   it("requires a baseline model in reverse mode and submits it, while forward mode never shows the picker", async () => {
@@ -610,28 +610,28 @@ describe("ShadowEvalSection", () => {
     const { start } = mockHooks({});
     render(<ShadowEvalSection />);
 
-    expect(screen.queryByPlaceholderText("Select a baseline model")).not.toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Every model the targets use")).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText("选择基线模型")).not.toBeInTheDocument();
+    expect(screen.getByPlaceholderText("目标使用的所有模型")).toBeInTheDocument();
 
     await chooseSelectOption(
       user,
-      screen.getByText("Adoption check: key's traffic vs the router"),
-      "Regression check: router's picks vs a baseline",
+      screen.getByText("采用检查：密钥流量对比路由"),
+      "回归检查：路由选择对比基线",
     );
-    expect(screen.queryByPlaceholderText("Every model the targets use")).not.toBeInTheDocument();
-    await user.click(screen.getByPlaceholderText("Search keys by alias"));
+    expect(screen.queryByPlaceholderText("目标使用的所有模型")).not.toBeInTheDocument();
+    await user.click(screen.getByPlaceholderText("按别名搜索密钥"));
     const keyList = await screen.findByTestId("paginated-multi-select-list");
     await user.click(within(keyList).getByText("prod-alpha"));
-    await chooseSelectOption(user, screen.getByPlaceholderText("Select up to 4 auto-routers"), "gpt-auto");
-    await user.click(screen.getByPlaceholderText("Select a judge model"));
+    await chooseSelectOption(user, screen.getByPlaceholderText("最多选择 4 个自动路由"), "gpt-auto");
+    await user.click(screen.getByPlaceholderText("选择评审模型"));
     await user.click(await screen.findByRole("option", { name: /prod-judge/ }));
 
-    expect(screen.getByText("Start shadow eval")).toBeDisabled();
+    expect(screen.getByText("开始评测")).toBeDisabled();
 
-    await user.click(screen.getByPlaceholderText("Select a baseline model"));
+    await user.click(screen.getByPlaceholderText("选择基线模型"));
     expect(screen.queryByRole("option", { name: /openai\/gpt-4o/ })).not.toBeInTheDocument();
     await user.click(screen.getByRole("option", { name: /prod-claude/ }));
-    await user.click(screen.getByText("Start shadow eval"));
+    await user.click(screen.getByText("开始评测"));
 
     const expectedBody = {
       api_key_ids: ["hash-alpha"],
@@ -654,20 +654,20 @@ describe("ShadowEvalSection", () => {
     const { start } = mockHooks({});
     render(<ShadowEvalSection />);
 
-    await user.click(screen.getByPlaceholderText("Search keys by alias"));
+    await user.click(screen.getByPlaceholderText("按别名搜索密钥"));
     const keyList = await screen.findByTestId("paginated-multi-select-list");
     await user.click(within(keyList).getByText("prod-alpha"));
-    const routerInput = screen.getByPlaceholderText("Select up to 4 auto-routers");
+    const routerInput = screen.getByPlaceholderText("最多选择 4 个自动路由");
     await user.click(routerInput);
     await user.click(await screen.findByText("gpt-auto"));
     await user.click(routerInput);
     await user.click(await screen.findByText("claude-auto"));
     expect(
-      screen.getByText("Every router sees the same sampled requests, judged against the same live responses"),
+      screen.getByText("每个路由看到相同的采样请求，并与相同的实时响应对比"),
     ).toBeInTheDocument();
-    await user.click(screen.getByPlaceholderText("Select a judge model"));
+    await user.click(screen.getByPlaceholderText("选择评审模型"));
     await user.click(await screen.findByRole("option", { name: /prod-judge/ }));
-    await user.click(screen.getByText("Start shadow eval"));
+    await user.click(screen.getByText("开始评测"));
 
     const expectedBody = {
       api_key_ids: ["hash-alpha"],
@@ -689,26 +689,26 @@ describe("ShadowEvalSection", () => {
     mockHooks({});
     render(<ShadowEvalSection />);
 
-    await user.click(screen.getByPlaceholderText("Search keys by alias"));
+    await user.click(screen.getByPlaceholderText("按别名搜索密钥"));
     const keyList = await screen.findByTestId("paginated-multi-select-list");
     await user.click(within(keyList).getByText("prod-alpha"));
-    const routerInput = screen.getByPlaceholderText("Select up to 4 auto-routers");
+    const routerInput = screen.getByPlaceholderText("最多选择 4 个自动路由");
     await user.click(routerInput);
     await user.click(await screen.findByText("gpt-auto"));
     await user.click(routerInput);
     await user.click(await screen.findByText("claude-auto"));
     await chooseSelectOption(
       user,
-      screen.getByText("Adoption check: key's traffic vs the router"),
-      "Regression check: router's picks vs a baseline",
+      screen.getByText("采用检查：密钥流量对比路由"),
+      "回归检查：路由选择对比基线",
     );
-    await user.click(screen.getByPlaceholderText("Select a judge model"));
+    await user.click(screen.getByPlaceholderText("选择评审模型"));
     await user.click(await screen.findByRole("option", { name: /prod-judge/ }));
-    await user.click(screen.getByPlaceholderText("Select a baseline model"));
+    await user.click(screen.getByPlaceholderText("选择基线模型"));
     await user.click(screen.getByRole("option", { name: /prod-claude/ }));
 
-    expect(screen.getByText("A regression check compares one router to its baseline")).toBeInTheDocument();
-    expect(screen.getByText("Start shadow eval")).toBeDisabled();
+    expect(screen.getByText("回归检查只对比一个路由与其基线")).toBeInTheDocument();
+    expect(screen.getByText("开始评测")).toBeDisabled();
   });
 
   it("renders a per-router comparison table only when the job ran several routers", () => {
@@ -731,14 +731,14 @@ describe("ShadowEvalSection", () => {
     mockHooks({ jobs: [multi], detailsById: { "job-1": multi } });
     render(<ShadowEvalSection />);
 
-    expect(screen.getByText("Router")).toBeInTheDocument();
+    expect(screen.getByText("路由")).toBeInTheDocument();
     const rows = screen.getAllByRole("row").map((row) => row.textContent ?? "");
     expect(rows.some((text) => text.includes("claude-auto") && text.includes("40.0%"))).toBe(true);
     expect(rows.some((text) => text.includes("gpt-auto") && text.includes("70.0%"))).toBe(true);
     expect(
       screen.getByText(
         (_, element) =>
-          element?.textContent === "Shadowing 10% of prod-alpha traffic via claude-auto, gpt-auto" &&
+          element?.textContent === "通过 claude-auto, gpt-auto 影子采样 prod-alpha 流量的 10%" &&
           element.tagName === "P",
       ),
     ).toBeInTheDocument();
@@ -752,7 +752,7 @@ describe("ShadowEvalSection", () => {
     expect(
       screen.getByText(
         (_, element) =>
-          element?.textContent === "Shadowing 10% of prod-alpha traffic via claude-auto" && element.tagName === "P",
+          element?.textContent === "通过 claude-auto 影子采样 prod-alpha 流量的 10%" && element.tagName === "P",
       ),
     ).toBeInTheDocument();
   });
@@ -763,7 +763,7 @@ describe("ShadowEvalSection", () => {
     mockHooks({ jobs: [single], detailsById: { "job-1": single } });
     render(<ShadowEvalSection />);
 
-    expect(screen.queryByText("Router")).not.toBeInTheDocument();
+    expect(screen.queryByText("路由")).not.toBeInTheDocument();
   });
 
   it("flips the arm labels and headline for a reverse job's results", () => {
@@ -773,17 +773,17 @@ describe("ShadowEvalSection", () => {
 
     expect(
       screen.getByText(
-        (_, element) => element?.textContent === "Comparing claude-auto to openai/gpt-4o on 10% of prod-alpha traffic",
+        (_, element) => element?.textContent === "对比 claude-auto 与 openai/gpt-4o，采样 prod-alpha 流量的 10%",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByText("Router matched or beat the baseline")).toBeInTheDocument();
+    expect(screen.getByText("路由持平或跑赢基线")).toBeInTheDocument();
     expect(screen.getByText("52.0%")).toBeInTheDocument();
-    expect(screen.getByText(/Router won 30.0%/)).toBeInTheDocument();
-    expect(screen.getByText(/Baseline won 48.0%/)).toBeInTheDocument();
-    expect(screen.getAllByText("Baseline wins")).toHaveLength(2);
-    expect(screen.getByText("Router pick")).toBeInTheDocument();
-    expect(screen.queryByText(/Current model/)).not.toBeInTheDocument();
-    expect(screen.queryByText("Compared against")).not.toBeInTheDocument();
+    expect(screen.getByText(/路由胜出 30.0%/)).toBeInTheDocument();
+    expect(screen.getByText(/基线模型 胜出 48.0%/)).toBeInTheDocument();
+    expect(screen.getAllByText("基线模型 胜出")).toHaveLength(2);
+    expect(screen.getByText("路由选择")).toBeInTheDocument();
+    expect(screen.queryByText(/当前模型/)).not.toBeInTheDocument();
+    expect(screen.queryByText("对比对象")).not.toBeInTheDocument();
   });
 
   it("labels the shadowed key by alias, then masked name, then truncated hash", () => {
@@ -843,11 +843,11 @@ describe("ShadowEvalSection", () => {
 
     expect(within(hungry).getByText("running")).toBeInTheDocument();
     expect(within(hungry).getByText("0 tokens / 5 tokens")).toBeInTheDocument();
-    expect(within(hungry).getByText("No verdicts yet")).toBeInTheDocument();
+    expect(within(hungry).getByText("还没有判定结果")).toBeInTheDocument();
 
-    expect(screen.getByText(/205 turns judged/)).toBeInTheDocument();
-    expect(screen.getByText(/Shadowing 10% of/)).toBeInTheDocument();
-    expect(screen.getByText("2 targets")).toBeInTheDocument();
+    expect(screen.getByText(/已判定 205 轮/)).toBeInTheDocument();
+    expect(screen.getByText(/影子采样/)).toBeInTheDocument();
+    expect(screen.getByText(/2 个目标/)).toBeInTheDocument();
   });
 
   it("reads a key that spent its budget as completed even before the sweep stamps it", () => {
@@ -870,7 +870,7 @@ describe("ShadowEvalSection", () => {
     expect(within(spent).getByText("completed")).toBeInTheDocument();
     expect(within(spent).getByText("2 tokens / 2 tokens")).toBeInTheDocument();
     expect(within(hungry).getByText("running")).toBeInTheDocument();
-    expect(within(hungry).getByText("3 / 500 turns")).toBeInTheDocument();
+    expect(within(hungry).getByText("3 / 500 轮")).toBeInTheDocument();
   });
 
   it("shows the per-key table while a multi-key job is still collecting, before any verdicts exist", () => {
@@ -892,9 +892,9 @@ describe("ShadowEvalSection", () => {
     if (!spent) throw new Error("expected a per-key row before verdicts exist");
     expect(within(spent).getByText("completed")).toBeInTheDocument();
     expect(within(spent).getByText("1 tokens / 1 tokens")).toBeInTheDocument();
-    expect(screen.getByText("Budget used")).toBeInTheDocument();
-    expect(screen.queryByText("Judged turns")).not.toBeInTheDocument();
-    expect(screen.getByText(/Collecting verdicts/)).toBeInTheDocument();
+    expect(screen.getByText("已用预算")).toBeInTheDocument();
+    expect(screen.queryByText("判定轮数")).not.toBeInTheDocument();
+    expect(screen.getByText(/正在收集判定结果/)).toBeInTheDocument();
   });
 
   it("reads every key as completed once the job's window closes, whatever its own stop state", () => {
@@ -921,12 +921,12 @@ describe("ShadowEvalSection", () => {
     const j = job({});
     mockHooks({ jobs: [j], detailsById: { "job-1": j } });
     render(<ShadowEvalSection />);
-    expect(screen.getByText("Router cost vs your current model")).toBeInTheDocument();
+    expect(screen.getByText("路由消耗对比当前模型")).toBeInTheDocument();
     expect(screen.getByText("-50.0%")).toBeInTheDocument();
     expect(
-      screen.getByText("0 tokens vs 1 tokens on the same judged turns; 2 cache-served turns excluded"),
+      screen.getByText("相同判定轮上 0 tokens 对比 1 tokens；2 轮由缓存服务，已排除"),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("Router cost").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("路由消耗").length).toBeGreaterThan(0);
   });
 
   it("hides the cost tile when either arm has no measured spend, so a pre-measurement job never reads as a free incumbent", () => {
@@ -939,16 +939,16 @@ describe("ShadowEvalSection", () => {
     };
     mockHooks({ jobs: [legacy], detailsById: { "job-1": legacy } });
     render(<ShadowEvalSection />);
-    expect(screen.queryByText(/Router cost vs/)).not.toBeInTheDocument();
-    expect(screen.getByText("Router matched or beat your current model")).toBeInTheDocument();
+    expect(screen.queryByText(/路由消耗对比/)).not.toBeInTheDocument();
+    expect(screen.getByText("路由持平或跑赢当前模型")).toBeInTheDocument();
   });
 
   it("flips the cost comparison arms for a reverse job", () => {
     const reverse = job({ direction: "reverse", baseline_model: "gpt-4o-mini" });
     mockHooks({ jobs: [reverse], detailsById: { "job-1": reverse } });
     render(<ShadowEvalSection />);
-    expect(screen.getByText("Router cost vs the baseline")).toBeInTheDocument();
-    expect(screen.getByText(/1 tokens vs 0 tokens on the same judged turns/)).toBeInTheDocument();
+    expect(screen.getByText("路由消耗对比基线")).toBeInTheDocument();
+    expect(screen.getByText(/相同判定轮上 1 tokens 对比 0 tokens/)).toBeInTheDocument();
     expect(screen.getByText("+100.0%")).toBeInTheDocument();
   });
 
@@ -968,9 +968,9 @@ describe("ShadowEvalSection", () => {
 
     expect(screen.queryByText("SIMPLE")).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /Previous evaluations \(1\)/ }));
-    expect(screen.getByText("view results")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: /10% of prod-alpha traffic via claude-auto/ }));
+    await user.click(screen.getByRole("button", { name: /历史评测（1）/ }));
+    expect(screen.getByText("查看结果")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /通过 claude-auto 影子采样 prod-alpha 流量的 10%/ }));
 
     expect(await screen.findByText("SIMPLE")).toBeInTheDocument();
     expect(screen.getByText("REASONING")).toBeInTheDocument();

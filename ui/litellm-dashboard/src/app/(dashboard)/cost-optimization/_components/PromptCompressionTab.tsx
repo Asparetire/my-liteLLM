@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CircleHelp } from "lucide-react";
 import { z } from "zod/v4";
+import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createGuardrailCall, getGuardrailsList } from "@/components/networking";
@@ -26,11 +27,12 @@ interface PromptCompressionTabProps {
   accessToken: string | null;
 }
 
-const compressionSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  apiBase: z.string().min(1, "API base is required"),
-  defaultOn: z.boolean(),
-});
+const buildCompressionSchema = (messages: { nameRequired: string; apiBaseRequired: string }) =>
+  z.object({
+    name: z.string().min(1, messages.nameRequired),
+    apiBase: z.string().min(1, messages.apiBaseRequired),
+    defaultOn: z.boolean(),
+  });
 
 type CompressionFormValues = z.infer<typeof compressionSchema>;
 
@@ -51,6 +53,12 @@ const labelWithHint = (label: string, hint: string): React.ReactNode => (
 );
 
 const PromptCompressionTab: React.FC<PromptCompressionTabProps> = ({ accessToken }) => {
+  const t = useTranslations("costOptimization");
+  const tCommon = useTranslations("common");
+  const compressionSchema = useMemo(
+    () => buildCompressionSchema({ nameRequired: t("nameRequired"), apiBaseRequired: t("apiBaseRequired") }),
+    [t],
+  );
   const form = useZodForm(compressionSchema, { defaultValues: EMPTY_VALUES });
   const [guardrails, setGuardrails] = useState<GuardrailListItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -64,10 +72,10 @@ const PromptCompressionTab: React.FC<PromptCompressionTabProps> = ({ accessToken
       .then((response) => setGuardrails(compressionGuardrailsOf(response as GuardrailListResponse)))
       .catch((error) => {
         console.error("Failed to load compression guardrails:", error);
-        toast.fromError("Failed to load compression guardrails");
+        toast.fromError(t("loadFailed"));
       })
       .finally(() => setIsLoading(false));
-  }, [accessToken]);
+  }, [accessToken, t]);
 
   useEffect(() => {
     loadGuardrails();
@@ -87,12 +95,12 @@ const PromptCompressionTab: React.FC<PromptCompressionTabProps> = ({ accessToken
           defaultOn: values.defaultOn ?? true,
         }),
       );
-      toast.success("Compression guardrail created");
+      toast.success(t("createdToast"));
       form.reset(EMPTY_VALUES);
       await loadGuardrails();
     } catch (error) {
       console.error("Failed to create compression guardrail:", error);
-      toast.fromError("Failed to create compression guardrail");
+      toast.fromError(t("createFailedToast"));
     } finally {
       setIsSaving(false);
     }
@@ -102,26 +110,26 @@ const PromptCompressionTab: React.FC<PromptCompressionTabProps> = ({ accessToken
     <div className="w-full space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Headroom prompt compression</CardTitle>
+          <CardTitle>{t("headroomTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="mb-4 text-sm text-muted-foreground">
-            Headroom is a native LiteLLM guardrail that compresses your prompts before they reach the model, so you pay
-            for fewer input tokens. The tokens it removes are priced and shown on the Usage tab as compression savings.{" "}
-            <a
-              href="https://docs.litellm.ai/docs/proxy/headroom"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-info underline"
-            >
-              Headroom setup docs
-            </a>
+            {t.rich("headroomDescription", {
+              link: (chunks) => (
+                <a
+                  href="https://docs.litellm.ai/docs/proxy/headroom"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-info underline"
+                >
+                  {chunks}
+                </a>
+              ),
+            })}
           </p>
-          {isLoading && <p className="text-sm text-muted-foreground">Loading...</p>}
+          {isLoading && <p className="text-sm text-muted-foreground">{tCommon("loading")}</p>}
           {!isLoading && guardrails.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              No prompt compression guardrails configured yet. Add one below to start saving on input tokens
-            </p>
+            <p className="text-sm text-muted-foreground">{t("emptyGuardrails")}</p>
           )}
           {!isLoading && guardrails.length > 0 && (
             <ul className="divide-y divide-border">
@@ -138,7 +146,7 @@ const PromptCompressionTab: React.FC<PromptCompressionTabProps> = ({ accessToken
                         : "bg-muted text-muted-foreground"
                     }`}
                   >
-                    {guardrail.litellm_params?.default_on ? "Always on" : "Opt-in"}
+                    {guardrail.litellm_params?.default_on ? t("alwaysOn") : t("optIn")}
                   </span>
                 </li>
               ))}
@@ -149,27 +157,24 @@ const PromptCompressionTab: React.FC<PromptCompressionTabProps> = ({ accessToken
 
       <Card>
         <CardHeader>
-          <CardTitle>Add Headroom compression guardrail</CardTitle>
+          <CardTitle>{t("addTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <TooltipProvider>
             <form onSubmit={form.handleSubmit(handleAdd)} noValidate>
               <FieldGroup>
-                <FormField control={form.control} name="name" label="Name">
+                <FormField control={form.control} name="name" label={t("nameLabel")}>
                   {({ ref, ...field }) => <Input {...field} ref={ref} placeholder="headroom-compression" />}
                 </FormField>
                 <FormField
                   control={form.control}
                   name="apiBase"
-                  label={labelWithHint(
-                    "Headroom API base",
-                    "Base URL of your Headroom compression service (LiteLLM calls its /v1/compress endpoint)",
-                  )}
-                  description="The URL where your Headroom compression service is hosted"
+                  label={labelWithHint(t("apiBaseLabel"), t("apiBaseHint"))}
+                  description={t("apiBaseDescription")}
                 >
                   {({ ref, ...field }) => <Input {...field} ref={ref} placeholder="https://your-headroom-endpoint" />}
                 </FormField>
-                <FormField control={form.control} name="defaultOn" label="Apply to all requests">
+                <FormField control={form.control} name="defaultOn" label={t("applyAllLabel")}>
                   {({ value, onChange, ref: _ref, ...field }) => (
                     <Switch
                       {...field}
@@ -183,22 +188,24 @@ const PromptCompressionTab: React.FC<PromptCompressionTabProps> = ({ accessToken
               </FieldGroup>
               <div className="mt-6 mb-4 rounded-lg border border-warning/20 bg-warning/10 p-3">
                 <p className="text-sm text-warning">
-                  Applying compression to all requests is available to all users. Enabling it selectively per key or
-                  team is a LiteLLM Enterprise feature. Get a trial key{" "}
-                  <a
-                    href="https://www.litellm.ai/#pricing"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                  >
-                    here
-                  </a>
+                  {t.rich("enterpriseNotice", {
+                    link: (chunks) => (
+                      <a
+                        href="https://www.litellm.ai/#pricing"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        {chunks}
+                      </a>
+                    ),
+                  })}
                 </p>
               </div>
               <div className="flex justify-end">
                 <Button type="submit" disabled={isSaving}>
                   {isSaving && <UiLoadingSpinner className="size-4" />}
-                  Add guardrail
+                  {t("addGuardrailBtn")}
                 </Button>
               </div>
             </form>
