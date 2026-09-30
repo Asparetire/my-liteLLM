@@ -2,6 +2,8 @@
  * Formatted view of tool definition with parameters table and call data
  */
 
+import { useTranslations } from "next-intl";
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ParsedTool, ParameterRow } from "./types";
 
@@ -10,6 +12,7 @@ interface FormattedToolViewProps {
 }
 
 export function FormattedToolView({ tool }: FormattedToolViewProps) {
+  const t = useTranslations("logs");
   // Parse parameters for table display
   const parameterRows: ParameterRow[] = Object.entries(tool.parameters?.properties || {}).map(
     ([name, schema]: [string, any]) => ({
@@ -33,13 +36,13 @@ export function FormattedToolView({ tool }: FormattedToolViewProps) {
       {/* Parameters Table */}
       {parameterRows.length > 0 && (
         <div>
-          <span className="mb-2 block text-xs text-muted-foreground">Parameters</span>
+          <span className="mb-2 block text-xs text-muted-foreground">{t("tsParametersLabel")}</span>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Parameter</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Description</TableHead>
+                <TableHead>{t("tsThParameter")}</TableHead>
+                <TableHead>{t("tsThType")}</TableHead>
+                <TableHead>{t("tsThDescription")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -67,7 +70,7 @@ export function FormattedToolView({ tool }: FormattedToolViewProps) {
       {/* If tool was called, show the arguments used */}
       {tool.called && tool.callData && (
         <div className="mt-4">
-          <span className="mb-2 block text-xs text-muted-foreground">Called With</span>
+          <span className="mb-2 block text-xs text-muted-foreground">{t("tsCalledWith")}</span>
           <div className="rounded border border-success/30 bg-success/10 p-3">
             <pre className="m-0 whitespace-pre-wrap break-words text-xs text-foreground">
               {JSON.stringify(tool.callData.arguments, null, 2)}

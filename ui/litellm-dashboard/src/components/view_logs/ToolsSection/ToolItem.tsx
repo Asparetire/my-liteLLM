@@ -3,6 +3,7 @@
  */
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronDown, ChevronRight, Wrench } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/cva.config";
@@ -14,6 +15,7 @@ interface ToolItemProps {
 }
 
 export function ToolItem({ tool }: ToolItemProps) {
+  const t = useTranslations("logs");
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -34,7 +36,7 @@ export function ToolItem({ tool }: ToolItemProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Badge variant={tool.called ? "default" : "secondary"}>{tool.called ? "called" : "not called"}</Badge>
+          <Badge variant={tool.called ? "default" : "secondary"}>{tool.called ? t("tsCalled") : t("tsNotCalled")}</Badge>
           {expanded ? (
             <ChevronDown className="size-3 text-muted-foreground" />
           ) : (

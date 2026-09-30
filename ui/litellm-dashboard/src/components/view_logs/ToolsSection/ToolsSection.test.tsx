@@ -158,8 +158,8 @@ describe("ToolsSection rendering", () => {
   it("summarises how many tools were provided and called", () => {
     render(<ToolsSection log={logWithTools(["get_weather", "search_web"], "get_weather")} />);
 
-    expect(screen.getByText("Tools")).toBeInTheDocument();
-    expect(screen.getByText("2 provided, 1 called")).toBeInTheDocument();
+    expect(screen.getByText("工具")).toBeInTheDocument();
+    expect(screen.getByText("提供 2 个，已调用 1 个")).toBeInTheDocument();
   });
 
   it("previews the first two tool names", () => {
@@ -177,25 +177,25 @@ describe("ToolsSection rendering", () => {
   it("reveals the tool list only after the section is expanded", async () => {
     render(<ToolsSection log={logWithTools(["get_weather", "search_web"], "get_weather")} />);
 
-    expect(isShown("called")).toBe(false);
-    expect(isShown("not called")).toBe(false);
+    expect(isShown("已调用")).toBe(false);
+    expect(isShown("未调用")).toBe(false);
 
-    await userEvent.click(screen.getByText("Tools"));
+    await userEvent.click(screen.getByText("工具"));
 
-    await waitFor(() => expect(isShown("called")).toBe(true));
-    expect(isShown("not called")).toBe(true);
+    await waitFor(() => expect(isShown("已调用")).toBe(true));
+    expect(isShown("未调用")).toBe(true);
   });
 
   it("keeps a tool's expanded detail across a close and reopen", async () => {
     render(<ToolsSection log={logWithTools(["get_weather", "search_web"], "get_weather")} />);
 
-    await userEvent.click(screen.getByText("Tools"));
+    await userEvent.click(screen.getByText("工具"));
     await userEvent.click(await screen.findByText(/1\. get_weather/));
-    expect(isShown("Description")).toBe(true);
+    expect(isShown("描述")).toBe(true);
 
-    await userEvent.click(screen.getByText("Tools"));
-    await userEvent.click(screen.getByText("Tools"));
+    await userEvent.click(screen.getByText("工具"));
+    await userEvent.click(screen.getByText("工具"));
 
-    await waitFor(() => expect(isShown("Description")).toBe(true));
+    await waitFor(() => expect(isShown("描述")).toBe(true));
   });
 });

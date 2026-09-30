@@ -4,6 +4,7 @@
  */
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { LogEntry } from "../columns";
@@ -15,6 +16,7 @@ interface ToolsSectionProps {
 }
 
 export function ToolsSection({ log }: ToolsSectionProps) {
+  const t = useTranslations("logs");
   const [open, setOpen] = useState(false);
   const tools = parseToolsFromLog(log);
 
@@ -42,9 +44,9 @@ export function ToolsSection({ log }: ToolsSectionProps) {
             <ChevronRight className="size-3.5 shrink-0 text-muted-foreground" />
           )}
           <div className="flex flex-wrap items-center gap-3">
-            <h3 className="text-lg font-medium text-foreground">Tools</h3>
+            <h3 className="text-lg font-medium text-foreground">{t("tsTitle")}</h3>
             <span className="text-sm text-muted-foreground">
-              {totalTools} provided, {calledTools} called
+              {t("tsSummary", { total: totalTools, called: calledTools })}
             </span>
             <span className="text-sm text-muted-foreground">
               • {toolNamePreview}
