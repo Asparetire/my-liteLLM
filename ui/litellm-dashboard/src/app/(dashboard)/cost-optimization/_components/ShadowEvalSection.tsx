@@ -105,7 +105,7 @@ const monoChunk = (chunks: React.ReactNode): React.ReactNode => <span className=
 const jobHeadline = (job: ShadowEvalJob, t: Translator): React.ReactNode => {
   const comparingParams = {
     router: jobRouters(job),
-    baseline: job.baseline_model,
+    baseline: job.baseline_model ?? "—",
     pct: job.shadow_percentage,
     targets: shadowedTargetsLabel(job, t),
     mono: monoChunk,

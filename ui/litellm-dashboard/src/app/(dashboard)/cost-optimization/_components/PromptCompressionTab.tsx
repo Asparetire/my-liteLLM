@@ -34,6 +34,14 @@ const buildCompressionSchema = (messages: { nameRequired: string; apiBaseRequire
     defaultOn: z.boolean(),
   });
 
+// Module-level schema for type inference only; the runtime schema comes from
+// buildCompressionSchema so zod error messages can be translated.
+const compressionSchema = z.object({
+  name: z.string(),
+  apiBase: z.string(),
+  defaultOn: z.boolean(),
+});
+
 type CompressionFormValues = z.infer<typeof compressionSchema>;
 
 const EMPTY_VALUES: CompressionFormValues = {
