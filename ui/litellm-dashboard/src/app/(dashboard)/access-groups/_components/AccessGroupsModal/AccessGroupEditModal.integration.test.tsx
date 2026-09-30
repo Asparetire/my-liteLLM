@@ -55,7 +55,7 @@ const accessGroup: AccessGroupResponse = {
 const renderModal = (data: AccessGroupResponse = accessGroup) =>
   renderWithProviders(<AccessGroupEditModal visible accessGroup={data} onCancel={vi.fn()} />);
 
-const save = async (user: User) => user.click(screen.getByRole("button", { name: "Save Changes" }));
+const save = async (user: User) => user.click(screen.getByRole("button", { name: "保存更改" }));
 
 const variables = () => mutate.mock.calls.at(-1)?.[0] as { accessGroupId: string; params: Record<string, unknown> };
 
@@ -89,9 +89,9 @@ describe("AccessGroupEditModal submit payload", () => {
     renderModal();
     await screen.findByDisplayValue("Engineering");
 
-    await user.click(screen.getByRole("tab", { name: /MCP Servers/ }));
-    await user.click(screen.getByRole("tab", { name: /Agents/ }));
-    await user.click(screen.getByRole("tab", { name: /General Info/ }));
+    await user.click(screen.getByRole("tab", { name: /MCP 服务器/ }));
+    await user.click(screen.getByRole("tab", { name: /智能体/ }));
+    await user.click(screen.getByRole("tab", { name: /基本信息/ }));
     await save(user);
 
     await waitFor(() => expect(mutate).toHaveBeenCalled());
@@ -150,7 +150,7 @@ describe("AccessGroupEditModal submit payload", () => {
     await user.clear(nameInput);
     await save(user);
 
-    expect(await screen.findByText("Please enter the access group name")).toBeInTheDocument();
+    expect(await screen.findByText("请输入访问组名称")).toBeInTheDocument();
     expect(mutate).not.toHaveBeenCalled();
   });
 
@@ -169,7 +169,7 @@ describe("AccessGroupEditModal submit payload", () => {
     renderModal({ ...accessGroup, access_model_names: [] });
     await screen.findByDisplayValue("Engineering");
 
-    await user.click(screen.getByRole("tab", { name: /Models/ }));
+    await user.click(screen.getByRole("tab", { name: /模型/ }));
     await user.click(await screen.findByLabelText("model-select"));
     await save(user);
 

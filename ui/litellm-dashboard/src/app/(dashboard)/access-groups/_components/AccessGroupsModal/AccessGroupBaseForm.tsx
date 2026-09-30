@@ -1,6 +1,7 @@
 "use client";
 
 import { BotIcon, InfoIcon, LayersIcon, ServerIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod/v4";
 
@@ -14,13 +15,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 
-export const accessGroupFormSchema = z.object({
-  name: z.string().min(1, "Please enter the access group name"),
+// Module-level schema for type inference only; the runtime schema comes from
+// buildAccessGroupFormSchema so the zod error message can be translated.
+const accessGroupFormShape = {
+  name: z.string(),
   description: z.string(),
   modelIds: z.array(z.string()),
   mcpServerIds: z.array(z.string()),
   agentIds: z.array(z.string()),
-});
+};
+
+const accessGroupFormSchema = z.object(accessGroupFormShape);
+
+export const buildAccessGroupFormSchema = (messages: { nameRequired: string }) => {
+  const shape = { ...accessGroupFormShape, name: z.string().min(1, messages.nameRequired) };
+  return z.object(shape);
+};
 
 export type AccessGroupFormValues = z.output<typeof accessGroupFormSchema>;
 
@@ -89,6 +99,7 @@ export function AccessGroupBaseForm({
   activeTab,
   onTabChange,
 }: AccessGroupBaseFormProps) {
+  const t = useTranslations("accessGroups");
   const { data: agentsData } = useAgents();
   const { data: mcpServersData } = useMCPServers();
 
@@ -106,52 +117,52 @@ export function AccessGroupBaseForm({
       <TabsList className="w-full">
         <TabsTrigger value={GENERAL_TAB}>
           <InfoIcon size={16} />
-          General Info
+          {t("tabGeneral")}
         </TabsTrigger>
         <TabsTrigger value={MODELS_TAB}>
           <LayersIcon size={16} />
-          Models
+          {t("tabModels")}
         </TabsTrigger>
         <TabsTrigger value={MCP_SERVERS_TAB}>
           <ServerIcon size={16} />
-          MCP Servers
+          {t("tabMcpServers")}
         </TabsTrigger>
         <TabsTrigger value={AGENTS_TAB}>
           <BotIcon size={16} />
-          Agents
+          {t("tabAgents")}
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value={GENERAL_TAB} className="pt-4">
         <FieldGroup>
-          <FormField control={form.control} name="name" label="Group Name">
+          <FormField control={form.control} name="name" label={t("groupName")}>
             {({ ref, ...field }) => (
-              <Input {...field} ref={ref} placeholder="e.g. Engineering Team" disabled={isNameDisabled} />
+              <Input {...field} ref={ref} placeholder={t("groupNamePlaceholder")} disabled={isNameDisabled} />
             )}
           </FormField>
-          <FormField control={form.control} name="description" label="Description">
+          <FormField control={form.control} name="description" label={t("description")}>
             {({ ref, ...field }) => (
-              <Textarea {...field} ref={ref} rows={4} placeholder="Describe the purpose of this access group..." />
+              <Textarea {...field} ref={ref} rows={4} placeholder={t("descriptionPlaceholder")} />
             )}
           </FormField>
         </FieldGroup>
       </TabsContent>
 
       <TabsContent value={MODELS_TAB} className="pt-4">
-        <FormField control={form.control} name="modelIds" label="Allowed Models">
+        <FormField control={form.control} name="modelIds" label={t("allowedModels")}>
           {(field) => <ModelSelect context="global" value={field.value} onChange={field.onChange} />}
         </FormField>
       </TabsContent>
 
       <TabsContent value={MCP_SERVERS_TAB} className="pt-4">
-        <FormField control={form.control} name="mcpServerIds" label="Allowed MCP Servers">
+        <FormField control={form.control} name="mcpServerIds" label={t("allowedMcpServers")}>
           {({ id, value, onChange, "aria-invalid": ariaInvalid, "aria-describedby": ariaDescribedBy }) => (
             <MultiSelect
               id={id}
               value={value}
               onChange={onChange}
               options={mcpServerOptions}
-              placeholder="Select MCP servers"
+              placeholder={t("selectMcpServers")}
               aria-invalid={ariaInvalid}
               aria-describedby={ariaDescribedBy}
             />
@@ -160,14 +171,14 @@ export function AccessGroupBaseForm({
       </TabsContent>
 
       <TabsContent value={AGENTS_TAB} className="pt-4">
-        <FormField control={form.control} name="agentIds" label="Allowed Agents">
+        <FormField control={form.control} name="agentIds" label={t("allowedAgents")}>
           {({ id, value, onChange, "aria-invalid": ariaInvalid, "aria-describedby": ariaDescribedBy }) => (
             <MultiSelect
               id={id}
               value={value}
               onChange={onChange}
               options={agentOptions}
-              placeholder="Select agents"
+              placeholder={t("selectAgents")}
               aria-invalid={ariaInvalid}
               aria-describedby={ariaDescribedBy}
             />

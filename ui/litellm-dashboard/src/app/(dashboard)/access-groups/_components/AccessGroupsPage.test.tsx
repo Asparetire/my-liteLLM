@@ -105,14 +105,14 @@ describe("AccessGroupsPage", () => {
 
   it("renders the page title and subtitle", () => {
     renderWithProviders(<AccessGroupsPage />);
-    expect(screen.getByRole("heading", { name: "Access Groups" })).toBeInTheDocument();
-    expect(screen.getByText("Manage resource permissions for your organization")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "访问组" })).toBeInTheDocument();
+    expect(screen.getByText("管理组织的资源权限")).toBeInTheDocument();
     expect(document.querySelector(".lucide-boxes")).not.toBeNull();
   });
 
   it("shows the Create Access Group button for an admin", () => {
     renderWithProviders(<AccessGroupsPage />);
-    expect(screen.getByRole("button", { name: /create access group/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /创建访问组/ })).toBeInTheDocument();
   });
 
   it("renders every access group row", () => {
@@ -127,24 +127,24 @@ describe("AccessGroupsPage", () => {
     renderWithProviders(<AccessGroupsPage />);
     // ag-1 has 2 models, 1 mcp server, 1 agent.
     const adminRow = screen.getByText("ag-1").closest("tr") as HTMLElement;
-    expect(within(adminRow).getByTitle("2 Models")).toHaveTextContent("2");
-    expect(within(adminRow).getByTitle("1 MCP Servers")).toHaveTextContent("1");
-    expect(within(adminRow).getByTitle("1 Agents")).toHaveTextContent("1");
+    expect(within(adminRow).getByTitle("2 模型")).toHaveTextContent("2");
+    expect(within(adminRow).getByTitle("1 MCP 服务器")).toHaveTextContent("1");
+    expect(within(adminRow).getByTitle("1 智能体")).toHaveTextContent("1");
   });
 
   it("shows the expected column headers", () => {
     renderWithProviders(<AccessGroupsPage />);
     expect(screen.getByRole("columnheader", { name: /^ID$/i })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: /Name/i })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: /Resources/i })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: /Created/i })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: /Updated/i })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: /名称/ })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: /资源/ })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: /创建时间/ })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: /更新时间/ })).toBeInTheDocument();
   });
 
   it("filters by name", async () => {
     const user = userEvent.setup();
     renderWithProviders(<AccessGroupsPage />);
-    fireEvent.change(screen.getByPlaceholderText("Search groups by name, ID, or description..."), {
+    fireEvent.change(screen.getByPlaceholderText("按名称、ID 或描述搜索组…"), {
       target: { value: "Admin" },
     });
     expect(screen.getByText("Admin Group")).toBeInTheDocument();
@@ -154,7 +154,7 @@ describe("AccessGroupsPage", () => {
   it("filters by ID", async () => {
     const user = userEvent.setup();
     renderWithProviders(<AccessGroupsPage />);
-    fireEvent.change(screen.getByPlaceholderText("Search groups by name, ID, or description..."), {
+    fireEvent.change(screen.getByPlaceholderText("按名称、ID 或描述搜索组…"), {
       target: { value: "ag-2" },
     });
     expect(screen.getByText("Read Only")).toBeInTheDocument();
@@ -164,7 +164,7 @@ describe("AccessGroupsPage", () => {
   it("filters by description", async () => {
     const user = userEvent.setup();
     renderWithProviders(<AccessGroupsPage />);
-    fireEvent.change(screen.getByPlaceholderText("Search groups by name, ID, or description..."), {
+    fireEvent.change(screen.getByPlaceholderText("按名称、ID 或描述搜索组…"), {
       target: { value: "read-only" },
     });
     expect(screen.getByText("Read Only")).toBeInTheDocument();
@@ -174,17 +174,17 @@ describe("AccessGroupsPage", () => {
   it("shows the filtered empty state when nothing matches", async () => {
     const user = userEvent.setup();
     renderWithProviders(<AccessGroupsPage />);
-    fireEvent.change(screen.getByPlaceholderText("Search groups by name, ID, or description..."), {
+    fireEvent.change(screen.getByPlaceholderText("按名称、ID 或描述搜索组…"), {
       target: { value: "no-such-group" },
     });
-    expect(screen.getByText("No matching access groups")).toBeInTheDocument();
+    expect(screen.getByText("未找到匹配的访问组")).toBeInTheDocument();
     expect(screen.queryByText("Admin Group")).not.toBeInTheDocument();
   });
 
   it("shows the empty state when there are no groups", () => {
     mockUseAccessGroups.mockReturnValue({ data: [], isLoading: false });
     renderWithProviders(<AccessGroupsPage />);
-    expect(screen.getByText("No access groups yet")).toBeInTheDocument();
+    expect(screen.getByText("暂无访问组")).toBeInTheDocument();
   });
 
   it("renders loading skeletons on the initial load", () => {
@@ -197,7 +197,7 @@ describe("AccessGroupsPage", () => {
   it("opens and closes the create modal", async () => {
     const user = userEvent.setup();
     renderWithProviders(<AccessGroupsPage />);
-    await user.click(screen.getByRole("button", { name: /create access group/i }));
+    await user.click(screen.getByRole("button", { name: /创建访问组/ }));
     expect(screen.getByTestId("create-access-group-modal")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Cancel" }));
     expect(screen.queryByTestId("create-access-group-modal")).not.toBeInTheDocument();
@@ -218,11 +218,11 @@ describe("AccessGroupsPage", () => {
     const user = userEvent.setup();
     renderWithProviders(<AccessGroupsPage />);
     await user.click(await openRowMenu(user, "ag-1"));
-    const dialog = screen.getByRole("dialog", { name: "Delete Access Group" });
+    const dialog = screen.getByRole("dialog", { name: "删除访问组" });
     expect(
-      within(dialog).getByText("Are you sure you want to delete this access group? This action cannot be undone."),
+      within(dialog).getByText("确定要删除该访问组吗？此操作无法撤销"),
     ).toBeInTheDocument();
-    expect(within(dialog).getByText("Access Group Information")).toBeInTheDocument();
+    expect(within(dialog).getByText("访问组信息")).toBeInTheDocument();
     expect(within(dialog).getByText("ag-1")).toBeInTheDocument();
     expect(within(dialog).getByText("Admin Group")).toBeInTheDocument();
   });
@@ -231,10 +231,10 @@ describe("AccessGroupsPage", () => {
     const user = userEvent.setup();
     renderWithProviders(<AccessGroupsPage />);
     await user.click(await openRowMenu(user, "ag-1"));
-    const dialog = screen.getByRole("dialog", { name: "Delete Access Group" });
+    const dialog = screen.getByRole("dialog", { name: "删除访问组" });
     await user.click(within(dialog).getByRole("button", { name: "取消" }));
     await waitFor(() => {
-      expect(screen.queryByRole("dialog", { name: "Delete Access Group" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("dialog", { name: "删除访问组" })).not.toBeInTheDocument();
     });
     expect(mockMutate).not.toHaveBeenCalled();
   });
@@ -246,7 +246,7 @@ describe("AccessGroupsPage", () => {
     });
     renderWithProviders(<AccessGroupsPage />);
     await user.click(await openRowMenu(user, "ag-1"));
-    const dialog = screen.getByRole("dialog", { name: "Delete Access Group" });
+    const dialog = screen.getByRole("dialog", { name: "删除访问组" });
     await user.click(within(dialog).getByRole("button", { name: "删除" }));
     expect(mockMutate).toHaveBeenCalledWith("ag-1", expect.any(Object));
   });
@@ -261,17 +261,17 @@ describe("AccessGroupsPage", () => {
     expect(screen.queryByText("ag-01")).not.toBeInTheDocument();
 
     // The only match lives on page 1, so the page index must reset or the table reads as empty.
-    fireEvent.change(screen.getByPlaceholderText("Search groups by name, ID, or description..."), {
+    fireEvent.change(screen.getByPlaceholderText("按名称、ID 或描述搜索组…"), {
       target: { value: "ag-01" },
     });
     expect(await screen.findByText("ag-01")).toBeInTheDocument();
-    expect(screen.queryByText("No matching access groups")).not.toBeInTheDocument();
+    expect(screen.queryByText("未找到匹配的访问组")).not.toBeInTheDocument();
   });
 
   it("hides the Create button and row actions for a non-admin", () => {
     mockUseAuthorized.mockReturnValue({ userRole: "Admin Viewer", accessToken: "sk-test" });
     renderWithProviders(<AccessGroupsPage />);
-    expect(screen.queryByRole("button", { name: /create access group/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /创建访问组/ })).not.toBeInTheDocument();
     expect(screen.queryByTestId("access-group-actions-ag-1")).not.toBeInTheDocument();
     // The read-only view still lists the groups.
     expect(screen.getByText("Admin Group")).toBeInTheDocument();

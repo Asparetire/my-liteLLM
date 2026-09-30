@@ -116,7 +116,7 @@ describe("AccessGroupDetail", () => {
 
     renderWithProviders(<AccessGroupDetail accessGroupId={accessGroupId} onBack={mockOnBack} />);
 
-    expect(screen.getByText("Access group not found")).toBeInTheDocument();
+    expect(screen.getByText("未找到访问组")).toBeInTheDocument();
     expect(screen.getByRole("button")).toBeInTheDocument();
   });
 
@@ -124,7 +124,7 @@ describe("AccessGroupDetail", () => {
     const user = userEvent.setup();
     renderWithProviders(<AccessGroupDetail accessGroupId={accessGroupId} onBack={mockOnBack} />);
 
-    await user.click(screen.getByRole("button", { name: "Back" }));
+    await user.click(screen.getByRole("button", { name: "返回" }));
 
     expect(mockOnBack).toHaveBeenCalledTimes(1);
   });
@@ -139,7 +139,7 @@ describe("AccessGroupDetail", () => {
   it("should display description in Group Details", () => {
     renderWithProviders(<AccessGroupDetail accessGroupId={accessGroupId} onBack={mockOnBack} />);
 
-    expect(screen.getByText("Group Details")).toBeInTheDocument();
+    expect(screen.getByText("组详情")).toBeInTheDocument();
     expect(screen.getByText("A test access group")).toBeInTheDocument();
   });
 
@@ -155,7 +155,7 @@ describe("AccessGroupDetail", () => {
 
     expect(screen.queryByRole("dialog", { name: "Edit Access Group" })).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /Edit Access Group/i }));
+    await user.click(screen.getByRole("button", { name: /编辑访问组/ }));
 
     expect(screen.getByRole("dialog", { name: "Edit Access Group" })).toBeInTheDocument();
   });
@@ -164,7 +164,7 @@ describe("AccessGroupDetail", () => {
     const user = userEvent.setup();
     renderWithProviders(<AccessGroupDetail accessGroupId={accessGroupId} onBack={mockOnBack} />);
 
-    await user.click(screen.getByRole("button", { name: /Edit Access Group/i }));
+    await user.click(screen.getByRole("button", { name: /编辑访问组/ }));
     expect(screen.getByRole("dialog", { name: "Edit Access Group" })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Close Modal" }));
@@ -175,7 +175,7 @@ describe("AccessGroupDetail", () => {
     it("should show the key alias and hide the token when the key has an alias", () => {
       renderWithProviders(<AccessGroupDetail accessGroupId={accessGroupId} onBack={mockOnBack} />);
 
-      expect(screen.getByText("Attached Keys")).toBeInTheDocument();
+      expect(screen.getByText("关联的密钥")).toBeInTheDocument();
       expect(screen.getByText("ci-key")).toBeInTheDocument();
       expect(screen.queryByText("key-1")).not.toBeInTheDocument();
     });
@@ -208,7 +208,7 @@ describe("AccessGroupDetail", () => {
     it("should show View All button for keys when more than 5", () => {
       renderWith({ assigned_keys: unnamed(["k1", "k2", "k3", "k4", "k5", "k6"]) });
 
-      expect(screen.getByRole("button", { name: "View All (6)" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "查看全部（6）" })).toBeInTheDocument();
       expect(screen.queryByText("k6")).not.toBeInTheDocument();
     });
 
@@ -216,18 +216,18 @@ describe("AccessGroupDetail", () => {
       const user = userEvent.setup();
       renderWith({ assigned_keys: unnamed(["k1", "k2", "k3", "k4", "k5", "k6"]) });
 
-      await user.click(screen.getByRole("button", { name: "View All (6)" }));
-      expect(screen.getByRole("button", { name: "Show Less" })).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "查看全部（6）" }));
+      expect(screen.getByRole("button", { name: "收起" })).toBeInTheDocument();
       expect(screen.getByText("k6")).toBeInTheDocument();
 
-      await user.click(screen.getByRole("button", { name: "Show Less" }));
-      expect(screen.getByRole("button", { name: "View All (6)" })).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "收起" }));
+      expect(screen.getByRole("button", { name: "查看全部（6）" })).toBeInTheDocument();
     });
 
     it("should show empty state when no keys attached", () => {
       renderWith({ assigned_keys: [] });
 
-      expect(screen.getByText("No keys attached")).toBeInTheDocument();
+      expect(screen.getByText("未关联密钥")).toBeInTheDocument();
     });
 
     it("should truncate long unaliased tokens with ellipsis", () => {
@@ -248,7 +248,7 @@ describe("AccessGroupDetail", () => {
     it("should show the team alias and hide the id when the team has an alias", () => {
       renderWithProviders(<AccessGroupDetail accessGroupId={accessGroupId} onBack={mockOnBack} />);
 
-      expect(screen.getByText("Attached Teams")).toBeInTheDocument();
+      expect(screen.getByText("关联的团队")).toBeInTheDocument();
       expect(screen.getByText("Platform Team")).toBeInTheDocument();
       expect(screen.queryByText("team-1")).not.toBeInTheDocument();
     });
@@ -280,20 +280,20 @@ describe("AccessGroupDetail", () => {
     it("should show View All button for teams when more than 5", () => {
       renderWith({ assigned_teams: unnamed(["t1", "t2", "t3", "t4", "t5", "t6"]) });
 
-      expect(screen.getByRole("button", { name: "View All (6)" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "查看全部（6）" })).toBeInTheDocument();
     });
 
     it("should show empty state when no teams attached", () => {
       renderWith({ assigned_teams: [] });
 
-      expect(screen.getByText("No teams attached")).toBeInTheDocument();
+      expect(screen.getByText("未关联团队")).toBeInTheDocument();
     });
   });
 
   it("should display Models tab with model names", () => {
     renderWithProviders(<AccessGroupDetail accessGroupId={accessGroupId} onBack={mockOnBack} />);
 
-    expect(screen.getByRole("tab", { name: /Models/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /模型/i })).toBeInTheDocument();
     expect(screen.getByText("model-1")).toBeInTheDocument();
     expect(screen.getByText("model-2")).toBeInTheDocument();
   });
@@ -303,7 +303,7 @@ describe("AccessGroupDetail", () => {
       const user = userEvent.setup();
       renderWithProviders(<AccessGroupDetail accessGroupId={accessGroupId} onBack={mockOnBack} />);
 
-      await user.click(screen.getByRole("tab", { name: /MCP Servers/i }));
+      await user.click(screen.getByRole("tab", { name: /MCP 服务器/i }));
 
       expect(screen.getByText("GitHub MCP")).toBeInTheDocument();
       expect(screen.queryByText("mcp-1")).not.toBeInTheDocument();
@@ -313,7 +313,7 @@ describe("AccessGroupDetail", () => {
       const user = userEvent.setup();
       renderWithProviders(<AccessGroupDetail accessGroupId={accessGroupId} onBack={mockOnBack} />);
 
-      await user.click(screen.getByRole("tab", { name: /MCP Servers/i }));
+      await user.click(screen.getByRole("tab", { name: /MCP 服务器/i }));
       await user.hover(screen.getByText("GitHub MCP"));
 
       expect(await screen.findByText("mcp-1")).toBeInTheDocument();
@@ -323,7 +323,7 @@ describe("AccessGroupDetail", () => {
       const user = userEvent.setup();
       renderWith({ access_mcp_servers: unnamed(["mcp-deleted"]) });
 
-      await user.click(screen.getByRole("tab", { name: /MCP Servers/i }));
+      await user.click(screen.getByRole("tab", { name: /MCP 服务器/i }));
 
       expect(screen.getByText("mcp-deleted")).toBeInTheDocument();
     });
@@ -332,9 +332,9 @@ describe("AccessGroupDetail", () => {
       const user = userEvent.setup();
       renderWith({ access_mcp_servers: [] });
 
-      await user.click(screen.getByRole("tab", { name: /MCP Servers/i }));
+      await user.click(screen.getByRole("tab", { name: /MCP 服务器/i }));
 
-      expect(screen.getByText("No MCP servers assigned to this group")).toBeInTheDocument();
+      expect(screen.getByText("该组未分配 MCP 服务器")).toBeInTheDocument();
     });
   });
 
@@ -343,7 +343,7 @@ describe("AccessGroupDetail", () => {
       const user = userEvent.setup();
       renderWithProviders(<AccessGroupDetail accessGroupId={accessGroupId} onBack={mockOnBack} />);
 
-      await user.click(screen.getByRole("tab", { name: /Agents/i }));
+      await user.click(screen.getByRole("tab", { name: /智能体/i }));
 
       expect(screen.getByText("Support Agent")).toBeInTheDocument();
       expect(screen.queryByText("agent-1")).not.toBeInTheDocument();
@@ -353,7 +353,7 @@ describe("AccessGroupDetail", () => {
       const user = userEvent.setup();
       renderWith({ access_agents: unnamed(["agent-deleted"]) });
 
-      await user.click(screen.getByRole("tab", { name: /Agents/i }));
+      await user.click(screen.getByRole("tab", { name: /智能体/i }));
 
       expect(screen.getByText("agent-deleted")).toBeInTheDocument();
     });
@@ -362,16 +362,16 @@ describe("AccessGroupDetail", () => {
       const user = userEvent.setup();
       renderWith({ access_agents: [] });
 
-      await user.click(screen.getByRole("tab", { name: /Agents/i }));
+      await user.click(screen.getByRole("tab", { name: /智能体/i }));
 
-      expect(screen.getByText("No agents assigned to this group")).toBeInTheDocument();
+      expect(screen.getByText("该组未分配智能体")).toBeInTheDocument();
     });
   });
 
   it("should show empty state in Models tab when no models assigned", () => {
     renderWith({ access_model_names: [] });
 
-    expect(screen.getByText("No models assigned to this group")).toBeInTheDocument();
+    expect(screen.getByText("该组未分配模型")).toBeInTheDocument();
   });
 
   it("should count resources from the resolved lists in the tab badges", () => {
@@ -380,14 +380,14 @@ describe("AccessGroupDetail", () => {
       access_agents: unnamed(["a1", "a2"]),
     });
 
-    expect(screen.getByRole("tab", { name: /MCP Servers/i })).toHaveTextContent("3");
-    expect(screen.getByRole("tab", { name: /Agents/i })).toHaveTextContent("2");
+    expect(screen.getByRole("tab", { name: /MCP 服务器/i })).toHaveTextContent("3");
+    expect(screen.getByRole("tab", { name: /智能体/i })).toHaveTextContent("2");
   });
 
   it("should display created and last updated timestamps", () => {
     renderWithProviders(<AccessGroupDetail accessGroupId={accessGroupId} onBack={mockOnBack} />);
 
-    expect(screen.getByText("Created")).toBeInTheDocument();
-    expect(screen.getByText("Last Updated")).toBeInTheDocument();
+    expect(screen.getByText("创建时间")).toBeInTheDocument();
+    expect(screen.getByText("更新时间")).toBeInTheDocument();
   });
 });

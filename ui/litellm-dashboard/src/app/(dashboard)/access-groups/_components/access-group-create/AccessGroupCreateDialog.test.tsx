@@ -48,9 +48,9 @@ describe("AccessGroupCreateDialog", () => {
     const user = userEvent.setup();
     const { createAccessGroup } = renderDialog();
 
-    await user.click(screen.getByRole("button", { name: "Create Group" }));
+    await user.click(screen.getByRole("button", { name: "创建组" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Please enter the access group name");
+    expect(await screen.findByRole("alert")).toHaveTextContent("请输入访问组名称");
     expect(createAccessGroup).not.toHaveBeenCalled();
   });
 
@@ -58,13 +58,13 @@ describe("AccessGroupCreateDialog", () => {
     const user = userEvent.setup();
     const { createAccessGroup } = renderDialog();
 
-    await user.click(screen.getByRole("tab", { name: "Models" }));
-    await waitFor(() => expect(screen.queryByLabelText("Group Name")).not.toBeInTheDocument());
+    await user.click(screen.getByRole("tab", { name: "模型" }));
+    await waitFor(() => expect(screen.queryByLabelText("组名称")).not.toBeInTheDocument());
 
-    await user.click(screen.getByRole("button", { name: "Create Group" }));
+    await user.click(screen.getByRole("button", { name: "创建组" }));
 
-    expect(await screen.findByLabelText("Group Name")).toBeInTheDocument();
-    expect(await screen.findByRole("alert")).toHaveTextContent("Please enter the access group name");
+    expect(await screen.findByLabelText("组名称")).toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent("请输入访问组名称");
     expect(createAccessGroup).not.toHaveBeenCalled();
   });
 
@@ -72,23 +72,23 @@ describe("AccessGroupCreateDialog", () => {
     const user = userEvent.setup();
     const { createAccessGroup } = renderDialog();
 
-    await user.type(screen.getByLabelText("Group Name"), "prod-models");
-    await user.click(screen.getByRole("button", { name: "Create Group" }));
+    await user.type(screen.getByLabelText("组名称"), "prod-models");
+    await user.click(screen.getByRole("button", { name: "创建组" }));
 
     await waitFor(() => expect(createAccessGroup).toHaveBeenCalledTimes(1));
     expect(createAccessGroup.mock.calls[0][0]).toStrictEqual({ access_group_name: "prod-models" });
-    await waitFor(() => expect(screen.queryByLabelText("Group Name")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByLabelText("组名称")).not.toBeInTheDocument());
   });
 
   it("maps the description and model selections into the create body", async () => {
     const user = userEvent.setup();
     const { createAccessGroup } = renderDialog();
 
-    await user.type(screen.getByLabelText("Group Name"), "prod-models");
-    await user.type(screen.getByLabelText("Description"), "engineering access");
-    await user.click(screen.getByRole("tab", { name: "Models" }));
+    await user.type(screen.getByLabelText("组名称"), "prod-models");
+    await user.type(screen.getByLabelText("描述"), "engineering access");
+    await user.click(screen.getByRole("tab", { name: "模型" }));
     await user.click(screen.getByRole("button", { name: "set-models" }));
-    await user.click(screen.getByRole("button", { name: "Create Group" }));
+    await user.click(screen.getByRole("button", { name: "创建组" }));
 
     await waitFor(() => expect(createAccessGroup).toHaveBeenCalledTimes(1));
     expect(createAccessGroup.mock.calls[0][0]).toStrictEqual({
@@ -104,35 +104,35 @@ describe("AccessGroupCreateDialog", () => {
       createAccessGroup: vi.fn().mockRejectedValue(new Error("boom")),
     });
 
-    await user.type(screen.getByLabelText("Group Name"), "prod-models");
-    await user.click(screen.getByRole("button", { name: "Create Group" }));
+    await user.type(screen.getByLabelText("组名称"), "prod-models");
+    await user.click(screen.getByRole("button", { name: "创建组" }));
 
     await waitFor(() => expect(createAccessGroup).toHaveBeenCalledTimes(1));
-    expect(screen.getByLabelText("Group Name")).toHaveValue("prod-models");
+    expect(screen.getByLabelText("组名称")).toHaveValue("prod-models");
   });
 
   it("resets the form when the dialog is cancelled and reopened", async () => {
     const user = userEvent.setup();
     renderDialog();
 
-    await user.type(screen.getByLabelText("Group Name"), "abandoned");
-    await user.click(screen.getByRole("button", { name: "Cancel" }));
-    await waitFor(() => expect(screen.queryByLabelText("Group Name")).not.toBeInTheDocument());
+    await user.type(screen.getByLabelText("组名称"), "abandoned");
+    await user.click(screen.getByRole("button", { name: "取消" }));
+    await waitFor(() => expect(screen.queryByLabelText("组名称")).not.toBeInTheDocument());
 
     await user.click(screen.getByRole("button", { name: "reopen" }));
-    expect(screen.getByLabelText("Group Name")).toHaveValue("");
+    expect(screen.getByLabelText("组名称")).toHaveValue("");
   });
 
   it("resets the form when the dialog is dismissed with Escape and reopened", async () => {
     const user = userEvent.setup();
     renderDialog();
 
-    await user.type(screen.getByLabelText("Group Name"), "abandoned");
+    await user.type(screen.getByLabelText("组名称"), "abandoned");
     await user.keyboard("{Escape}");
-    await waitFor(() => expect(screen.queryByLabelText("Group Name")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByLabelText("组名称")).not.toBeInTheDocument());
 
     await user.click(screen.getByRole("button", { name: "reopen" }));
-    expect(screen.getByLabelText("Group Name")).toHaveValue("");
+    expect(screen.getByLabelText("组名称")).toHaveValue("");
   });
 
   it("cannot be dismissed while a create is pending, then closes once on success", async () => {
@@ -146,15 +146,15 @@ describe("AccessGroupCreateDialog", () => {
     );
     renderDialog({ createAccessGroup });
 
-    await user.type(screen.getByLabelText("Group Name"), "prod-models");
+    await user.type(screen.getByLabelText("组名称"), "prod-models");
     await user.keyboard("{Enter}");
     await waitFor(() => expect(createAccessGroup).toHaveBeenCalledTimes(1));
 
     await user.keyboard("{Escape}");
-    expect(screen.getByLabelText("Group Name")).toHaveValue("prod-models");
+    expect(screen.getByLabelText("组名称")).toHaveValue("prod-models");
 
     resolveCreate({});
-    await waitFor(() => expect(screen.queryByLabelText("Group Name")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByLabelText("组名称")).not.toBeInTheDocument());
   });
 
   it("does not fire a second create while one is pending", async () => {
@@ -168,13 +168,13 @@ describe("AccessGroupCreateDialog", () => {
     );
     renderDialog({ createAccessGroup });
 
-    await user.type(screen.getByLabelText("Group Name"), "prod-models");
+    await user.type(screen.getByLabelText("组名称"), "prod-models");
     await user.keyboard("{Enter}");
     await waitFor(() => expect(createAccessGroup).toHaveBeenCalledTimes(1));
     await user.keyboard("{Enter}");
 
     expect(createAccessGroup).toHaveBeenCalledTimes(1);
     resolveCreate({});
-    await waitFor(() => expect(screen.queryByLabelText("Group Name")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByLabelText("组名称")).not.toBeInTheDocument());
   });
 });
