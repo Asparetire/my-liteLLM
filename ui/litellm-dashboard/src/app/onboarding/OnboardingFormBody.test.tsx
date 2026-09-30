@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, renderWithProviders, screen, waitFor } from "../../../tests/test-utils";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { OnboardingFormBody } from "./OnboardingFormBody";
@@ -18,60 +18,60 @@ describe("OnboardingFormBody", () => {
   });
 
   it("should show 'Sign Up' heading for signup variant", () => {
-    render(<OnboardingFormBody {...defaultProps} />);
-    expect(screen.getByRole("heading", { name: "Sign Up" })).toBeInTheDocument();
+    renderWithProviders(<OnboardingFormBody {...defaultProps} />);
+    expect(screen.getByRole("heading", { name: "注册" })).toBeInTheDocument();
   });
 
   it("should show 'Reset Password' heading for reset_password variant", () => {
-    render(<OnboardingFormBody {...defaultProps} variant="reset_password" />);
-    expect(screen.getByRole("heading", { name: "Reset Password" })).toBeInTheDocument();
+    renderWithProviders(<OnboardingFormBody {...defaultProps} variant="reset_password" />);
+    expect(screen.getByRole("heading", { name: "重置密码" })).toBeInTheDocument();
   });
 
   it("should show SSO alert for signup variant", () => {
-    render(<OnboardingFormBody {...defaultProps} />);
+    renderWithProviders(<OnboardingFormBody {...defaultProps} />);
     expect(screen.getByText("SSO")).toBeInTheDocument();
   });
 
   it("should hide SSO alert for reset_password variant", () => {
-    render(<OnboardingFormBody {...defaultProps} variant="reset_password" />);
+    renderWithProviders(<OnboardingFormBody {...defaultProps} variant="reset_password" />);
     expect(screen.queryByText("SSO")).not.toBeInTheDocument();
   });
 
   it("should pre-fill the email field with userEmail", async () => {
-    render(<OnboardingFormBody {...defaultProps} userEmail="user@example.com" />);
+    renderWithProviders(<OnboardingFormBody {...defaultProps} userEmail="user@example.com" />);
     await waitFor(() => {
-      expect(screen.getByLabelText("Email Address")).toHaveValue("user@example.com");
+      expect(screen.getByLabelText("邮箱地址")).toHaveValue("user@example.com");
     });
   });
 
   it("should disable the email field", () => {
-    render(<OnboardingFormBody {...defaultProps} />);
-    expect(screen.getByLabelText("Email Address")).toBeDisabled();
+    renderWithProviders(<OnboardingFormBody {...defaultProps} />);
+    expect(screen.getByLabelText("邮箱地址")).toBeDisabled();
   });
 
   it("should show claimError message when claimError is set", () => {
-    render(<OnboardingFormBody {...defaultProps} claimError="Something went wrong" />);
+    renderWithProviders(<OnboardingFormBody {...defaultProps} claimError="Something went wrong" />);
     expect(screen.getByText("Something went wrong")).toBeInTheDocument();
   });
 
   it("should not show claimError message when claimError is null", () => {
-    render(<OnboardingFormBody {...defaultProps} claimError={null} />);
+    renderWithProviders(<OnboardingFormBody {...defaultProps} claimError={null} />);
     expect(screen.queryByText("Something went wrong")).not.toBeInTheDocument();
   });
 
   it("should show a loading indicator on the submit button when isPending is true", () => {
-    render(<OnboardingFormBody {...defaultProps} isPending={true} />);
+    renderWithProviders(<OnboardingFormBody {...defaultProps} isPending={true} />);
     // antd v5 renders a loading icon with aria-label="loading" inside the button
-    expect(screen.getByRole("img", { name: "loading" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "加载中" })).toBeInTheDocument();
   });
 
   it("should call onSubmit with the typed password on form submit", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(<OnboardingFormBody {...defaultProps} onSubmit={onSubmit} />);
+    renderWithProviders(<OnboardingFormBody {...defaultProps} onSubmit={onSubmit} />);
 
-    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "mypassword" } });
-    await user.click(screen.getByRole("button", { name: /sign up/i }));
+    fireEvent.change(screen.getByLabelText("密码"), { target: { value: "mypassword" } });
+    await user.click(screen.getByRole("button", { name: /注册/ }));
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ password: "mypassword" }));
@@ -79,7 +79,7 @@ describe("OnboardingFormBody", () => {
   });
 
   it("should show 'Reset Password' on the submit button for reset_password variant", () => {
-    render(<OnboardingFormBody {...defaultProps} variant="reset_password" />);
-    expect(screen.getByRole("button", { name: /reset password/i })).toBeInTheDocument();
+    renderWithProviders(<OnboardingFormBody {...defaultProps} variant="reset_password" />);
+    expect(screen.getByRole("button", { name: /重置密码/ })).toBeInTheDocument();
   });
 });

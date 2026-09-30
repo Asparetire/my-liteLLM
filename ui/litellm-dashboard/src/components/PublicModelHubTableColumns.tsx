@@ -199,7 +199,7 @@ export const getPublicModelHubColumns = ({ onModelClick, t }: PublicModelHubColu
       cell: ({ row }) => (
         <span className="flex items-center gap-2 text-sm">
           <span>{getModeIcon(row.original.mode || "")}</span>
-          <span>{row.original.mode || "Chat"}</span>
+          <span>{row.original.mode || t("modeChatFallback")}</span>
         </span>
       ),
     },
@@ -281,7 +281,7 @@ export const getPublicModelHubColumns = ({ onModelClick, t }: PublicModelHubColu
               <span className="capitalize">
                 <StatusBadge
                   tone={HEALTH_TONES[model.health_status ?? ""] || "neutral"}
-                  label={model.health_status ?? "Unknown"}
+                  label={model.health_status ?? t("healthUnknown")}
                 />
               </span>
             }

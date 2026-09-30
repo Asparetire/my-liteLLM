@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, renderWithProviders, screen, waitFor } from "../../../../tests/test-utils";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -51,7 +51,7 @@ describe("UIThemeSettings", () => {
   });
 
   it("should render nothing without an access token", () => {
-    const { container } = render(<UIThemeSettings userID="user-1" userRole="Admin" accessToken={null} />);
+    const { container } = renderWithProviders(<UIThemeSettings userID="user-1" userRole="Admin" accessToken={null} />);
 
     expect(container).toBeEmptyDOMElement();
     expect(fetchMock).not.toHaveBeenCalled();
@@ -62,7 +62,7 @@ describe("UIThemeSettings", () => {
       okResponse({ logo_url: "https://cdn.example.com/logo.svg", favicon_url: "https://cdn.example.com/fav.ico" }),
     );
 
-    render(<UIThemeSettings userID="user-1" userRole="Admin" accessToken="sk-test" />);
+    renderWithProviders(<UIThemeSettings userID="user-1" userRole="Admin" accessToken="sk-test" />);
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText(LOGO_PLACEHOLDER)).toHaveValue("https://cdn.example.com/logo.svg");
@@ -74,13 +74,13 @@ describe("UIThemeSettings", () => {
 
   it("should save the entered urls and report success", async () => {
     const user = userEvent.setup();
-    render(<UIThemeSettings userID="user-1" userRole="Admin" accessToken="sk-test" />);
+    renderWithProviders(<UIThemeSettings userID="user-1" userRole="Admin" accessToken="sk-test" />);
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
 
     fireEvent.change(screen.getByPlaceholderText(LOGO_PLACEHOLDER), { target: { value: "https://a.test/logo.png" } });
     fireEvent.change(screen.getByPlaceholderText(FAVICON_PLACEHOLDER), { target: { value: "https://a.test/fav.ico" } });
-    await user.click(screen.getByRole("button", { name: "Save Changes" }));
+    await user.click(screen.getByRole("button", { name: "保存更改" }));
 
     await waitFor(() => expect(patchCalls()).toHaveLength(1));
     expect(bodyOf(patchCalls()[0])).toEqual({
@@ -88,14 +88,14 @@ describe("UIThemeSettings", () => {
       logo_url_dark: null,
       favicon_url: "https://a.test/fav.ico",
     });
-    await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Theme settings updated successfully!"));
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith("主题设置更新成功！"));
   });
 
   it("should load and save a separate dark-mode logo url", async () => {
     const user = userEvent.setup();
     fetchMock.mockImplementation(() => okResponse({ logo_url_dark: "https://cdn.example.com/logo-dark.svg" }));
 
-    render(<UIThemeSettings userID="user-1" userRole="Admin" accessToken="sk-test" />);
+    renderWithProviders(<UIThemeSettings userID="user-1" userRole="Admin" accessToken="sk-test" />);
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText(LOGO_DARK_PLACEHOLDER)).toHaveValue("https://cdn.example.com/logo-dark.svg");
@@ -105,7 +105,7 @@ describe("UIThemeSettings", () => {
     fireEvent.change(screen.getByPlaceholderText(LOGO_DARK_PLACEHOLDER), {
       target: { value: "https://a.test/logo-dark.png" },
     });
-    await user.click(screen.getByRole("button", { name: "Save Changes" }));
+    await user.click(screen.getByRole("button", { name: "保存更改" }));
 
     await waitFor(() => expect(patchCalls()).toHaveLength(1));
     expect(bodyOf(patchCalls()[0]).logo_url_dark).toBe("https://a.test/logo-dark.png");
@@ -113,14 +113,14 @@ describe("UIThemeSettings", () => {
 
   it("should surface a backend failure when saving fails", async () => {
     const user = userEvent.setup();
-    render(<UIThemeSettings userID="user-1" userRole="Admin" accessToken="sk-test" />);
+    renderWithProviders(<UIThemeSettings userID="user-1" userRole="Admin" accessToken="sk-test" />);
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     fetchMock.mockImplementation(() => Promise.resolve({ ok: false } as Response));
 
-    await user.click(screen.getByRole("button", { name: "Save Changes" }));
+    await user.click(screen.getByRole("button", { name: "保存更改" }));
 
-    await waitFor(() => expect(toast.fromError).toHaveBeenCalledWith("Failed to update theme settings"));
+    await waitFor(() => expect(toast.fromError).toHaveBeenCalledWith("主题设置更新失败"));
     expect(toast.success).not.toHaveBeenCalled();
   });
 
@@ -130,13 +130,13 @@ describe("UIThemeSettings", () => {
       okResponse({ logo_url: "https://cdn.example.com/logo.svg", favicon_url: "https://cdn.example.com/fav.ico" }),
     );
 
-    render(<UIThemeSettings userID="user-1" userRole="Admin" accessToken="sk-test" />);
+    renderWithProviders(<UIThemeSettings userID="user-1" userRole="Admin" accessToken="sk-test" />);
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText(LOGO_PLACEHOLDER)).toHaveValue("https://cdn.example.com/logo.svg");
     });
 
-    await user.click(screen.getByRole("button", { name: "Reset to Default" }));
+    await user.click(screen.getByRole("button", { name: "恢复默认" }));
 
     await waitFor(() => expect(patchCalls()).toHaveLength(1));
     expect(bodyOf(patchCalls()[0])).toEqual({ logo_url: null, logo_url_dark: null, favicon_url: null });
@@ -146,6 +146,6 @@ describe("UIThemeSettings", () => {
     expect(setLogoUrl).toHaveBeenLastCalledWith(null);
     expect(setLogoUrlDark).toHaveBeenLastCalledWith(null);
     expect(setFaviconUrl).toHaveBeenLastCalledWith(null);
-    await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Theme settings reset to default!"));
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith("主题设置已恢复默认！"));
   });
 });

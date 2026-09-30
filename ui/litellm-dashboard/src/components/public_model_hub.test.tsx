@@ -369,7 +369,7 @@ describe("PublicModelHub", () => {
     await waitFor(() => {
       const gpt35Row = screen.getByText("gpt-3.5-turbo").closest("tr");
       expect(gpt35Row).toBeInTheDocument();
-      expect(within(gpt35Row as HTMLElement).getByText("Unknown")).toBeInTheDocument();
+      expect(within(gpt35Row as HTMLElement).getByText("未知")).toBeInTheDocument();
     });
   });
 

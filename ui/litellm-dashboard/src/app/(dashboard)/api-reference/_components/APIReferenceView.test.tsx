@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { renderWithProviders, screen } from "../../../../../tests/test-utils";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import APIReferenceView from "./APIReferenceView";
@@ -13,7 +13,7 @@ describe("APIReferenceView", () => {
 
   it("uses the API doc base url when provided", () => {
     const apiDocUrl = "https://docs.litellm.test";
-    render(<APIReferenceView proxySettings={{ LITELLM_UI_API_DOC_BASE_URL: apiDocUrl }} />);
+    renderWithProviders(<APIReferenceView proxySettings={{ LITELLM_UI_API_DOC_BASE_URL: apiDocUrl }} />);
 
     const codeBlocks = screen.getAllByTestId(codeBlockTestId);
     expect(codeBlocks[0]).toHaveTextContent(new RegExp(apiDocUrl));
@@ -21,7 +21,7 @@ describe("APIReferenceView", () => {
 
   it("falls back to the proxy base url when the docs url is missing", () => {
     const proxyUrl = "https://proxy.litellm.test";
-    render(<APIReferenceView proxySettings={{ PROXY_BASE_URL: proxyUrl }} />);
+    renderWithProviders(<APIReferenceView proxySettings={{ PROXY_BASE_URL: proxyUrl }} />);
 
     const codeBlocks = screen.getAllByTestId(codeBlockTestId);
     expect(codeBlocks[0]).toHaveTextContent(new RegExp(proxyUrl));
@@ -31,7 +31,7 @@ describe("APIReferenceView", () => {
     const apiDocUrl = "https://docs-preferred.litellm.test";
     const proxyUrl = "https://proxy-backup.litellm.test";
 
-    render(
+    renderWithProviders(
       <APIReferenceView
         proxySettings={{
           LITELLM_UI_API_DOC_BASE_URL: apiDocUrl,
@@ -47,18 +47,18 @@ describe("APIReferenceView", () => {
   });
 
   it("renders the page title, blurb and docs link", () => {
-    render(<APIReferenceView proxySettings={{ PROXY_BASE_URL: "https://proxy.litellm.test" }} />);
+    renderWithProviders(<APIReferenceView proxySettings={{ PROXY_BASE_URL: "https://proxy.litellm.test" }} />);
 
-    expect(screen.getByText("OpenAI Compatible Proxy: API Reference")).toBeInTheDocument();
-    expect(screen.getByText(/LiteLLM is OpenAI Compatible/)).toBeInTheDocument();
+    expect(screen.getByText("OpenAI 兼容代理：API 参考")).toBeInTheDocument();
+    expect(screen.getByText(/LiteLLM 兼容 OpenAI/)).toBeInTheDocument();
 
-    const docsLink = screen.getByRole("link", { name: /API Reference Docs/ });
+    const docsLink = screen.getByRole("link", { name: /API 参考文档/ });
     expect(docsLink).toHaveAttribute("href", "https://docs.litellm.ai/docs/proxy/user_keys");
     expect(docsLink).toHaveAttribute("target", "_blank");
   });
 
   it("exposes the three SDK tabs with the first selected by default", () => {
-    render(<APIReferenceView proxySettings={{ PROXY_BASE_URL: "https://proxy.litellm.test" }} />);
+    renderWithProviders(<APIReferenceView proxySettings={{ PROXY_BASE_URL: "https://proxy.litellm.test" }} />);
 
     expect(screen.getAllByRole("tab").map((tab) => tab.textContent)).toEqual([
       "OpenAI Python SDK",
@@ -79,7 +79,7 @@ describe("APIReferenceView", () => {
   ])("selecting %s shows its snippet wired to the base url", async (tabName, marker) => {
     const proxyUrl = "https://proxy.litellm.test";
     const user = userEvent.setup();
-    render(<APIReferenceView proxySettings={{ PROXY_BASE_URL: proxyUrl }} />);
+    renderWithProviders(<APIReferenceView proxySettings={{ PROXY_BASE_URL: proxyUrl }} />);
 
     await user.click(screen.getByRole("tab", { name: tabName }));
 

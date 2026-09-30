@@ -1562,7 +1562,9 @@
     "valueFree": "免费",
     "valueNa": "暂无",
     "responseTimeLabel": "响应时间：{time}ms",
-    "lastCheckedLabel": "上次检查：{time}"
+    "lastCheckedLabel": "上次检查：{time}",
+    "modeChatFallback": "聊天",
+    "healthUnknown": "未知"
   },
   "usage": {
     "usageTitle": "用量",
@@ -2851,5 +2853,48 @@
     "missingValue": "缺少值",
     "duplicateModel": "模型重复",
     "duplicateKey": "键重复"
+  },
+  "uiTheme": {
+    "title": "界面主题自定义",
+    "description": "使用自定义 Logo 与网站图标个性化你的 LiteLLM 管理界面。",
+    "logoLabel": "自定义 Logo URL",
+    "logoHelp": "输入自定义 Logo 的 URL，留空则使用默认值",
+    "logoDarkLabel": "自定义 Logo URL（深色模式）",
+    "logoDarkHelp": "输入适配深色背景的 Logo URL，留空则沿用上方 Logo",
+    "faviconLabel": "自定义网站图标 URL",
+    "faviconHelp": "输入自定义网站图标的 URL（.ico、.png 或 .svg），留空则使用默认值",
+    "save": "保存更改",
+    "reset": "恢复默认",
+    "toastUpdated": "主题设置更新成功！",
+    "toastUpdateFailed": "主题设置更新失败",
+    "toastReset": "主题设置已恢复默认！",
+    "toastResetFailed": "主题设置重置失败"
+  },
+  "apiReference": {
+    "title": "OpenAI 兼容代理：API 参考",
+    "intro": "LiteLLM 兼容 OpenAI。这意味着你的 API Key 可直接用于 OpenAI SDK，只需将 base_url 指向你的 LiteLLM 代理即可。示例如下：",
+    "docsLink": "API 参考文档",
+    "openDocsTitle": "在新标签页打开文档",
+    "opensInNewTab": "（在新标签页打开）"
+  },
+  "onboarding": {
+    "loading": "加载中",
+    "signupTitle": "注册",
+    "resetTitle": "重置密码",
+    "signupDesc": "认领你的用户账号以登录管理界面。",
+    "resetDesc": "重置密码以访问管理界面。",
+    "ssoTitle": "SSO",
+    "ssoDescription": "SSO 属于企业版功能。",
+    "getFreeTrial": "获取免费试用",
+    "emailLabel": "邮箱地址",
+    "passwordLabel": "密码",
+    "passwordCreateDesc": "为你的账号创建密码",
+    "passwordResetDesc": "输入你的新密码",
+    "passwordRequired": "注册需要填写密码",
+    "failedToStartSession": "启动会话失败，请重试。",
+    "failedToSubmit": "提交失败，请重试。",
+    "failedToLoadInvitation": "加载邀请失败",
+    "invitationInvalid": "邀请链接可能无效或已过期。",
+    "backToLogin": "返回登录"
   }
 }

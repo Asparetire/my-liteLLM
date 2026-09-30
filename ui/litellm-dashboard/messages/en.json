@@ -1562,7 +1562,9 @@
     "valueFree": "Free",
     "valueNa": "N/A",
     "responseTimeLabel": "Response Time: {time}ms",
-    "lastCheckedLabel": "Last Checked: {time}"
+    "lastCheckedLabel": "Last Checked: {time}",
+    "modeChatFallback": "Chat",
+    "healthUnknown": "Unknown"
   },
   "usage": {
     "usageTitle": "Usage",
@@ -2851,5 +2853,48 @@
     "missingValue": "Missing value",
     "duplicateModel": "Duplicate model",
     "duplicateKey": "Duplicate key"
+  },
+  "uiTheme": {
+    "title": "UI Theme Customization",
+    "description": "Customize your LiteLLM admin dashboard with a custom logo and favicon.",
+    "logoLabel": "Custom Logo URL",
+    "logoHelp": "Enter a URL for your custom logo or leave empty for default",
+    "logoDarkLabel": "Custom Logo URL (dark mode)",
+    "logoDarkHelp": "Enter a URL for a logo suited to dark backgrounds, or leave empty to reuse the logo above",
+    "faviconLabel": "Custom Favicon URL",
+    "faviconHelp": "Enter a URL for your custom favicon (.ico, .png, or .svg) or leave empty for default",
+    "save": "Save Changes",
+    "reset": "Reset to Default",
+    "toastUpdated": "Theme settings updated successfully!",
+    "toastUpdateFailed": "Failed to update theme settings",
+    "toastReset": "Theme settings reset to default!",
+    "toastResetFailed": "Failed to reset theme settings"
+  },
+  "apiReference": {
+    "title": "OpenAI Compatible Proxy: API Reference",
+    "intro": "LiteLLM is OpenAI Compatible. This means your API Key works with the OpenAI SDK. Just replace the base_url to point to your litellm proxy. Example Below",
+    "docsLink": "API Reference Docs",
+    "openDocsTitle": "Open documentation in a new tab",
+    "opensInNewTab": "(opens in a new tab)"
+  },
+  "onboarding": {
+    "loading": "loading",
+    "signupTitle": "Sign Up",
+    "resetTitle": "Reset Password",
+    "signupDesc": "Claim your user account to login to Admin UI.",
+    "resetDesc": "Reset your password to access Admin UI.",
+    "ssoTitle": "SSO",
+    "ssoDescription": "SSO is under the Enterprise Tier.",
+    "getFreeTrial": "Get Free Trial",
+    "emailLabel": "Email Address",
+    "passwordLabel": "Password",
+    "passwordCreateDesc": "Create a password for your account",
+    "passwordResetDesc": "Enter your new password",
+    "passwordRequired": "password required to sign up",
+    "failedToStartSession": "Failed to start session. Please try again.",
+    "failedToSubmit": "Failed to submit. Please try again.",
+    "failedToLoadInvitation": "Failed to load invitation",
+    "invitationInvalid": "The invitation link may be invalid or expired.",
+    "backToLogin": "Back to Login"
   }
 }

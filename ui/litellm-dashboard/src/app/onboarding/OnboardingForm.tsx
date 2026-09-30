@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { jwtDecode } from "jwt-decode";
 import { useOnboardingCredentials, useClaimOnboardingToken } from "@/app/(dashboard)/hooks/onboarding/useOnboarding";
 import { getProxyBaseUrl } from "@/components/networking";
@@ -14,6 +15,7 @@ type OnboardingFormProps = {
 };
 
 export function OnboardingForm({ variant }: OnboardingFormProps) {
+  const t = useTranslations("onboarding");
   const searchParams = useSearchParams()!;
   const inviteId = searchParams.get("invitation_id");
   const [claimError, setClaimError] = React.useState<string | null>(null);
@@ -41,7 +43,7 @@ export function OnboardingForm({ variant }: OnboardingFormProps) {
       {
         onSuccess: (data: { token?: string }) => {
           if (!data?.token) {
-            setClaimError("Failed to start session. Please try again.");
+            setClaimError(t("failedToStartSession"));
             return;
           }
           // Invite signup is a principal-change boundary — the prior admin's
@@ -54,7 +56,7 @@ export function OnboardingForm({ variant }: OnboardingFormProps) {
           window.location.href = proxyBaseUrl ? `${proxyBaseUrl}/ui/?login=success` : "/ui/?login=success";
         },
         onError: (error: Error) => {
-          setClaimError(error.message || "Failed to submit. Please try again.");
+          setClaimError(error.message || t("failedToSubmit"));
         },
       },
     );
