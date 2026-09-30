@@ -39,14 +39,14 @@ describe("OrganizationsTable", () => {
   it("renders every column header", () => {
     render(<OrganizationsTable {...baseProps} organizations={[]} />);
     for (const header of [
-      "Organization ID",
-      "Organization Name",
-      "Created",
-      "Spend (tokens)",
-      "Budget (tokens)",
-      "Models",
-      "TPM / RPM Limits",
-      "Members",
+      "组织 ID",
+      "组织名称",
+      "创建时间",
+      "消费（tokens）",
+      "预算（tokens）",
+      "模型",
+      "TPM / RPM 限额",
+      "成员",
     ]) {
       expect(screen.getByText(header)).toBeInTheDocument();
     }
@@ -145,7 +145,7 @@ describe("OrganizationsTable", () => {
     expect(screen.getByText("100 tokens")).toBeInTheDocument();
     expect(screen.getByText("TPM: 1000")).toBeInTheDocument();
     expect(screen.getByText("RPM: 60")).toBeInTheDocument();
-    expect(screen.getByText("3 Members")).toBeInTheDocument();
+    expect(screen.getByText("3 名成员")).toBeInTheDocument();
     // Five models, three visible -> the shared ModelsCell collapses the rest.
     expect(screen.getByText("+2 more")).toBeInTheDocument();
   });
@@ -211,9 +211,9 @@ describe("OrganizationsTable", () => {
 
   it("uses a search-aware empty state", () => {
     const { rerender } = render(<OrganizationsTable {...baseProps} searchActive={false} organizations={[]} />);
-    expect(screen.getByText("No organizations yet")).toBeInTheDocument();
+    expect(screen.getByText("暂无组织")).toBeInTheDocument();
 
     rerender(<OrganizationsTable {...baseProps} searchActive={true} organizations={[]} />);
-    expect(screen.getByText("No matching organizations")).toBeInTheDocument();
+    expect(screen.getByText("未找到匹配的组织")).toBeInTheDocument();
   });
 });

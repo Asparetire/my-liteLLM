@@ -6,6 +6,7 @@ import React, { useMemo, useState } from "react";
 
 import { DataTable } from "@/components/shared/DataTable";
 import { Organization } from "@/components/networking";
+import { useTranslations } from "next-intl";
 
 import { getOrganizationsTableColumns } from "./OrganizationsTableColumns";
 
@@ -22,6 +23,7 @@ interface OrganizationsTableProps {
 const DEFAULT_SORTING: SortingState = [{ id: "created_at", desc: true }];
 
 function EmptyState({ searchActive }: { searchActive: boolean }) {
+  const t = useTranslations("organizations");
   const Icon = searchActive ? SearchX : Building2;
   return (
     <div className="flex flex-col items-center gap-1 py-6">
@@ -29,12 +31,10 @@ function EmptyState({ searchActive }: { searchActive: boolean }) {
         <Icon className="size-5 text-muted-foreground" />
       </div>
       <div className="text-sm font-medium text-foreground">
-        {searchActive ? "No matching organizations" : "No organizations yet"}
+        {searchActive ? t("emptyNoMatch") : t("emptyNone")}
       </div>
       <div className="text-sm text-muted-foreground">
-        {searchActive
-          ? "No organizations match your search. Try a different name or ID."
-          : "Create an organization to group teams, models, and budgets."}
+        {searchActive ? t("emptyNoMatchHint") : t("emptyHint")}
       </div>
     </div>
   );
@@ -49,12 +49,13 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
   onEditClick,
   onDeleteClick,
 }) => {
+  const t = useTranslations("organizations");
   const [sorting, setSorting] = useState<SortingState>(DEFAULT_SORTING);
 
   const columns = useMemo(() => {
-    const deps = { userRole, onOrganizationClick, onEditClick, onDeleteClick };
+    const deps = { userRole, onOrganizationClick, onEditClick, onDeleteClick, t };
     return getOrganizationsTableColumns(deps);
-  }, [userRole, onOrganizationClick, onEditClick, onDeleteClick]);
+  }, [userRole, onOrganizationClick, onEditClick, onDeleteClick, t]);
 
   return (
     <DataTable
@@ -66,7 +67,7 @@ const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
       sorting={sorting}
       onSortingChange={setSorting}
       isLoading={isLoading}
-      loadingMessage="Loading organizations…"
+      loadingMessage={t("loading")}
       noDataMessage={<EmptyState searchActive={searchActive} />}
       size="compact"
     />

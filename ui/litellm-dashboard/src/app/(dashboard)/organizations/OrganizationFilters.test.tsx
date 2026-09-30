@@ -24,7 +24,7 @@ describe("OrganizationFilters", () => {
       />,
     );
 
-    expect(screen.getByPlaceholderText("Search by Organization Name")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("按组织名称搜索")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^filters$/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /reset filters/i })).toBeInTheDocument();
   });
@@ -44,7 +44,7 @@ describe("OrganizationFilters", () => {
       />,
     );
 
-    expect(screen.getByPlaceholderText("Search by Organization ID")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("按组织 ID 搜索")).toBeInTheDocument();
   });
 
   it("should call onChange when organization name input changes", async () => {
@@ -63,7 +63,7 @@ describe("OrganizationFilters", () => {
       />,
     );
 
-    const input = screen.getByPlaceholderText("Search by Organization Name");
+    const input = screen.getByPlaceholderText("按组织名称搜索");
     fireEvent.change(input, { target: { value: "test" } });
 
     await waitFor(

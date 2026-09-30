@@ -89,14 +89,14 @@ describe("OrganizationsPanel", () => {
   it("gates non-premium users behind the enterprise notice", () => {
     renderPanel({ premiumUser: false });
 
-    expect(screen.getByText(/LiteLLM Enterprise feature/i)).toBeInTheDocument();
-    expect(screen.queryByText("+ Create New Organization")).not.toBeInTheDocument();
+    expect(screen.getByText(/企业版功能/)).toBeInTheDocument();
+    expect(screen.queryByText("+ 创建组织")).not.toBeInTheDocument();
   });
 
   it("shows the create button for a premium admin", () => {
     renderPanel();
 
-    expect(screen.getByText("+ Create New Organization")).toBeInTheDocument();
+    expect(screen.getByText("+ 创建组织")).toBeInTheDocument();
   });
 
   it("resolves the loading skeleton to false when the query is disabled (no token)", () => {
