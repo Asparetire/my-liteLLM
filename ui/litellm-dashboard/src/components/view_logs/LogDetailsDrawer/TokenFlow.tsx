@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 interface TokenFlowProps {
   prompt?: number;
   completion?: number;
@@ -9,10 +11,6 @@ interface TokenFlowProps {
  * Shows total with breakdown of prompt and completion tokens.
  */
 export function TokenFlow({ prompt = 0, completion = 0, total = 0 }: TokenFlowProps) {
-  return (
-    <span>
-      {total.toLocaleString()} ({prompt.toLocaleString()} prompt tokens + {completion.toLocaleString()} completion
-      tokens)
-    </span>
-  );
+  const t = useTranslations("logs");
+  return <span>{t("tokenFlow", { total: total.toLocaleString(), prompt: prompt.toLocaleString(), completion: completion.toLocaleString() })}</span>;
 }

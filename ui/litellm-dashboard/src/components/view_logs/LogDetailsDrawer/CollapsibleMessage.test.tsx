@@ -18,7 +18,7 @@ describe("CollapsibleMessage", () => {
   it("should render the label and char count", () => {
     render(<CollapsibleMessage label="SYSTEM" content="Hello" />);
     expect(screen.getByText("SYSTEM")).toBeInTheDocument();
-    expect(screen.getByText("(5 chars)")).toBeInTheDocument();
+    expect(screen.getByText("（5 字符）")).toBeInTheDocument();
   });
 
   it("should show content when defaultExpanded is true", () => {

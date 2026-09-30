@@ -3,6 +3,7 @@
  */
 
 import { ChevronDown, ChevronUp, Copy, MessageSquare } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/cva.config";
@@ -28,6 +29,7 @@ export function SectionHeader({
   onToggleCollapse,
   turnCount,
 }: SectionHeaderProps) {
+  const t = useTranslations("logs");
   const summary = (
     <>
       {onToggleCollapse &&
@@ -43,15 +45,19 @@ export function SectionHeader({
         ) : (
           <span className="text-sm opacity-60 grayscale">✨</span>
         )}
-        <span className="text-sm font-medium">{type === "input" ? "Input" : "Output"}</span>
+        <span className="text-sm font-medium">{type === "input" ? t("sectionInput") : t("sectionOutput")}</span>
       </div>
 
-      {tokens !== undefined && <span className="text-xs text-muted-foreground">Tokens: {tokens.toLocaleString()}</span>}
+      {tokens !== undefined && (
+        <span className="text-xs text-muted-foreground">{t("tokensCount", { count: tokens.toLocaleString() })}</span>
+      )}
 
-      {cost !== undefined && <span className="text-xs text-muted-foreground">Cost: ${cost.toFixed(6)}</span>}
+      {cost !== undefined && (
+        <span className="text-xs text-muted-foreground">{t("costAmount", { amount: `$${cost.toFixed(6)}` })}</span>
+      )}
 
       {turnCount !== undefined && turnCount > 0 && (
-        <span className="text-xs text-muted-foreground">Turns: {turnCount}</span>
+        <span className="text-xs text-muted-foreground">{t("turnsCount", { count: turnCount })}</span>
       )}
     </>
   );
@@ -82,7 +88,7 @@ export function SectionHeader({
             <Button
               variant="ghost"
               size="icon-sm"
-              aria-label={type === "input" ? "Copy input" : "Copy output"}
+              aria-label={type === "input" ? t("copyInputAria") : t("copyOutputAria")}
               onClick={(e) => {
                 e.stopPropagation();
                 onCopy();
@@ -92,7 +98,7 @@ export function SectionHeader({
         >
           <Copy />
         </TooltipTrigger>
-        <TooltipContent>Copy</TooltipContent>
+        <TooltipContent>{t("copy")}</TooltipContent>
       </Tooltip>
     </div>
   );

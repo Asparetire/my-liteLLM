@@ -41,14 +41,14 @@ const renderHeader = (log: LogEntry, isSidebarCollapsed: boolean) =>
     />,
   );
 
-const expandToggle = () => screen.getByLabelText("Expand trace sidebar");
+const expandToggle = () => screen.getByLabelText("展开追踪侧栏");
 
 describe("DrawerHeader sidebar toggle", () => {
   it("stays out of the header while the sidebar owns it", () => {
     renderHeader(logEntry({}), false);
 
-    expect(screen.queryByLabelText("Expand trace sidebar")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Collapse trace sidebar")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("展开追踪侧栏")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("收起追踪侧栏")).not.toBeInTheDocument();
   });
 
   it("shares the model row once the sidebar is collapsed", () => {

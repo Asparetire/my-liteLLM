@@ -5,8 +5,10 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ParsedMessage } from "./prettyMessagesTypes";
+import { ROLE_LABEL_KEYS } from "./prettyMessagesUtils";
 import { SimpleMessageBlock } from "./SimpleMessageBlock";
 
 interface HistoryTreeProps {
@@ -14,6 +16,7 @@ interface HistoryTreeProps {
 }
 
 export function HistoryTree({ messages }: HistoryTreeProps) {
+  const t = useTranslations("logs");
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (messages.length === 0) {
@@ -29,7 +32,7 @@ export function HistoryTree({ messages }: HistoryTreeProps) {
           <ChevronRight className="size-3 shrink-0 text-muted-foreground" />
         )}
         <span className="text-[10px] uppercase tracking-[0.5px] text-muted-foreground">
-          HISTORY ({messages.length} message{messages.length !== 1 ? "s" : ""})
+          {t("historyLabel", { count: messages.length })}
         </span>
       </CollapsibleTrigger>
 
@@ -37,7 +40,7 @@ export function HistoryTree({ messages }: HistoryTreeProps) {
         {messages.map((msg, index) => (
           <SimpleMessageBlock
             key={index}
-            label={msg.role.toUpperCase()}
+            label={t(ROLE_LABEL_KEYS[msg.role])}
             content={msg.content}
             toolCalls={msg.toolCalls}
             isCompact={true}

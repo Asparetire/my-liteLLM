@@ -155,7 +155,7 @@ describe("RealtimePrettyView", () => {
 
   it("should render the component successfully", () => {
     render(<RealtimePrettyView response={sampleRealtimeResponse} />);
-    expect(screen.getByText("Session")).toBeInTheDocument();
+    expect(screen.getByText("会话")).toBeInTheDocument();
   });
 
   it("should display the session model name", () => {
@@ -178,7 +178,7 @@ describe("RealtimePrettyView", () => {
 
   it("should display the turn count in session header", () => {
     render(<RealtimePrettyView response={sampleRealtimeResponse} />);
-    expect(screen.getByText("2 turns")).toBeInTheDocument();
+    expect(screen.getByText("2 轮")).toBeInTheDocument();
   });
 
   it("should display singular 'turn' for a single response event", () => {
@@ -211,17 +211,17 @@ describe("RealtimePrettyView", () => {
       ],
     };
     render(<RealtimePrettyView response={singleTurnResponse} />);
-    expect(screen.getByText("1 turn")).toBeInTheDocument();
+    expect(screen.getByText("1 轮")).toBeInTheDocument();
   });
 
   it("should display the turn count in the output section header", () => {
     render(<RealtimePrettyView response={sampleRealtimeResponse} />);
-    expect(screen.getByText("Turns: 2")).toBeInTheDocument();
+    expect(screen.getByText("轮次：2")).toBeInTheDocument();
   });
 
   it("should display the Output section header", () => {
     render(<RealtimePrettyView response={sampleRealtimeResponse} />);
-    expect(screen.getByText("Output")).toBeInTheDocument();
+    expect(screen.getByText("输出")).toBeInTheDocument();
   });
 
   it("should display transcript text from response turns", () => {
@@ -238,18 +238,18 @@ describe("RealtimePrettyView", () => {
 
   it("should display token usage per turn", () => {
     render(<RealtimePrettyView response={sampleRealtimeResponse} />);
-    expect(screen.getByText("116 in / 46 out tokens")).toBeInTheDocument();
-    expect(screen.getByText("178 in / 247 out tokens")).toBeInTheDocument();
+    expect(screen.getByText("输入 116 / 输出 46 token")).toBeInTheDocument();
+    expect(screen.getByText("输入 178 / 输出 247 token")).toBeInTheDocument();
   });
 
   it("should expand session details when session header is clicked", async () => {
     const user = userEvent.setup();
     render(<RealtimePrettyView response={sampleRealtimeResponse} />);
 
-    await user.click(screen.getByText("Session"));
+    await user.click(screen.getByText("会话"));
 
     await waitFor(() => {
-      expect(screen.getByText("Temperature")).toBeInTheDocument();
+      expect(screen.getByText("温度")).toBeInTheDocument();
     });
   });
 
@@ -257,10 +257,10 @@ describe("RealtimePrettyView", () => {
     const user = userEvent.setup();
     render(<RealtimePrettyView response={sampleRealtimeResponse} />);
 
-    await user.click(screen.getByText("Session"));
+    await user.click(screen.getByText("会话"));
 
     await waitFor(() => {
-      expect(screen.getByText("Instructions")).toBeInTheDocument();
+      expect(screen.getByText("说明")).toBeInTheDocument();
       expect(screen.getByText("You are a helpful assistant.")).toBeInTheDocument();
     });
   });
@@ -269,10 +269,10 @@ describe("RealtimePrettyView", () => {
     const user = userEvent.setup();
     render(<RealtimePrettyView response={sampleRealtimeResponse} />);
 
-    await user.click(screen.getByText("Session"));
+    await user.click(screen.getByText("会话"));
 
     await waitFor(() => {
-      expect(screen.getByText("Input Audio Format")).toBeInTheDocument();
+      expect(screen.getByText("输入音频格式")).toBeInTheDocument();
       expect(screen.getAllByText("pcm16").length).toBeGreaterThanOrEqual(1);
     });
   });
@@ -288,7 +288,7 @@ describe("RealtimePrettyView", () => {
       results: [{ type: "unknown.event" }],
     };
     render(<RealtimePrettyView response={emptyResponse} />);
-    expect(screen.getByText("No recognized realtime events found")).toBeInTheDocument();
+    expect(screen.getByText("未识别到实时事件")).toBeInTheDocument();
   });
 
   it("should handle response with no output items gracefully", () => {
@@ -312,8 +312,8 @@ describe("RealtimePrettyView", () => {
     render(
       <RealtimePrettyView response={sampleRealtimeResponse} metrics={{ completion_tokens: 500, output_cost: 0.005 }} />,
     );
-    expect(screen.getByText(/Tokens: 500/)).toBeInTheDocument();
-    expect(screen.getByText(/Cost: \$0\.005000/)).toBeInTheDocument();
+    expect(screen.getByText(/Token：500/)).toBeInTheDocument();
+    expect(screen.getByText(/成本：\$0\.005000/)).toBeInTheDocument();
   });
 
   it("should toggle output section collapse when header is clicked", async () => {
@@ -323,7 +323,7 @@ describe("RealtimePrettyView", () => {
     const transcript = screen.getByText("Hello! How's your day going?");
     expect(transcript).toBeVisible();
 
-    const outputHeader = screen.getByText("Output").closest("div");
+    const outputHeader = screen.getByText("输出").closest("div");
     if (outputHeader) {
       await user.click(outputHeader);
       await waitFor(() => {

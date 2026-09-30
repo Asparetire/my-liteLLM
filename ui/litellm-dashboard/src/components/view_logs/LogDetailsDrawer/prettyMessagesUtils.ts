@@ -43,6 +43,14 @@ export const ROLE_STYLES: Record<string, RoleStyle> = {
   },
 };
 
+/** logs-namespace message keys for rendering a chat role label. */
+export const ROLE_LABEL_KEYS: Record<MessageRole, string> = {
+  system: "roleSystem",
+  user: "roleUser",
+  assistant: "roleAssistant",
+  tool: "roleTool",
+};
+
 type UnknownRecord = Record<string, unknown>;
 
 const isRecord = (value: unknown): value is UnknownRecord =>

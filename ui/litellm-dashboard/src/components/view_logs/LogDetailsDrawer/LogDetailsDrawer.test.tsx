@@ -101,11 +101,11 @@ describe("LogDetailsDrawer session sidebar sorting", () => {
     renderSessionDrawer();
     await waitFor(() => expect(sidebarEventNames()).toHaveLength(4));
 
-    fireEvent.click(screen.getByText("Start time"));
+    fireEvent.click(screen.getByText("开始时间"));
 
     await waitFor(() => expect(sidebarEventNames()).toEqual(["llm-early", "tool-early", "llm-late", "tool-late"]));
 
-    fireEvent.click(screen.getByText("Duration"));
+    fireEvent.click(screen.getByText("耗时"));
 
     await waitFor(() => expect(sidebarEventNames()).toEqual(["tool-early", "llm-late", "llm-early", "tool-late"]));
   });
@@ -114,7 +114,7 @@ describe("LogDetailsDrawer session sidebar sorting", () => {
     const { rerender, drawer } = renderSessionDrawer();
     await waitFor(() => expect(sidebarEventNames()).toHaveLength(4));
 
-    fireEvent.click(screen.getByText("Start time"));
+    fireEvent.click(screen.getByText("开始时间"));
     await waitFor(() => expect(sidebarEventNames()).toEqual(["llm-early", "tool-early", "llm-late", "tool-late"]));
 
     rerender(drawer(false));

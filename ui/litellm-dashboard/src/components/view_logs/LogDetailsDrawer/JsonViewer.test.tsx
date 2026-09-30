@@ -15,7 +15,7 @@ describe("JsonViewer", () => {
   it("should render a placeholder and no tree when the log entry carries no payload", () => {
     renderWithTheme("light", null);
 
-    expect(screen.getByText("No data")).toBeInTheDocument();
+    expect(screen.getByText("暂无数据")).toBeInTheDocument();
     expect(screen.queryByRole("tree")).not.toBeInTheDocument();
   });
 
@@ -25,14 +25,14 @@ describe("JsonViewer", () => {
     expect(screen.getByRole("tree")).toBeInTheDocument();
     expect(screen.getByText(/model/)).toBeInTheDocument();
     expect(screen.getByText(/stream/)).toBeInTheDocument();
-    expect(screen.queryByText("No data")).not.toBeInTheDocument();
+    expect(screen.queryByText("暂无数据")).not.toBeInTheDocument();
   });
 
   it("should treat an empty payload as data rather than showing the placeholder", () => {
     renderWithTheme("light", {});
 
     expect(screen.getByRole("tree")).toBeInTheDocument();
-    expect(screen.queryByText("No data")).not.toBeInTheDocument();
+    expect(screen.queryByText("暂无数据")).not.toBeInTheDocument();
   });
 
   it("should style the tree with the light palette when the dashboard theme is light", () => {

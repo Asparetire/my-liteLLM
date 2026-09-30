@@ -60,7 +60,7 @@ describe("PrettyMessagesView", () => {
     };
 
     render(<PrettyMessagesView request={request} response={response} />);
-    expect(screen.getByText("Session")).toBeInTheDocument();
+    expect(screen.getByText("会话")).toBeInTheDocument();
     expect(screen.getByText("Hello from realtime!")).toBeInTheDocument();
     const modelElements = screen.getAllByText("gpt-4o-mini-realtime-preview");
     expect(modelElements.length).toBeGreaterThanOrEqual(1);
@@ -86,7 +86,7 @@ describe("PrettyMessagesView", () => {
     render(<PrettyMessagesView request={request} response={response} />);
     expect(screen.getByText("Reply with exactly: hello from responses api")).toBeInTheDocument();
     expect(screen.getByText("hello from responses api")).toBeInTheDocument();
-    expect(screen.queryByText("No response data available")).not.toBeInTheDocument();
+    expect(screen.queryByText("暂无响应数据")).not.toBeInTheDocument();
   });
 
   it("renders a Responses API tool call, whose output item is a function_call", () => {
@@ -110,7 +110,7 @@ describe("PrettyMessagesView", () => {
     render(<PrettyMessagesView request={request} response={response} />);
     expect(screen.getByText("What is the weather in San Francisco? Use the tool.")).toBeInTheDocument();
     expect(screen.getByText("get_weather")).toBeInTheDocument();
-    expect(screen.queryByText("No response data available")).not.toBeInTheDocument();
+    expect(screen.queryByText("暂无响应数据")).not.toBeInTheDocument();
   });
 
   it("renders instructions as the system turn and a bare string input", () => {
@@ -136,7 +136,7 @@ describe("PrettyMessagesView", () => {
 
     render(<PrettyMessagesView request={request} response={response} />);
     expect(screen.getByText("answered")).toBeInTheDocument();
-    expect(screen.queryByText("No response data available")).not.toBeInTheDocument();
+    expect(screen.queryByText("暂无响应数据")).not.toBeInTheDocument();
   });
 
   it("renders a Responses API follow-up turn carrying a prior function_call and its output", () => {
@@ -159,7 +159,7 @@ describe("PrettyMessagesView", () => {
     render(<PrettyMessagesView request={request} response={response} />);
     expect(screen.getByText("It is 18 degrees.")).toBeInTheDocument();
     expect(screen.getByText('{"temp":18}')).toBeInTheDocument();
-    expect(screen.getByText("TOOL")).toBeInTheDocument();
+    expect(screen.getByText("工具结果")).toBeInTheDocument();
   });
 
   it("maps the developer and legacy function roles onto the roles the drawer renders", () => {
@@ -174,7 +174,7 @@ describe("PrettyMessagesView", () => {
 
     render(<PrettyMessagesView request={request} response={response} />);
     expect(screen.getByText("Stay terse.")).toBeInTheDocument();
-    expect(screen.getByText("TOOL")).toBeInTheDocument();
+    expect(screen.getByText("工具结果")).toBeInTheDocument();
     expect(screen.queryByText("FUNCTION")).not.toBeInTheDocument();
   });
 
@@ -183,7 +183,7 @@ describe("PrettyMessagesView", () => {
 
     render(<PrettyMessagesView request={request} response={{ output: [] }} />);
     expect(screen.getByText("Hello")).toBeInTheDocument();
-    expect(screen.getByText("No response data available")).toBeInTheDocument();
+    expect(screen.getByText("暂无响应数据")).toBeInTheDocument();
   });
 
   it("should render standard view when response has results but no realtime events", () => {

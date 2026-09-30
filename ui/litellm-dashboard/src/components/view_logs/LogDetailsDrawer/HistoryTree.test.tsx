@@ -18,13 +18,13 @@ describe("HistoryTree", () => {
       { role: "user", content: "How are you?" },
     ];
     render(<HistoryTree messages={messages} />);
-    expect(screen.getByText("HISTORY (3 messages)")).toBeInTheDocument();
+    expect(screen.getByText("历史（3 条消息）")).toBeInTheDocument();
   });
 
   it('should render message count with singular "message" for one message', () => {
     const messages: ParsedMessage[] = [{ role: "user", content: "Hello" }];
     render(<HistoryTree messages={messages} />);
-    expect(screen.getByText("HISTORY (1 message)")).toBeInTheDocument();
+    expect(screen.getByText("历史（1 条消息）")).toBeInTheDocument();
   });
 
   it("should expand and show messages when header is clicked", async () => {
@@ -36,7 +36,7 @@ describe("HistoryTree", () => {
     render(<HistoryTree messages={messages} />);
 
     // Click to expand
-    await user.click(screen.getByText("HISTORY (2 messages)"));
+    await user.click(screen.getByText("历史（2 条消息）"));
 
     expect(screen.getByText("Hello")).toBeInTheDocument();
     expect(screen.getByText("Hi there")).toBeInTheDocument();

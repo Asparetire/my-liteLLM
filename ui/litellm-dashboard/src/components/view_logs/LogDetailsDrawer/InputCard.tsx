@@ -4,8 +4,10 @@
  */
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "@/lib/toast";
 import { ParsedMessage } from "./prettyMessagesTypes";
+import { ROLE_LABEL_KEYS } from "./prettyMessagesUtils";
 import { SectionHeader } from "./SectionHeader";
 import { CollapsibleMessage } from "./CollapsibleMessage";
 import { HistoryTree } from "./HistoryTree";
@@ -18,6 +20,7 @@ interface InputCardProps {
 }
 
 export function InputCard({ messages, promptTokens, inputCost }: InputCardProps) {
+  const t = useTranslations("logs");
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   if (messages.length === 0) {
@@ -33,7 +36,7 @@ export function InputCard({ messages, promptTokens, inputCost }: InputCardProps)
   const handleCopy = () => {
     const content = lastMessage?.content || "";
     navigator.clipboard.writeText(content);
-    toast.success("Input copied");
+    toast.success(t("inputCopiedToast"));
   };
 
   return (
@@ -68,7 +71,7 @@ export function InputCard({ messages, promptTokens, inputCost }: InputCardProps)
           {/* System Message - Collapsible with arrow */}
           {systemMessage && (
             <CollapsibleMessage
-              label="SYSTEM"
+              label={t(ROLE_LABEL_KEYS.system)}
               content={systemMessage.content}
               defaultExpanded={!!(systemMessage.content && systemMessage.content.length < 200)}
             />
@@ -80,7 +83,7 @@ export function InputCard({ messages, promptTokens, inputCost }: InputCardProps)
           {/* Last User Message - Always visible */}
           {lastMessage && (
             <SimpleMessageBlock
-              label={lastMessage.role.toUpperCase()}
+              label={t(ROLE_LABEL_KEYS[lastMessage.role])}
               content={lastMessage.content}
               toolCalls={lastMessage.toolCalls}
             />

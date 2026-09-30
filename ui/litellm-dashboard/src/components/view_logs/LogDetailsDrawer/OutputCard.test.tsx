@@ -25,12 +25,12 @@ describe("OutputCard", () => {
 
   it("should render the OutputCard component", () => {
     render(<OutputCard message={mockMessage} />);
-    expect(screen.getByText("Output")).toBeInTheDocument();
+    expect(screen.getByText("输出")).toBeInTheDocument();
   });
 
   it("should display 'No response data available' when message is null", () => {
     render(<OutputCard message={null} />);
-    expect(screen.getByText("No response data available")).toBeInTheDocument();
+    expect(screen.getByText("暂无响应数据")).toBeInTheDocument();
   });
 
   it("should display message content when message is present", () => {
@@ -40,23 +40,23 @@ describe("OutputCard", () => {
 
   it("should display ASSISTANT label when message is present", () => {
     render(<OutputCard message={mockMessage} />);
-    expect(screen.getByText("ASSISTANT")).toBeInTheDocument();
+    expect(screen.getByText("助手")).toBeInTheDocument();
   });
 
   it("should display token count when provided", () => {
     render(<OutputCard message={mockMessage} completionTokens={250} />);
-    expect(screen.getByText(/Tokens: 250/)).toBeInTheDocument();
+    expect(screen.getByText(/Token：250/)).toBeInTheDocument();
   });
 
   it("should display cost when provided", () => {
     render(<OutputCard message={mockMessage} outputCost={0.0025} />);
-    expect(screen.getByText(/Cost: \$0\.002500/)).toBeInTheDocument();
+    expect(screen.getByText(/成本：\$0\.002500/)).toBeInTheDocument();
   });
 
   it("should copy message content when copy button is clicked", async () => {
     render(<OutputCard message={mockMessage} />);
 
-    const copyButton = screen.getByRole("button", { name: /copy/i });
+    const copyButton = screen.getByRole("button", { name: /复制/ });
 
     expect(copyButton).toBeInTheDocument();
 
@@ -74,7 +74,7 @@ describe("OutputCard", () => {
 
     render(<OutputCard message={null} />);
 
-    const copyButton = screen.getByRole("button", { name: /copy/i });
+    const copyButton = screen.getByRole("button", { name: /复制/ });
 
     expect(copyButton).toBeInTheDocument();
     await user.click(copyButton);
@@ -88,7 +88,7 @@ describe("OutputCard", () => {
     const user = userEvent.setup();
     render(<OutputCard message={mockMessage} />);
 
-    const header = screen.getByText("Output").closest("div");
+    const header = screen.getByText("输出").closest("div");
     expect(header).toBeInTheDocument();
 
     const content = screen.getByText("This is a test response");
@@ -109,7 +109,7 @@ describe("OutputCard", () => {
       content: "",
     };
     render(<OutputCard message={messageWithEmptyContent} />);
-    expect(screen.getByText("Output")).toBeInTheDocument();
+    expect(screen.getByText("输出")).toBeInTheDocument();
   });
 
   it("should handle tool calls in message", () => {
@@ -130,18 +130,18 @@ describe("OutputCard", () => {
 
   it("should display both token count and cost when both are provided", () => {
     render(<OutputCard message={mockMessage} completionTokens={300} outputCost={0.003} />);
-    expect(screen.getByText(/Tokens: 300/)).toBeInTheDocument();
-    expect(screen.getByText(/Cost: \$0\.003000/)).toBeInTheDocument();
+    expect(screen.getByText(/Token：300/)).toBeInTheDocument();
+    expect(screen.getByText(/成本：\$0\.003000/)).toBeInTheDocument();
   });
 
   it("should handle collapse toggle when message is null", async () => {
     const user = userEvent.setup();
     render(<OutputCard message={null} />);
 
-    const header = screen.getByText("Output").closest("div");
+    const header = screen.getByText("输出").closest("div");
     expect(header).toBeInTheDocument();
 
-    const noDataText = screen.getByText("No response data available");
+    const noDataText = screen.getByText("暂无响应数据");
     expect(noDataText).toBeInTheDocument();
     expect(noDataText).toBeVisible();
 

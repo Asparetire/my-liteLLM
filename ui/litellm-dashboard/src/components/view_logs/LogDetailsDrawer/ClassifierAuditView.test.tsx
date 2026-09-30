@@ -17,23 +17,23 @@ describe("ClassifierAuditView", () => {
         response={{ tier: "SIMPLE", reason: "a greeting" }}
       />,
     );
-    const classifier = within(screen.getByRole("region", { name: "Classifier input" }));
+    const classifier = within(screen.getByRole("region", { name: "分类器输入" }));
     expect(classifier.getByText(/classification rubric/)).toBeInTheDocument();
     expect(classifier.queryByText(/source-only/)).not.toBeInTheDocument();
     expect(
-      within(screen.getByRole("region", { name: "Originating request, credentials masked" })).getByText(/source-only/),
+      within(screen.getByRole("region", { name: "原始请求（凭据已脱敏）" })).getByText(/source-only/),
     ).toBeInTheDocument();
     expect(
-      within(screen.getByRole("region", { name: "Classifier response" })).getByText(/a greeting/),
+      within(screen.getByRole("region", { name: "分类器响应" })).getByText(/a greeting/),
     ).toBeInTheDocument();
-    await user.click(classifier.getByRole("button", { name: "Copy Classifier input" }));
+    await user.click(classifier.getByRole("button", { name: "复制分类器输入" }));
     expect(await navigator.clipboard.readText()).toBe(JSON.stringify(input, null, 2));
   });
 
   it("does not present legacy source messages as captured classifier input", () => {
     render(<ClassifierAuditView request={{ messages: [{ content: "legacy source" }] }} response={undefined} />);
-    expect(screen.getAllByText("Not captured or message logging disabled")).toHaveLength(3);
-    expect(screen.queryByRole("button", { name: "Copy Classifier input" })).not.toBeInTheDocument();
+    expect(screen.getAllByText("未捕获或未开启消息日志")).toHaveLength(3);
+    expect(screen.queryByRole("button", { name: "复制分类器输入" })).not.toBeInTheDocument();
   });
 
   it("labels truncated input without marking a complete source request as truncated", () => {
@@ -46,11 +46,11 @@ describe("ClassifierAuditView", () => {
         response={{ tier: "SIMPLE" }}
       />,
     );
-    expect(within(screen.getByRole("region", { name: "Classifier input" })).getByRole("status")).toHaveTextContent(
-      "This stored copy is truncated",
+    expect(within(screen.getByRole("region", { name: "分类器输入" })).getByRole("status")).toHaveTextContent(
+      "该存储副本已被截断，完整载荷无法从所配置的日志存储中获取",
     );
     expect(
-      within(screen.getByRole("region", { name: "Originating request, credentials masked" })).queryByRole("status"),
+      within(screen.getByRole("region", { name: "原始请求（凭据已脱敏）" })).queryByRole("status"),
     ).not.toBeInTheDocument();
   });
 });

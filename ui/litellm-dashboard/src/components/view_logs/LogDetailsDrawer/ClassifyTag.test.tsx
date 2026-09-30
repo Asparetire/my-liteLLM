@@ -5,7 +5,7 @@ import { ClassifyTag } from "./ClassifyTag";
 describe("ClassifyTag", () => {
   it("renders for an auto-router classifier row", () => {
     render(<ClassifyTag origin="autorouter_classifier" />);
-    expect(screen.getByText("Classify")).toBeInTheDocument();
+    expect(screen.getByText("分类")).toBeInTheDocument();
   });
 
   it("renders nothing for ordinary traffic, which is what makes the tag meaningful", () => {

@@ -27,7 +27,7 @@ describe("InputCard", () => {
 
   it("should render the InputCard component", () => {
     render(<InputCard messages={mockMessages} />);
-    expect(screen.getByText("Input")).toBeInTheDocument();
+    expect(screen.getByText("输入")).toBeInTheDocument();
   });
 
   it("should return null when messages array is empty", () => {
@@ -47,7 +47,7 @@ describe("InputCard", () => {
       },
     ];
     render(<InputCard messages={messagesWithSystem} />);
-    expect(screen.getByText("SYSTEM")).toBeInTheDocument();
+    expect(screen.getByText("系统")).toBeInTheDocument();
     expect(screen.getByText("You are a helpful assistant")).toBeInTheDocument();
   });
 
@@ -83,12 +83,12 @@ describe("InputCard", () => {
 
   it("should display token count when provided", () => {
     render(<InputCard messages={mockMessages} promptTokens={150} />);
-    expect(screen.getByText(/Tokens: 150/)).toBeInTheDocument();
+    expect(screen.getByText(/Token：150/)).toBeInTheDocument();
   });
 
   it("should display cost when provided", () => {
     render(<InputCard messages={mockMessages} inputCost={0.0015} />);
-    expect(screen.getByText(/Cost: \$0\.001500/)).toBeInTheDocument();
+    expect(screen.getByText(/成本：\$0\.001500/)).toBeInTheDocument();
   });
 
   it("should copy last message content when copy button is clicked", async () => {
@@ -101,7 +101,7 @@ describe("InputCard", () => {
 
     render(<InputCard messages={messages} />);
 
-    const copyButton = screen.getByRole("button", { name: /copy/i });
+    const copyButton = screen.getByRole("button", { name: /复制/ });
 
     expect(copyButton).toBeInTheDocument();
 
@@ -118,7 +118,7 @@ describe("InputCard", () => {
     const user = userEvent.setup();
     render(<InputCard messages={mockMessages} />);
 
-    const header = screen.getByText("Input").closest("div");
+    const header = screen.getByText("输入").closest("div");
     expect(header).toBeInTheDocument();
 
     const content = screen.getByText("Hello, how are you?");
@@ -141,7 +141,7 @@ describe("InputCard", () => {
       },
     ];
     render(<InputCard messages={messages} />);
-    expect(screen.queryByText("SYSTEM")).not.toBeInTheDocument();
+    expect(screen.queryByText("系统")).not.toBeInTheDocument();
     expect(screen.getByText("User message only")).toBeInTheDocument();
   });
 
@@ -153,7 +153,7 @@ describe("InputCard", () => {
       },
     ];
     render(<InputCard messages={messages} />);
-    expect(screen.getByText("SYSTEM")).toBeInTheDocument();
+    expect(screen.getByText("系统")).toBeInTheDocument();
     expect(screen.getByText("System only")).toBeInTheDocument();
   });
 
@@ -165,7 +165,7 @@ describe("InputCard", () => {
       },
     ];
     render(<InputCard messages={messages} />);
-    expect(screen.getByText("ASSISTANT")).toBeInTheDocument();
+    expect(screen.getByText("助手")).toBeInTheDocument();
     expect(screen.getByText("Assistant response")).toBeInTheDocument();
   });
 
@@ -195,7 +195,7 @@ describe("InputCard", () => {
       },
     ];
     render(<InputCard messages={messages} />);
-    const copyButton = screen.getByRole("button", { name: /copy/i });
+    const copyButton = screen.getByRole("button", { name: /复制/ });
     expect(copyButton).toBeInTheDocument();
   });
 });
