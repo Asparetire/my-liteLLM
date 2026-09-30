@@ -5,7 +5,7 @@ import { ConfigInfoMessage } from "./ConfigInfoMessage";
 describe("ConfigInfoMessage", () => {
   it("should render the info message when show is true", () => {
     render(<ConfigInfoMessage show={true} />);
-    expect(screen.getByText("Request/Response Data Not Available")).toBeInTheDocument();
+    expect(screen.getByText("无法显示请求日志配置")).toBeInTheDocument();
   });
 
   it("should render nothing when show is false", () => {
@@ -18,8 +18,8 @@ describe("ConfigInfoMessage", () => {
     expect(screen.getByText(/store_prompts_in_spend_logs: true/)).toBeInTheDocument();
   });
 
-  it("should reference Admin Settings \u2192 Logging Settings", () => {
+  it("should reference Admin Settings logging settings entry", () => {
     render(<ConfigInfoMessage show={true} />);
-    expect(screen.getByText(/Admin Settings → Logging Settings/)).toBeInTheDocument();
+    expect(screen.getByText(/管理设置的日志设置/)).toBeInTheDocument();
   });
 });

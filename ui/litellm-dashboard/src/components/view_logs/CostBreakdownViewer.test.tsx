@@ -6,7 +6,7 @@ import { CostBreakdownViewer, CostBreakdown } from "./CostBreakdownViewer";
 
 async function expandCostBreakdown() {
   const user = userEvent.setup();
-  await user.click(screen.getByText("Cost Breakdown"));
+  await user.click(screen.getByText("成本明细"));
 }
 
 describe("CostBreakdownViewer", () => {
@@ -37,11 +37,11 @@ describe("CostBreakdownViewer", () => {
       />,
     );
 
-    expect(screen.getByText("Cost Breakdown")).toBeInTheDocument();
+    expect(screen.getByText("成本明细")).toBeInTheDocument();
     await expandCostBreakdown();
-    expect(screen.getByText("Input Cost:")).toBeInTheDocument();
-    expect(screen.getByText("Output Cost:")).toBeInTheDocument();
-    expect(screen.getByText("Final Calculated Cost:")).toBeInTheDocument();
+    expect(screen.getByText("输入成本：")).toBeInTheDocument();
+    expect(screen.getByText("输出成本：")).toBeInTheDocument();
+    expect(screen.getByText("最终计算成本：")).toBeInTheDocument();
   });
 
   it("shows token counts when the panel is expanded", async () => {
@@ -59,10 +59,10 @@ describe("CostBreakdownViewer", () => {
 
     await expandCostBreakdown();
 
-    expect(screen.getByText("Input Cost:")).toBeInTheDocument();
-    expect(screen.getByText("Output Cost:")).toBeInTheDocument();
-    expect(screen.getByText(/500 prompt tokens/)).toBeInTheDocument();
-    expect(screen.getByText(/200 completion tokens/)).toBeInTheDocument();
+    expect(screen.getByText("输入成本：")).toBeInTheDocument();
+    expect(screen.getByText("输出成本：")).toBeInTheDocument();
+    expect(screen.getByText(/输入 500 tokens/)).toBeInTheDocument();
+    expect(screen.getByText(/输出 200 tokens/)).toBeInTheDocument();
   });
 
   it("shows non-null, non-zero additional_costs", async () => {
@@ -129,7 +129,7 @@ describe("CostBreakdownViewer", () => {
       />,
     );
 
-    expect(screen.getByText("Cost Breakdown")).toBeInTheDocument();
+    expect(screen.getByText("成本明细")).toBeInTheDocument();
     await expandCostBreakdown();
     expect(screen.getByText("Model Router Flat Cost:")).toBeInTheDocument();
     expect(container).not.toBeEmptyDOMElement();
@@ -191,8 +191,8 @@ describe("CostBreakdownViewer", () => {
 
     await expandCostBreakdown();
 
-    expect(screen.getByText("Prompt Cache Read Cost:")).toBeInTheDocument();
-    expect(screen.getByText("Prompt Cache Write Cost:")).toBeInTheDocument();
+    expect(screen.getByText("缓存读取成本：")).toBeInTheDocument();
+    expect(screen.getByText("缓存写入成本：")).toBeInTheDocument();
   });
 
   it("shows '(Cached)' in the header when cacheHit is true", () => {
@@ -204,7 +204,7 @@ describe("CostBreakdownViewer", () => {
 
     renderWithProviders(<CostBreakdownViewer costBreakdown={breakdown} totalSpend={0} cacheHit="true" />);
 
-    expect(screen.getByText(/\(Cached\)/)).toBeInTheDocument();
+    expect(screen.getByText(/缓存命中/)).toBeInTheDocument();
   });
 
   it("shows discount label with percentage when panel is expanded", async () => {
@@ -219,7 +219,7 @@ describe("CostBreakdownViewer", () => {
 
     await expandCostBreakdown();
 
-    expect(screen.getByText(/Discount \(10\.00%\)/)).toBeInTheDocument();
+    expect(screen.getByText(/折扣（10\.00%）/)).toBeInTheDocument();
   });
 
   it("shows margin label with percentage when panel is expanded", async () => {
@@ -234,7 +234,7 @@ describe("CostBreakdownViewer", () => {
 
     await expandCostBreakdown();
 
-    expect(screen.getByText(/Margin \(15\.00%\)/)).toBeInTheDocument();
-    expect(screen.getByText("Final Calculated Cost:")).toBeInTheDocument();
+    expect(screen.getByText(/加价（15\.00%）/)).toBeInTheDocument();
+    expect(screen.getByText("最终计算成本：")).toBeInTheDocument();
   });
 });

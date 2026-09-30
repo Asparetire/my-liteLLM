@@ -3,6 +3,8 @@
  * Used in the request logs table and session type column.
  */
 
+import { useTranslations } from "next-intl";
+
 export const SparkleIcon = ({ size = 12 }: { size?: number }) => (
   <svg
     width={size}
@@ -76,30 +78,42 @@ export const LayersIcon = ({ size = 12 }: { size?: number }) => (
   </svg>
 );
 
-export const LlmBadge = ({ count }: { count?: number }) => (
-  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-info/10 text-info border border-info/20 rounded-full text-[11px] font-medium whitespace-nowrap">
-    <SparkleIcon />
-    {count != null ? count : "LLM"}
-  </span>
-);
+export const LlmBadge = ({ count }: { count?: number }) => {
+  const t = useTranslations("logs");
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-info/10 text-info border border-info/20 rounded-full text-[11px] font-medium whitespace-nowrap">
+      <SparkleIcon />
+      {count != null ? count : t("badgeLlm")}
+    </span>
+  );
+};
 
-export const McpBadge = ({ count }: { count?: number }) => (
-  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-warning/10 text-warning border border-warning/20 rounded-full text-[11px] font-medium whitespace-nowrap">
-    <WrenchIcon />
-    {count != null ? count : "MCP"}
-  </span>
-);
+export const McpBadge = ({ count }: { count?: number }) => {
+  const t = useTranslations("logs");
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-warning/10 text-warning border border-warning/20 rounded-full text-[11px] font-medium whitespace-nowrap">
+      <WrenchIcon />
+      {count != null ? count : t("badgeMcp")}
+    </span>
+  );
+};
 
-export const AgentBadge = ({ count }: { count?: number }) => (
-  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-violet-50 text-violet-700 border border-violet-200 rounded-full text-[11px] font-medium whitespace-nowrap dark:bg-violet-950 dark:text-violet-300 dark:border-violet-800">
-    <AgentIcon />
-    {count != null ? count : "Agent"}
-  </span>
-);
+export const AgentBadge = ({ count }: { count?: number }) => {
+  const t = useTranslations("logs");
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-violet-50 text-violet-700 border border-violet-200 rounded-full text-[11px] font-medium whitespace-nowrap dark:bg-violet-950 dark:text-violet-300 dark:border-violet-800">
+      <AgentIcon />
+      {count != null ? count : t("badgeAgent")}
+    </span>
+  );
+};
 
-export const BatchBadge = () => (
-  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-teal-50 text-teal-700 border border-teal-200 rounded-full text-[11px] font-medium whitespace-nowrap dark:bg-teal-950 dark:text-teal-300 dark:border-teal-800">
-    <LayersIcon />
-    Batch
-  </span>
-);
+export const BatchBadge = () => {
+  const t = useTranslations("logs");
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-teal-50 text-teal-700 border border-teal-200 rounded-full text-[11px] font-medium whitespace-nowrap dark:bg-teal-950 dark:text-teal-300 dark:border-teal-800">
+      <LayersIcon />
+      {t("badgeBatch")}
+    </span>
+  );
+};

@@ -82,8 +82,8 @@ describe("SpendLogsTable network access by role", () => {
     // silent absence below means the gate worked, not that nothing rendered.
     await waitFor(() => expect(requestedUrls().some((url) => url.includes("/key/list"))).toBe(true));
 
-    await user.click(screen.getByRole("tab", { name: "Deleted Keys" }));
-    await user.click(screen.getByRole("tab", { name: "Request Logs" }));
+    await user.click(screen.getByRole("tab", { name: "已删除密钥" }));
+    await user.click(screen.getByRole("tab", { name: "请求日志" }));
 
     expect(requestedUrls().filter((url) => url.includes("/audit"))).toEqual([]);
     expect(requestedUrls().filter((url) => url.includes("/v2/team/list"))).toEqual([]);
@@ -109,7 +109,7 @@ describe("SpendLogsTable network access by role", () => {
 
     expect(requestedUrls().filter((url) => url.includes("/audit"))).toEqual([]);
 
-    await user.click(screen.getByRole("tab", { name: "Audit Logs" }));
+    await user.click(screen.getByRole("tab", { name: "审计日志" }));
 
     await waitFor(() => expect(requestedUrls().some((url) => url.includes("/audit"))).toBe(true));
   });
@@ -118,12 +118,12 @@ describe("SpendLogsTable network access by role", () => {
     const user = userEvent.setup();
     renderAs("Admin");
 
-    await user.click(screen.getByRole("tab", { name: "Deleted Teams" }));
+    await user.click(screen.getByRole("tab", { name: "已删除团队" }));
 
-    expect(screen.getByRole("tab", { name: "Deleted Teams" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "已删除团队" })).toHaveAttribute("aria-selected", "true");
     expect(requestedUrls().filter((url) => url.includes("/audit"))).toEqual([]);
 
-    await user.click(screen.getByRole("tab", { name: "Audit Logs" }));
+    await user.click(screen.getByRole("tab", { name: "审计日志" }));
 
     await waitFor(() => expect(requestedUrls().some((url) => url.includes("/audit"))).toBe(true));
   });

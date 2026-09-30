@@ -4,6 +4,7 @@ import { useDebouncedValue } from "@tanstack/react-pacer/debouncer";
 import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
 import type { ColumnFiltersState, OnChangeFn, PaginationState, SortingState } from "@tanstack/react-table";
 import moment from "moment";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { DEFAULT_PAGE_SIZE_OPTIONS } from "@/components/shared/DataTable";
@@ -41,6 +42,7 @@ interface RequestLogsPanelProps {
 }
 
 export default function RequestLogsPanel({ accessToken, token, userRole, userID, isActive }: RequestLogsPanelProps) {
+  const t = useTranslations("logs");
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: PAGE_SIZE });
   const [sorting, setSorting] = useState<SortingState>(DEFAULT_LOGS_SORTING);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -281,7 +283,7 @@ export default function RequestLogsPanel({ accessToken, token, userRole, userID,
         keyData={selectedKeyInfo}
         teams={allTeams ?? []}
         onClose={() => setSelectedKeyIdInfoView(null)}
-        backButtonText="Back to Logs"
+        backButtonText={t("backToLogs")}
       />
     );
   }
@@ -289,7 +291,7 @@ export default function RequestLogsPanel({ accessToken, token, userRole, userID,
   return (
     <AutoRouterModelGroupsProvider>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold">Request Logs</h1>
+        <h1 className="text-xl font-semibold">{t("requestLogsTitle")}</h1>
       </div>
 
       {isLiveTail && pagination.pageIndex === 0 && <LiveTailBanner onStop={() => setIsLiveTail(false)} />}

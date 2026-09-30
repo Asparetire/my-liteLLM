@@ -38,19 +38,19 @@ describe("AuditLogDrawer", () => {
   it("should render nothing when there is no log", () => {
     const { container } = render(<AuditLogDrawer {...defaultProps} log={null} />);
     expect(container).toBeEmptyDOMElement();
-    expect(screen.queryByText("Details")).not.toBeInTheDocument();
+    expect(screen.queryByText("详情")).not.toBeInTheDocument();
   });
 
   it("should show the action and the local timestamp in the header", () => {
     render(<AuditLogDrawer {...defaultProps} />);
-    expect(screen.getByText("updated")).toBeInTheDocument();
-    expect(screen.getByText(moment.utc(baseLog.updated_at).local().format("MMM D, YYYY HH:mm:ss"))).toBeInTheDocument();
+    expect(screen.getByText("更新")).toBeInTheDocument();
+    expect(screen.getByText(moment.utc(baseLog.updated_at).local().format("YYYY-MM-DD HH:mm:ss"))).toBeInTheDocument();
   });
 
   it("should show the friendly table name for a known table", () => {
     render(<AuditLogDrawer {...defaultProps} />);
-    expect(screen.getByText("Table")).toBeInTheDocument();
-    expect(screen.getByText("Teams")).toBeInTheDocument();
+    expect(screen.getByText("对象表")).toBeInTheDocument();
+    expect(screen.getByText("团队")).toBeInTheDocument();
   });
 
   it("should fall back to the raw table name when it is not mapped", () => {
@@ -67,7 +67,7 @@ describe("AuditLogDrawer", () => {
 
   it("should show a placeholder when the log has no api key hash", () => {
     render(<AuditLogDrawer {...defaultProps} log={{ ...baseLog, changed_by_api_key: "" }} />);
-    expect(screen.getByText("API Key (Hash)")).toBeInTheDocument();
+    expect(screen.getByText("API 密钥（哈希）")).toBeInTheDocument();
     expect(screen.queryByText("hashed-key-abc")).not.toBeInTheDocument();
   });
 
@@ -82,14 +82,14 @@ describe("AuditLogDrawer", () => {
   it("should show only the fields that changed in the before and after blocks", () => {
     render(<AuditLogDrawer {...defaultProps} />);
 
-    expect(within(blockNamed("Before")).getByText(/"max_budget": 10/)).toBeInTheDocument();
-    expect(within(blockNamed("After")).getByText(/"max_budget": 25/)).toBeInTheDocument();
+    expect(within(blockNamed("变更前")).getByText(/"max_budget": 10/)).toBeInTheDocument();
+    expect(within(blockNamed("变更后")).getByText(/"max_budget": 25/)).toBeInTheDocument();
     expect(screen.queryByText(/tpm_limit/)).not.toBeInTheDocument();
   });
 
   it("should note when an update has no differing fields", () => {
     render(<AuditLogDrawer {...defaultProps} log={{ ...baseLog, before_value: { a: 1 }, updated_values: { a: 1 } }} />);
-    expect(screen.getAllByText(/No differing fields detected/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/未检测到有差异的字段/).length).toBeGreaterThan(0);
   });
 
   it("should show N/A for a side with no values on a create", () => {
@@ -99,8 +99,8 @@ describe("AuditLogDrawer", () => {
         log={{ ...baseLog, action: "created", before_value: {}, updated_values: { team_alias: "new team" } }}
       />,
     );
-    expect(within(blockNamed("Before")).getByText("N/A")).toBeInTheDocument();
-    expect(within(blockNamed("After")).getByText(/"team_alias": "new team"/)).toBeInTheDocument();
+    expect(within(blockNamed("变更前")).getByText("N/A")).toBeInTheDocument();
+    expect(within(blockNamed("变更后")).getByText(/"team_alias": "new team"/)).toBeInTheDocument();
   });
 
   it("should render key-table updates as labelled plain text rather than json", () => {
@@ -115,8 +115,8 @@ describe("AuditLogDrawer", () => {
         }}
       />,
     );
-    expect(within(blockNamed("Before")).getByText("1 tokens")).toBeInTheDocument();
-    expect(within(blockNamed("After")).getByText("2 tokens")).toBeInTheDocument();
+    expect(within(blockNamed("变更前")).getByText("1 tokens")).toBeInTheDocument();
+    expect(within(blockNamed("变更后")).getByText("2 tokens")).toBeInTheDocument();
     expect(screen.queryByText(/"spend"/)).not.toBeInTheDocument();
   });
 
@@ -127,7 +127,7 @@ describe("AuditLogDrawer", () => {
     Object.defineProperty(window, "isSecureContext", { value: true, configurable: true });
 
     render(<AuditLogDrawer {...defaultProps} />);
-    await user.click(within(blockNamed("Before")).getByTitle("Copy JSON"));
+    await user.click(within(blockNamed("变更前")).getByTitle("复制 JSON"));
 
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(JSON.stringify({ max_budget: 10 }, null, 2)));
   });

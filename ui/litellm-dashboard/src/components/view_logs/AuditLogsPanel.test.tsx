@@ -59,10 +59,10 @@ const renderPanel = () => {
 };
 
 const TEXT_FILTERS: { filterId: string; placeholder: string; paramKey: keyof AuditLogsParams }[] = [
-  { filterId: "object_id", placeholder: "Enter object ID…", paramKey: "object_id" },
-  { filterId: "changed_by", placeholder: "Enter user ID…", paramKey: "changed_by" },
-  { filterId: "team_id", placeholder: "Enter team ID…", paramKey: "object_team_id" },
-  { filterId: "key_hash", placeholder: "Enter key hash…", paramKey: "object_key_hash" },
+  { filterId: "object_id", placeholder: "输入对象 ID", paramKey: "object_id" },
+  { filterId: "changed_by", placeholder: "输入用户 ID", paramKey: "changed_by" },
+  { filterId: "team_id", placeholder: "输入团队 ID", paramKey: "object_team_id" },
+  { filterId: "key_hash", placeholder: "输入密钥哈希", paramKey: "object_key_hash" },
 ];
 
 const SELECT_FILTERS: {
@@ -72,8 +72,8 @@ const SELECT_FILTERS: {
   paramKey: keyof AuditLogsParams;
   value: string;
 }[] = [
-  { label: "Action", comboboxIndex: 0, option: "Created", paramKey: "action", value: "created" },
-  { label: "Table", comboboxIndex: 1, option: "Teams", paramKey: "table_name", value: "LiteLLM_TeamTable" },
+  { label: "操作", comboboxIndex: 0, option: "创建", paramKey: "action", value: "created" },
+  { label: "对象表", comboboxIndex: 1, option: "团队", paramKey: "table_name", value: "LiteLLM_TeamTable" },
 ];
 
 describe("AuditLogsPanel", () => {

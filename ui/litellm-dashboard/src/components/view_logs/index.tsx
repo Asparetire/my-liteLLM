@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import useCan from "@/app/(dashboard)/hooks/useCan";
 import DeletedKeysPage from "../DeletedKeysPage/DeletedKeysPage";
@@ -19,25 +20,26 @@ type LogsTabId = "request logs" | "audit logs" | "deleted keys" | "deleted teams
 
 interface LogsTab {
   id: LogsTabId;
-  label: string;
+  labelKey: string;
 }
 
-const REQUEST_LOGS_TAB: LogsTab = { id: "request logs", label: "Request Logs" };
-const AUDIT_LOGS_TAB: LogsTab = { id: "audit logs", label: "Audit Logs" };
-const DELETED_KEYS_TAB: LogsTab = { id: "deleted keys", label: "Deleted Keys" };
-const DELETED_TEAMS_TAB: LogsTab = { id: "deleted teams", label: "Deleted Teams" };
+const REQUEST_LOGS_TAB: LogsTab = { id: "request logs", labelKey: "tabRequestLogs" };
+const AUDIT_LOGS_TAB: LogsTab = { id: "audit logs", labelKey: "tabAuditLogs" };
+const DELETED_KEYS_TAB: LogsTab = { id: "deleted keys", labelKey: "tabDeletedKeys" };
+const DELETED_TEAMS_TAB: LogsTab = { id: "deleted teams", labelKey: "tabDeletedTeams" };
 
 const tabContentClassName = (tabId: LogsTabId): string =>
   tabId === REQUEST_LOGS_TAB.id ? "flex min-h-0 flex-1 flex-col" : "min-h-0 flex-1 overflow-y-auto";
 
 export default function SpendLogsTable({ accessToken, token, userRole, userID, premiumUser }: SpendLogsTableProps) {
+  const t = useTranslations("logs");
   const [activeTab, setActiveTab] = useState<LogsTabId>(REQUEST_LOGS_TAB.id);
   const canViewAuditLogs = useCan("viewAuditLogs");
   const canViewDeletedTeams = useCan("viewDeletedTeams");
 
   if (!accessToken || !token || !userRole || !userID) {
     return (
-      <div role="status" aria-busy="true" aria-label="Loading" className="flex h-64 items-center justify-center">
+      <div role="status" aria-busy="true" aria-label={t("loading")} className="flex h-64 items-center justify-center">
         <UiLoadingSpinner className="size-8 text-primary" />
       </div>
     );
@@ -86,7 +88,7 @@ export default function SpendLogsTable({ accessToken, token, userRole, userID, p
         <TabsList variant="line">
           {tabs.map((tab) => (
             <TabsTrigger key={tab.id} value={tab.id} className="flex-none">
-              {tab.label}
+              {t(tab.labelKey)}
             </TabsTrigger>
           ))}
         </TabsList>

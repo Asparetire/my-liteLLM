@@ -45,9 +45,9 @@ describe("TypeBadges", () => {
   });
 
   describe("BatchBadge", () => {
-    it("should render 'Batch'", () => {
+    it("should render '批量'", () => {
       render(<BatchBadge />);
-      expect(screen.getByText("Batch")).toBeInTheDocument();
+      expect(screen.getByText("批量")).toBeInTheDocument();
     });
   });
 });

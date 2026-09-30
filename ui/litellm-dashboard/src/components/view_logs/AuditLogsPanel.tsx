@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useDebouncedValue } from "@tanstack/react-pacer/debouncer";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { ColumnFiltersState, OnChangeFn, PaginationState } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 import { resolveLogoSrc } from "@/lib/assetPaths";
 import { DEBOUNCE_WAIT_MS } from "@/utils/debounceConstants";
 import { uiAuditLogsCall } from "../networking";
@@ -39,6 +40,7 @@ export default function AuditLogsPanel({
   isActive,
   premiumUser,
 }: AuditLogsProps) {
+  const t = useTranslations("logs");
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: PAGE_SIZE });
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [searchInput, setSearchInput] = useState("");
@@ -100,16 +102,12 @@ export default function AuditLogsPanel({
   if (!premiumUser) {
     return (
       <div style={{ textAlign: "center", marginTop: "20px" }}>
-        <h1 style={{ display: "block", marginBottom: "10px" }}>✨ Enterprise Feature.</h1>
-        <p style={{ display: "block", marginBottom: "10px" }}>
-          This is a LiteLLM Enterprise feature, and requires a valid key to use.
-        </p>
-        <p style={{ display: "block", marginBottom: "20px", fontStyle: "italic" }}>
-          Here&apos;s a preview of what Audit Logs offer:
-        </p>
+        <h1 style={{ display: "block", marginBottom: "10px" }}>{t("enterpriseFeatureTitle")}</h1>
+        <p style={{ display: "block", marginBottom: "10px" }}>{t("enterpriseFeatureBody")}</p>
+        <p style={{ display: "block", marginBottom: "20px", fontStyle: "italic" }}>{t("enterprisePreviewHint")}</p>
         <img
           src={resolveLogoSrc(auditLogsPreviewImg)}
-          alt="Audit Logs Preview"
+          alt={t("auditLogsPreviewAlt")}
           style={{
             maxWidth: "100%",
             maxHeight: "700px",
@@ -128,7 +126,7 @@ export default function AuditLogsPanel({
   return (
     <>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold">Audit Logs</h1>
+        <h1 className="text-xl font-semibold">{t("auditLogsTitle")}</h1>
       </div>
 
       <AuditLogsTable

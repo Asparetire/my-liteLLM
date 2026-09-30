@@ -395,8 +395,8 @@ describe("RequestLogsPanel", () => {
       fireEvent.click(screen.getByTestId("pagination-next"));
       await waitFor(() => expect(lastCall()?.page).toBe(2));
 
-      await user.click(screen.getByRole("button", { name: /Last 24 Hours/i }));
-      await user.click(await screen.findByRole("button", { name: "Custom Range" }));
+      await user.click(screen.getByRole("button", { name: /最近 24 小时/ }));
+      await user.click(await screen.findByRole("button", { name: "自定义时间范围" }));
 
       await waitFor(() => {
         const call = lastCall();
@@ -469,9 +469,9 @@ describe("RequestLogsPanel", () => {
       fireEvent.change(screen.getByTestId("datatable-search"), { target: { value: "sess-42" } });
       await waitFor(() => expect(row("req-sess")).not.toBeNull());
       expect(row("req-initial")).toBeNull();
-      expect(screen.getByTestId("filter-chip-search")).toHaveTextContent("Search:sess-42");
+      expect(screen.getByTestId("filter-chip-search")).toHaveTextContent("搜索:sess-42");
 
-      await user.click(screen.getByRole("button", { name: "Remove Search filter" }));
+      await user.click(screen.getByRole("button", { name: "Remove 搜索 filter" }));
 
       expect(screen.getByTestId("datatable-search")).toHaveValue("");
       await waitFor(() => expect(row("req-initial")).not.toBeNull());
@@ -485,8 +485,8 @@ describe("RequestLogsPanel", () => {
       renderPanel();
 
       await waitFor(() => expect(uiSpendLogsCall).toHaveBeenCalled());
-      await user.click(screen.getByRole("button", { name: /Last 24 Hours/i }));
-      await user.click(await screen.findByRole("button", { name: "Last 15 Minutes" }));
+      await user.click(screen.getByRole("button", { name: /最近 24 小时/ }));
+      await user.click(await screen.findByRole("button", { name: "最近 15 分钟" }));
 
       const windowSeconds = () => {
         const call = lastCall();
@@ -505,13 +505,13 @@ describe("RequestLogsPanel", () => {
       renderPanel();
 
       await waitFor(() => expect(uiSpendLogsCall).toHaveBeenCalled());
-      await user.click(screen.getByRole("button", { name: /Last 24 Hours/i }));
-      await user.click(await screen.findByRole("button", { name: "Last 15 Minutes" }));
-      expect(await screen.findByRole("button", { name: /Last 15 Minutes/i })).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /最近 24 小时/ }));
+      await user.click(await screen.findByRole("button", { name: "最近 15 分钟" }));
+      expect(await screen.findByRole("button", { name: /最近 15 分钟/ })).toBeInTheDocument();
 
-      await user.click(screen.getByRole("button", { name: "Reset Filters" }));
+      await user.click(screen.getByRole("button", { name: "重置筛选" }));
 
-      expect(await screen.findByRole("button", { name: /Last 24 Hours/i })).toBeInTheDocument();
+      expect(await screen.findByRole("button", { name: /最近 24 小时/ })).toBeInTheDocument();
 
       await user.click(screen.getByTestId("datatable-refresh"));
 
@@ -755,7 +755,7 @@ describe("RequestLogsPanel", () => {
   });
 
   describe("hide health checks", () => {
-    const toggle = () => screen.getByRole("switch", { name: "Hide Health Checks" });
+    const toggle = () => screen.getByRole("switch", { name: "隐藏健康检查" });
 
     it("defaults to showing health checks and refetches without them from page 1 when toggled on", async () => {
       const user = userEvent.setup();
@@ -797,11 +797,11 @@ describe("RequestLogsPanel", () => {
       const user = userEvent.setup();
       renderPanel();
 
-      expect(await screen.findByText("Auto-refreshing every 15 seconds")).toBeInTheDocument();
+      expect(await screen.findByText("自动刷新中")).toBeInTheDocument();
 
-      await user.click(screen.getByRole("button", { name: "Stop" }));
+      await user.click(screen.getByRole("button", { name: "停止" }));
 
-      expect(screen.queryByText("Auto-refreshing every 15 seconds")).not.toBeInTheDocument();
+      expect(screen.queryByText("自动刷新中")).not.toBeInTheDocument();
     });
   });
 });

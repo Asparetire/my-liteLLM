@@ -18,12 +18,20 @@ export type AuditLogEntry = {
   updated_values: Record<string, unknown>;
 };
 
-export const AUDIT_TABLE_NAME_DISPLAY: Record<string, string> = {
-  LiteLLM_VerificationToken: "Keys",
-  LiteLLM_TeamTable: "Teams",
-  LiteLLM_UserTable: "Users",
-  LiteLLM_OrganizationTable: "Organizations",
-  LiteLLM_ProxyModelTable: "Models",
+// 操作/表名显示：值是 logs 命名空间的键，消费组件用 t() 解析；未匹配时回退原始数据值
+export const AUDIT_ACTION_LABEL_KEYS: Record<string, string> = {
+  created: "auditActionCreated",
+  updated: "auditActionUpdated",
+  deleted: "auditActionDeleted",
+  rotated: "auditActionRotated",
+};
+
+export const AUDIT_TABLE_NAME_KEYS: Record<string, string> = {
+  LiteLLM_VerificationToken: "auditTableKeys",
+  LiteLLM_TeamTable: "auditTableTeams",
+  LiteLLM_UserTable: "auditTableUsers",
+  LiteLLM_OrganizationTable: "auditTableOrganizations",
+  LiteLLM_ProxyModelTable: "auditTableModels",
 };
 
 const ACTION_TONE: Record<string, StatusTone> = {
@@ -37,13 +45,14 @@ const capitalize = (value: string): string => (value ? value.charAt(0).toUpperCa
 
 interface AuditLogsTableColumnsDeps {
   onViewLog: (log: AuditLogEntry) => void;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }
 
-export const getAuditLogsTableColumns = ({ onViewLog }: AuditLogsTableColumnsDeps): ColumnDef<AuditLogEntry>[] => [
+export const getAuditLogsTableColumns = ({ onViewLog, t }: AuditLogsTableColumnsDeps): ColumnDef<AuditLogEntry>[] => [
   {
     id: "updated_at",
     accessorKey: "updated_at",
-    header: "Timestamp",
+    header: t("colTimestamp"),
     size: 200,
     enableSorting: false,
     cell: ({ row }) => <DateCell value={row.original.updated_at} />,
@@ -51,27 +60,38 @@ export const getAuditLogsTableColumns = ({ onViewLog }: AuditLogsTableColumnsDep
   {
     id: "action",
     accessorKey: "action",
-    header: "Action",
+    header: t("auditFilterAction"),
     size: 110,
     enableSorting: false,
     cell: ({ row }) => (
-      <StatusBadge tone={ACTION_TONE[row.original.action] ?? "neutral"} label={capitalize(row.original.action)} />
+      <StatusBadge
+        tone={ACTION_TONE[row.original.action] ?? "neutral"}
+        label={
+          row.original.action in AUDIT_ACTION_LABEL_KEYS
+            ? t(AUDIT_ACTION_LABEL_KEYS[row.original.action])
+            : capitalize(row.original.action)
+        }
+      />
     ),
   },
   {
     id: "table_name",
     accessorKey: "table_name",
-    header: "Table",
+    header: t("auditFilterTable"),
     size: 130,
     enableSorting: false,
     cell: ({ row }) => (
-      <span className="text-sm">{AUDIT_TABLE_NAME_DISPLAY[row.original.table_name] ?? row.original.table_name}</span>
+      <span className="text-sm">
+        {row.original.table_name in AUDIT_TABLE_NAME_KEYS
+          ? t(AUDIT_TABLE_NAME_KEYS[row.original.table_name])
+          : row.original.table_name}
+      </span>
     ),
   },
   {
     id: "object_id",
     accessorKey: "object_id",
-    header: "Object ID",
+    header: t("auditFilterObjectId"),
     minSize: 220,
     enableSorting: false,
     cell: ({ row }) => (
@@ -86,7 +106,7 @@ export const getAuditLogsTableColumns = ({ onViewLog }: AuditLogsTableColumnsDep
   {
     id: "changed_by",
     accessorKey: "changed_by",
-    header: "Changed By",
+    header: t("auditFilterChangedBy"),
     size: 200,
     enableSorting: false,
     cell: ({ row }) => <DefaultProxyAdminTag userId={row.original.changed_by} />,
@@ -94,7 +114,7 @@ export const getAuditLogsTableColumns = ({ onViewLog }: AuditLogsTableColumnsDep
   {
     id: "changed_by_api_key",
     accessorKey: "changed_by_api_key",
-    header: "API Key (Hash)",
+    header: t("colApiKeyHash"),
     size: 160,
     enableSorting: false,
     cell: ({ row }) => <IdCell value={row.original.changed_by_api_key} variant="plain" />,

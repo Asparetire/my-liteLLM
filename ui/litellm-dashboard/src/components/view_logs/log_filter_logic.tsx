@@ -36,20 +36,21 @@ export const LOG_FILTER_IDS = {
   SEARCH: "search",
 } as const;
 
-export const LOG_FILTER_LABELS: Record<string, string> = {
-  [LOG_FILTER_IDS.TEAM_ID]: "Team ID",
-  [LOG_FILTER_IDS.STATUS]: "Status",
-  [LOG_FILTER_IDS.CACHE_STATUS]: "Cache",
-  [LOG_FILTER_IDS.KEY_ALIAS]: "Key Alias",
-  [LOG_FILTER_IDS.USER_ID]: "User ID",
-  [LOG_FILTER_IDS.END_USER]: "End User",
-  [LOG_FILTER_IDS.ERROR_CODE]: "Error Code",
-  [LOG_FILTER_IDS.ERROR_MESSAGE]: "Error Message",
-  [LOG_FILTER_IDS.KEY_HASH]: "Key Hash",
-  [LOG_FILTER_IDS.SESSION_ID]: "Session ID",
-  [LOG_FILTER_IDS.MODEL_ID]: "Model",
-  [LOG_FILTER_IDS.PUBLIC_MODEL_OR_SEARCH_TOOL]: "Public model / search tool",
-  [LOG_FILTER_IDS.SEARCH]: "Search",
+// 过滤器显示名：值是 logs 命名空间的键，消费组件用 t() 解析（模块级常量不能直接调 t）
+export const LOG_FILTER_LABEL_KEYS: Record<string, string> = {
+  [LOG_FILTER_IDS.TEAM_ID]: "filterTeamId",
+  [LOG_FILTER_IDS.STATUS]: "filterStatus",
+  [LOG_FILTER_IDS.CACHE_STATUS]: "filterCache",
+  [LOG_FILTER_IDS.KEY_ALIAS]: "filterKeyAlias",
+  [LOG_FILTER_IDS.USER_ID]: "filterUserId",
+  [LOG_FILTER_IDS.END_USER]: "filterEndUser",
+  [LOG_FILTER_IDS.ERROR_CODE]: "filterErrorCode",
+  [LOG_FILTER_IDS.ERROR_MESSAGE]: "filterErrorMessage",
+  [LOG_FILTER_IDS.KEY_HASH]: "filterKeyHash",
+  [LOG_FILTER_IDS.SESSION_ID]: "filterSessionId",
+  [LOG_FILTER_IDS.MODEL_ID]: "filterModel",
+  [LOG_FILTER_IDS.PUBLIC_MODEL_OR_SEARCH_TOOL]: "filterPublicModel",
+  [LOG_FILTER_IDS.SEARCH]: "filterSearch",
 };
 
 export interface LogsWindow {

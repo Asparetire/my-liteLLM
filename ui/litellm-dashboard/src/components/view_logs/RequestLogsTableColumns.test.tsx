@@ -26,7 +26,29 @@ const logEntry = (overrides: Partial<LogEntry>): LogEntry => ({
   ...overrides,
 });
 
-const noopDeps = { onKeyHashClick: vi.fn(), onSessionClick: vi.fn() };
+// 纯模块测试：用 zh-CN 文案表 stub t，与 messages/zh-CN.json 的 logs 命名空间保持一致
+const stubT = (key: string, values?: Record<string, string | number>) => {
+  const zh: Record<string, string> = {
+    tooltipLlmCount: "{count} 个 LLM",
+    tooltipAgentCount: "{count} 个 Agent",
+    tooltipMcpCount: "{count} 个 MCP",
+    tooltipCacheHitCount: "{count} 次缓存命中",
+    statusSuccess: "成功",
+    statusFailure: "失败",
+    batchSucceeded: "批量成功 {successful}/{total}",
+    batchFailedTooltip: "批量中有 {failed} 个失败，点击查看详情",
+    batchCost: "批量成本",
+    sessionTotal: "会话合计",
+    inclMcpSpend: "含 MCP 支出：{spend}（{count} 次调用）",
+  };
+  let out = zh[key] ?? key;
+  if (values) {
+    for (const [name, value] of Object.entries(values)) out = out.replaceAll(`{${name}}`, String(value));
+  }
+  return out;
+};
+
+const noopDeps = { onKeyHashClick: vi.fn(), onSessionClick: vi.fn(), t: stubT };
 
 function renderRows(rows: LogEntry[], deps = noopDeps) {
   render(
@@ -54,7 +76,7 @@ describe("Cost column", () => {
     const user = userEvent.setup();
     renderRows([logEntry({ request_id: "req-spend", spend: 0.00012345678 })]);
 
-    await user.hover(screen.getByText("$0.000123"));
+    await user.hover(screen.getByText("< 1 token"));
     expect(await screen.findByText("$0.00012345678")).toBeInTheDocument();
   });
 
@@ -62,16 +84,16 @@ describe("Cost column", () => {
     renderRows([
       logEntry({
         request_id: "req-session",
-        spend: 0.01,
+        spend: 1,
         session_id: "sess-1",
         session_total_count: 3,
-        session_total_spend: 0.06,
+        session_total_spend: 60,
       }),
     ]);
 
-    expect(screen.getByText("$0.060000")).toBeInTheDocument();
-    expect(screen.queryByText("$0.010000")).not.toBeInTheDocument();
-    expect(screen.getByText("session total")).toBeInTheDocument();
+    expect(screen.getByText("60 tokens")).toBeInTheDocument();
+    expect(screen.queryByText("1 token")).not.toBeInTheDocument();
+    expect(screen.getByText("会话合计")).toBeInTheDocument();
   });
 });
 
@@ -96,7 +118,7 @@ describe("Tokens column", () => {
 
     const tokensCell = screen.getByRole("cell", { name: /\(42\+18\)/ });
     expect(tokensCell).toHaveTextContent("60");
-    expect(tokensCell).toHaveTextContent("session total");
+    expect(tokensCell).toHaveTextContent("会话合计");
     expect(screen.queryByText("10")).not.toBeInTheDocument();
     expect(screen.queryByText("(7+3)")).not.toBeInTheDocument();
   });
@@ -106,7 +128,7 @@ describe("Tokens column", () => {
 
     const tokensCell = screen.getByRole("cell", { name: /\(7\+3\)/ });
     expect(tokensCell).toHaveTextContent("10");
-    expect(tokensCell).not.toHaveTextContent("session total");
+    expect(tokensCell).not.toHaveTextContent("会话合计");
   });
 });
 
@@ -126,7 +148,7 @@ describe("Type column", () => {
 
     expect(screen.queryByText("MCP")).not.toBeInTheDocument();
     await user.hover(screen.getByText("3"));
-    expect(await screen.findByText("2 LLM • 1 MCP")).toBeInTheDocument();
+    expect(await screen.findByText("2 个 LLM • 1 个 MCP")).toBeInTheDocument();
   });
 
   it("keeps the plain MCP badge for a single MCP call", () => {
@@ -138,7 +160,7 @@ describe("Type column", () => {
   it("marks a batch cost row with the Batch badge instead of LLM", () => {
     renderRows([logEntry({ request_id: "batch_1_batch_cost", call_type: "aretrieve_batch" })]);
 
-    expect(screen.getByText("Batch")).toBeInTheDocument();
+    expect(screen.getByText("批量")).toBeInTheDocument();
     expect(screen.queryByText("LLM")).not.toBeInTheDocument();
   });
 
@@ -151,7 +173,7 @@ describe("Type column", () => {
     };
     renderRows([logEntry(groupedCostRow)]);
 
-    expect(screen.getByText("Batch")).toBeInTheDocument();
+    expect(screen.getByText("批量")).toBeInTheDocument();
     expect(screen.queryByText("2")).not.toBeInTheDocument();
   });
 });
@@ -168,22 +190,22 @@ describe("batch rows", () => {
     const user = userEvent.setup();
     renderRows([batchRow({ metadata: { batch_successful_requests: 2, batch_failed_requests: 1 } })]);
 
-    expect(screen.queryByText("Success")).not.toBeInTheDocument();
-    await user.hover(screen.getByText("2/3 succeeded"));
-    expect(await screen.findByText("1 of 3 batch requests failed")).toBeInTheDocument();
+    expect(screen.queryByText("成功")).not.toBeInTheDocument();
+    await user.hover(screen.getByText("批量成功 2/3"));
+    expect(await screen.findByText("批量中有 1 个失败，点击查看详情")).toBeInTheDocument();
   });
 
   it("keeps the Success badge when every batch request succeeded", () => {
     renderRows([batchRow({ metadata: { batch_successful_requests: 3, batch_failed_requests: 0 } })]);
 
-    expect(screen.getByText("Success")).toBeInTheDocument();
+    expect(screen.getByText("成功")).toBeInTheDocument();
   });
 
   it("keeps the Failure badge when the batch row itself failed, whatever the counts say", () => {
     renderRows([batchRow({ metadata: { status: "failure", batch_successful_requests: 2, batch_failed_requests: 1 } })]);
 
-    expect(screen.getByText("Failure")).toBeInTheDocument();
-    expect(screen.queryByText("2/3 succeeded")).not.toBeInTheDocument();
+    expect(screen.getByText("失败")).toBeInTheDocument();
+    expect(screen.queryByText("批量成功 2/3")).not.toBeInTheDocument();
   });
 
   it("shows the provider batch id, not the synthetic _batch_cost request id", () => {
@@ -191,14 +213,14 @@ describe("batch rows", () => {
 
     expect(screen.getByText("batch_abc123")).toBeInTheDocument();
     expect(screen.queryByText("batch_abc123_batch_cost")).not.toBeInTheDocument();
-    expect(screen.getByText("batch cost")).toBeInTheDocument();
+    expect(screen.getByText("批量成本")).toBeInTheDocument();
   });
 
   it("leaves ordinary request ids untouched", () => {
     renderRows([logEntry({ request_id: "chatcmpl-42" })]);
 
     expect(screen.getByText("chatcmpl-42")).toBeInTheDocument();
-    expect(screen.queryByText("batch cost")).not.toBeInTheDocument();
+    expect(screen.queryByText("批量成本")).not.toBeInTheDocument();
   });
 });
 
@@ -241,7 +263,7 @@ describe("Model column", () => {
 describe("row action cells", () => {
   it("reports the key hash through the injected dependency rather than a row field", async () => {
     const user = userEvent.setup();
-    const deps = { onKeyHashClick: vi.fn(), onSessionClick: vi.fn() };
+    const deps = { onKeyHashClick: vi.fn(), onSessionClick: vi.fn(), t: stubT };
     renderRows([logEntry({ request_id: "req-key", metadata: { user_api_key: "sk-hash-9" } })], deps);
 
     await user.click(screen.getByText("sk-hash-9"));
@@ -250,7 +272,7 @@ describe("row action cells", () => {
 
   it("reports the clicked row from the session cell, so two rows sharing a session id stay distinguishable", async () => {
     const user = userEvent.setup();
-    const deps = { onKeyHashClick: vi.fn(), onSessionClick: vi.fn() };
+    const deps = { onKeyHashClick: vi.fn(), onSessionClick: vi.fn(), t: stubT };
     renderRows(
       [
         logEntry({ request_id: "req-key-a", session_id: "sess-42", api_key: "key-a" }),

@@ -233,7 +233,7 @@ describe("LogDetailContent", () => {
       />,
     );
 
-    expect(screen.getByText("Request/Response Data Not Available")).toBeInTheDocument();
+    expect(screen.getByText("无法显示请求日志配置")).toBeInTheDocument();
   });
 
   it("should not display ConfigInfoMessage when isLoadingDetails is true even without data", () => {
@@ -248,7 +248,7 @@ describe("LogDetailContent", () => {
       />,
     );
 
-    expect(screen.queryByText("Request/Response Data Not Available")).not.toBeInTheDocument();
+    expect(screen.queryByText("无法显示请求日志配置")).not.toBeInTheDocument();
   });
 
   it("should display loading state when isLoadingDetails is true", () => {
@@ -605,7 +605,7 @@ describe("LogDetailContent", () => {
       />,
     );
 
-    expect(screen.getByText("Vector Store Requests")).toBeInTheDocument();
+    expect(screen.getByText("向量存储请求")).toBeInTheDocument();
   });
 
   it("should display provider as dash when custom_llm_provider is absent", () => {

@@ -68,7 +68,7 @@ describe("SpendLogsTable", () => {
   it("renders the four log tabs", () => {
     renderAs("Admin");
 
-    for (const label of ["Request Logs", "Audit Logs", "Deleted Keys", "Deleted Teams"]) {
+    for (const label of ["请求日志", "审计日志", "已删除密钥", "已删除团队"]) {
       expect(screen.getByRole("tab", { name: label })).toBeInTheDocument();
     }
   });
@@ -79,7 +79,7 @@ describe("SpendLogsTable", () => {
 
     expect(screen.getByTestId("request-logs-panel")).toHaveTextContent("active");
 
-    await user.click(screen.getByRole("tab", { name: "Audit Logs" }));
+    await user.click(screen.getByRole("tab", { name: "审计日志" }));
 
     expect(await screen.findByTestId("audit-logs-panel")).toHaveTextContent("active");
     expect(screen.getByTestId("request-logs-panel")).toHaveTextContent("inactive");
@@ -89,10 +89,10 @@ describe("SpendLogsTable", () => {
     it.each(["Internal User", "Internal Viewer"])("hides Audit Logs and Deleted Teams from %s", (role) => {
       renderAs(role);
 
-      expect(screen.getByRole("tab", { name: "Request Logs" })).toBeInTheDocument();
-      expect(screen.getByRole("tab", { name: "Deleted Keys" })).toBeInTheDocument();
-      expect(screen.queryByRole("tab", { name: "Audit Logs" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("tab", { name: "Deleted Teams" })).not.toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "请求日志" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "已删除密钥" })).toBeInTheDocument();
+      expect(screen.queryByRole("tab", { name: "审计日志" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("tab", { name: "已删除团队" })).not.toBeInTheDocument();
     });
 
     it("never mounts the panels that call the admin-only endpoints for an internal user", () => {
@@ -108,14 +108,14 @@ describe("SpendLogsTable", () => {
     it("shows Deleted Teams to an org admin, whose session role reads as a plain internal user", () => {
       renderAs("Internal User", ORG_ADMIN_MEMBERSHIPS);
 
-      expect(screen.getByRole("tab", { name: "Deleted Teams" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "已删除团队" })).toBeInTheDocument();
       expect(screen.getByTestId("deleted-teams-page")).toBeInTheDocument();
     });
 
     it("does not hand an org admin the Audit Logs tab, which the backend still refuses them", () => {
       renderAs("Internal User", ORG_ADMIN_MEMBERSHIPS);
 
-      expect(tabNames()).toEqual(["Request Logs", "Deleted Keys", "Deleted Teams"]);
+      expect(tabNames()).toEqual(["请求日志", "已删除密钥", "已删除团队"]);
       expect(screen.queryByTestId("audit-logs-panel")).not.toBeInTheDocument();
     });
 
@@ -124,19 +124,19 @@ describe("SpendLogsTable", () => {
         { organization_id: "org-1", members: [{ user_id: "user-1", user_role: "internal_user" }] },
       ]);
 
-      expect(tabNames()).toEqual(["Request Logs", "Deleted Keys"]);
+      expect(tabNames()).toEqual(["请求日志", "已删除密钥"]);
     });
 
     it("activates the org admin's selected tab rather than the one at the four-tab index", async () => {
       const user = userEvent.setup();
       renderAs("Internal User", ORG_ADMIN_MEMBERSHIPS);
 
-      await user.click(screen.getByRole("tab", { name: "Deleted Teams" }));
+      await user.click(screen.getByRole("tab", { name: "已删除团队" }));
 
-      expect(screen.getByRole("tab", { name: "Deleted Teams" })).toHaveAttribute("aria-selected", "true");
+      expect(screen.getByRole("tab", { name: "已删除团队" })).toHaveAttribute("aria-selected", "true");
       expect(screen.getByTestId("request-logs-panel")).toHaveTextContent("inactive");
 
-      await user.click(screen.getByRole("tab", { name: "Request Logs" }));
+      await user.click(screen.getByRole("tab", { name: "请求日志" }));
 
       expect(screen.getByTestId("request-logs-panel")).toHaveTextContent("active");
     });
@@ -147,7 +147,7 @@ describe("SpendLogsTable", () => {
       const user = userEvent.setup();
       renderAs("Admin");
 
-      await user.click(screen.getByRole("tab", { name: "Deleted Keys" }));
+      await user.click(screen.getByRole("tab", { name: "已删除密钥" }));
 
       expect(screen.getByTestId("audit-logs-panel")).toHaveTextContent("inactive");
       expect(screen.getByTestId("request-logs-panel")).toHaveTextContent("inactive");
@@ -157,7 +157,7 @@ describe("SpendLogsTable", () => {
       const user = userEvent.setup();
       renderAs("Admin");
 
-      await user.click(screen.getByRole("tab", { name: "Deleted Teams" }));
+      await user.click(screen.getByRole("tab", { name: "已删除团队" }));
 
       expect(screen.getByTestId("audit-logs-panel")).toHaveTextContent("inactive");
       expect(screen.getByTestId("deleted-teams-page")).toBeInTheDocument();
@@ -167,12 +167,12 @@ describe("SpendLogsTable", () => {
       const user = userEvent.setup();
       renderAs("Internal User");
 
-      await user.click(screen.getByRole("tab", { name: "Deleted Keys" }));
+      await user.click(screen.getByRole("tab", { name: "已删除密钥" }));
 
       expect(screen.getByTestId("deleted-keys-page")).toBeInTheDocument();
       expect(screen.getByTestId("request-logs-panel")).toHaveTextContent("inactive");
 
-      await user.click(screen.getByRole("tab", { name: "Request Logs" }));
+      await user.click(screen.getByRole("tab", { name: "请求日志" }));
 
       expect(screen.getByTestId("request-logs-panel")).toHaveTextContent("active");
     });
@@ -184,14 +184,14 @@ describe("SpendLogsTable", () => {
       renderWithProviders(<SpendLogsTable {...defaultProps} accessToken={null} />);
 
       expect(document.querySelector('[aria-busy="true"]')).toBeInTheDocument();
-      expect(screen.queryByRole("tab", { name: "Request Logs" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("tab", { name: "请求日志" })).not.toBeInTheDocument();
     });
 
     it("renders the tabs (no spinner) once all credentials are present", () => {
       renderAs("Admin");
 
       expect(document.querySelector('[aria-busy="true"]')).not.toBeInTheDocument();
-      expect(screen.getByRole("tab", { name: "Request Logs" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "请求日志" })).toBeInTheDocument();
     });
   });
 });
