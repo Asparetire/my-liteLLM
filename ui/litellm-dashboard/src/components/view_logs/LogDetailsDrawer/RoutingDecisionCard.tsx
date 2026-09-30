@@ -1,9 +1,12 @@
 "use client";
 
 import { Waypoints } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/cva.config";
+
+type Translator = (key: string, values?: Record<string, string | number>) => string;
 
 export interface RoutingDecisionTierBoundaries {
   simple_medium?: number;
@@ -29,10 +32,10 @@ export interface RoutingDecision {
   reasoning_override_min_score?: number;
 }
 
-const ROUTER_TYPE_LABELS: Record<string, string> = {
-  complexity: "Auto-Router v2",
-  adaptive: "Adaptive router",
-  quality: "Quality router",
+const ROUTER_TYPE_LABEL_KEYS: Record<string, string> = {
+  complexity: "routerTypeAutoRouterV2",
+  adaptive: "routerTypeAdaptive",
+  quality: "routerTypeQuality",
 };
 
 /**
@@ -41,6 +44,7 @@ const ROUTER_TYPE_LABELS: Record<string, string> = {
  * use the snapshot rather than today's config.
  */
 function describeScoreAgainstBoundaries(
+  t: Translator,
   score: number,
   boundaries?: RoutingDecisionTierBoundaries,
   renamed?: boolean,
@@ -53,17 +57,17 @@ function describeScoreAgainstBoundaries(
   } = boundaries;
   if (simpleMedium === undefined || mediumComplex === undefined || complexReasoning === undefined) return null;
 
-  const named = (range: string, tier: string): string => (renamed ? range : `${range}, ${tier}`);
-  if (score < simpleMedium) return named(`below ${simpleMedium}`, "SIMPLE");
-  if (score < mediumComplex) return named(`${simpleMedium} to ${mediumComplex}`, "MEDIUM");
-  if (score < complexReasoning) return named(`${mediumComplex} to ${complexReasoning}`, "COMPLEX");
-  return named(`at or above ${complexReasoning}`, "REASONING");
+  const named = (range: string, tier: string): string => (renamed ? range : t("scoreWithTier", { range, tier }));
+  if (score < simpleMedium) return named(t("scoreBelow", { bound: simpleMedium }), "SIMPLE");
+  if (score < mediumComplex) return named(t("scoreBetween", { low: simpleMedium, high: mediumComplex }), "MEDIUM");
+  if (score < complexReasoning) return named(t("scoreBetween", { low: mediumComplex, high: complexReasoning }), "COMPLEX");
+  return named(t("scoreAtOrAbove", { bound: complexReasoning }), "REASONING");
 }
 
-function describePlanModeFloor(matchedKeyword: string | undefined): string {
-  if (matchedKeyword === "exit_plan_mode") return "Plan-mode floor (exit_plan_mode tool)";
-  if (matchedKeyword) return `Plan-mode floor: "${matchedKeyword}"`;
-  return "Plan-mode floor";
+function describePlanModeFloor(t: Translator, matchedKeyword: string | undefined): string {
+  if (matchedKeyword === "exit_plan_mode") return t("planModeFloorTool");
+  if (matchedKeyword) return t("planModeFloorKeyword", { keyword: matchedKeyword });
+  return t("planModeFloor");
 }
 
 /**
@@ -71,37 +75,37 @@ function describePlanModeFloor(matchedKeyword: string | undefined): string {
  * would add to housekeeping_patterns to cover another client, so naming it turns the row into
  * the instruction. Without it the drawer says only that the classifier was skipped.
  */
-function describeHousekeeping(matchedKeyword: string | undefined): string {
-  if (matchedKeyword) return `Client housekeeping call: "${matchedKeyword}"`;
-  return "Client housekeeping call, classifier skipped";
+function describeHousekeeping(t: Translator, matchedKeyword: string | undefined): string {
+  if (matchedKeyword) return t("housekeepingKeyword", { keyword: matchedKeyword });
+  return t("housekeepingPlain");
 }
 
 /** Rows logged before the floor was recorded name what it tracked back then instead of a number. */
-function describeReasoningOverride(tierLabel: string | undefined, floor: number | undefined): string {
-  const stated = floor === undefined ? "the Simple to Medium boundary" : String(floor);
-  return `Heuristic, ${tierLabel ?? "REASONING"} override (2 or more reasoning markers, score of at least ${stated})`;
+function describeReasoningOverride(t: Translator, tierLabel: string | undefined, floor: number | undefined): string {
+  const stated = floor === undefined ? t("simpleToMediumBoundary") : String(floor);
+  return t("reasoningOverride", { tier: tierLabel ?? "REASONING", floor: stated });
 }
 
-const CONSTANT_CAUSE_LABELS: Record<string, string> = {
-  heuristic_scorer: "Heuristic scorer",
-  heuristic_v2: "Heuristic v2",
-  heuristic_first_short_circuit: "Heuristic scorer, classifier skipped",
-  hybrid_short_circuit: "Heuristic scorer, score clear of every boundary",
-  classifier_plugin: "Custom classifier plugin",
-  semantic_keyword_match: "Semantic keyword match",
-  session_affinity_pin: "Pinned to session",
-  session_affinity_escalation: "Escalated from session pin",
-  user_turn_continuation: "Continuation turn, classifier skipped",
-  modality_escalation: "Escalated for image input",
-  modality_pin_override: "Overrode session pin for image input",
-  quality_tier: "Quality tier mapping",
-  bandit: "Adaptive bandit",
-  default_fallback: "Default model, no route matched",
-  classifier_fallback: "Fallback tier, LLM classifier failed",
-  default_model_fallback: "Default model, LLM classifier failed",
+const CONSTANT_CAUSE_LABEL_KEYS: Record<string, string> = {
+  heuristic_scorer: "causeHeuristicScorer",
+  heuristic_v2: "causeHeuristicV2",
+  heuristic_first_short_circuit: "causeHeuristicFirstShortCircuit",
+  hybrid_short_circuit: "causeHybridShortCircuit",
+  classifier_plugin: "causeClassifierPlugin",
+  semantic_keyword_match: "causeSemanticKeywordMatch",
+  session_affinity_pin: "causeSessionAffinityPin",
+  session_affinity_escalation: "causeSessionAffinityEscalation",
+  user_turn_continuation: "causeUserTurnContinuation",
+  modality_escalation: "causeModalityEscalation",
+  modality_pin_override: "causeModalityPinOverride",
+  quality_tier: "causeQualityTier",
+  bandit: "causeBandit",
+  default_fallback: "causeDefaultFallback",
+  classifier_fallback: "causeClassifierFallback",
+  default_model_fallback: "causeDefaultModelFallback",
 };
 
-function describeCause(decision: RoutingDecision): string {
+function describeCause(t: Translator, decision: RoutingDecision): string {
   const {
     cause,
     classifier_model: classifierModel,
@@ -110,23 +114,23 @@ function describeCause(decision: RoutingDecision): string {
     reasoning_override_min_score: overrideFloor,
   } = decision;
 
-  const constant = cause ? CONSTANT_CAUSE_LABELS[cause] : undefined;
-  if (constant) return constant;
+  const constantKey = cause ? CONSTANT_CAUSE_LABEL_KEYS[cause] : undefined;
+  if (constantKey) return t(constantKey);
 
   switch (cause) {
     case "reasoning_override":
-      return describeReasoningOverride(tierLabel, overrideFloor);
+      return describeReasoningOverride(t, tierLabel, overrideFloor);
     case "llm_classifier":
-      return classifierModel ? `LLM classifier (${classifierModel})` : "LLM classifier";
+      return classifierModel ? t("llmClassifierWithModel", { model: classifierModel }) : t("llmClassifier");
     case "literal_keyword_match":
     case "keyword":
-      return matchedKeyword ? `Keyword match: "${matchedKeyword}"` : "Keyword match";
+      return matchedKeyword ? t("keywordMatchWith", { keyword: matchedKeyword }) : t("keywordMatch");
     case "plan_mode":
-      return describePlanModeFloor(matchedKeyword);
+      return describePlanModeFloor(t, matchedKeyword);
     case "housekeeping":
-      return describeHousekeeping(matchedKeyword);
+      return describeHousekeeping(t, matchedKeyword);
     default:
-      return cause ?? "Unknown";
+      return cause ?? t("causeUnknown");
   }
 }
 
@@ -136,9 +140,9 @@ function describeCause(decision: RoutingDecision): string {
  * ordinary route; it just must not claim a bump that did not happen. Only called when
  * the request escalated or asked to, so there is no "did not escalate" case.
  */
-function describeEscalation(escalated: boolean, keyword: string | undefined): string {
-  if (escalated) return keyword ? `Yes, keyword "${keyword}"` : "Yes";
-  return keyword ? `Requested via "${keyword}"; already at the highest tier` : "Requested; already at the highest tier";
+function describeEscalation(t: Translator, escalated: boolean, keyword: string | undefined): string {
+  if (escalated) return keyword ? t("escalationYesKeyword", { keyword }) : t("escalationYes");
+  return keyword ? t("escalationRequestedKeyword", { keyword }) : t("escalationRequested");
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
@@ -157,6 +161,7 @@ export function RoutingDecisionCard({
   decision?: RoutingDecision | null;
   className?: string;
 }) {
+  const t = useTranslations("logs");
   if (!decision || !decision.cause) return null;
 
   const {
@@ -178,12 +183,12 @@ export function RoutingDecisionCard({
   // inside `signals`, which redaction can remove.
   const scoreExplanation =
     score !== undefined && decision.cause !== "reasoning_override" && decision.cause !== "plan_mode"
-      ? describeScoreAgainstBoundaries(score, tierBoundaries, tierLabel !== undefined)
+      ? describeScoreAgainstBoundaries(t, score, tierBoundaries, tierLabel !== undefined)
       : null;
 
   return (
     <div className={cn("mb-6 w-full max-w-full overflow-hidden rounded-lg bg-card shadow-sm", className)}>
-      <div className="border-b px-4 py-2.5 text-sm font-medium">Routing</div>
+      <div className="border-b px-4 py-2.5 text-sm font-medium">{t("routingTitle")}</div>
       <div className="px-4 py-3">
         {routerModelName && (
           <div className="mb-2 flex items-center gap-2 text-sm font-medium">
@@ -191,37 +196,39 @@ export function RoutingDecisionCard({
             <span>{routerModelName}</span>
             {routerType && (
               <span className="font-normal text-muted-foreground">
-                ({ROUTER_TYPE_LABELS[routerType] ?? routerType})
+                ({routerType in ROUTER_TYPE_LABEL_KEYS ? t(ROUTER_TYPE_LABEL_KEYS[routerType]) : routerType})
               </span>
             )}
           </div>
         )}
 
         {tier && (
-          <Row label="Tier">
+          <Row label={t("labelTier")}>
             <Badge variant="secondary" className="font-normal">
               {tierLabel ?? tier}
             </Badge>
           </Row>
         )}
 
-        {requestType && <Row label="Request type">{requestType}</Row>}
+        {requestType && <Row label={t("labelRequestType")}>{requestType}</Row>}
 
-        <Row label="Decided by">{describeCause(decision)}</Row>
+        <Row label={t("labelDecidedBy")}>{describeCause(t, decision)}</Row>
 
         {score !== undefined && (
-          <Row label="Score">
+          <Row label={t("labelScore")}>
             <span className="tabular-nums">{score.toFixed(2)}</span>
             {scoreExplanation && <span className="ml-2 text-muted-foreground">({scoreExplanation})</span>}
           </Row>
         )}
 
-        {routedModel && <Row label="Routed to">{routedModel}</Row>}
+        {routedModel && <Row label={t("labelRoutedTo")}>{routedModel}</Row>}
 
-        {escalated !== undefined && <Row label="Escalated">{describeEscalation(escalated, escalationKeyword)}</Row>}
+        {escalated !== undefined && (
+          <Row label={t("labelEscalated")}>{describeEscalation(t, escalated, escalationKeyword)}</Row>
+        )}
 
         {signals && signals.length > 0 && (
-          <Row label="Signals">
+          <Row label={t("labelSignals")}>
             <span className="flex flex-wrap gap-1">
               {signals.map((signal) => (
                 <Badge key={signal} variant="outline" className="font-normal">

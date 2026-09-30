@@ -23,11 +23,11 @@ describe("RoutingDecisionCard", () => {
   it("explains a heuristic score against the boundaries that were in effect", () => {
     render(<RoutingDecisionCard decision={heuristic} />);
     expect(screen.getByText("smart-router")).toBeInTheDocument();
-    expect(screen.getByText("(Auto-Router v2)")).toBeInTheDocument();
+    expect(screen.getByText("(自动路由器 v2)")).toBeInTheDocument();
     expect(screen.getByText("REASONING")).toBeInTheDocument();
-    expect(screen.getByText("Heuristic scorer")).toBeInTheDocument();
+    expect(screen.getByText("启发式打分器")).toBeInTheDocument();
     expect(screen.getByText("0.82")).toBeInTheDocument();
-    expect(screen.getByText("(at or above 0.6, REASONING)")).toBeInTheDocument();
+    expect(screen.getByText("(0.6 及以上，REASONING)")).toBeInTheDocument();
     expect(screen.getByText("claude-sonnet")).toBeInTheDocument();
     expect(screen.getByText("long (900 tokens)")).toBeInTheDocument();
   });
@@ -45,7 +45,7 @@ describe("RoutingDecisionCard", () => {
         }}
       />,
     );
-    expect(screen.getByText("(at or above 0.3, REASONING)")).toBeInTheDocument();
+    expect(screen.getByText("(0.3 及以上，REASONING)")).toBeInTheDocument();
   });
 
   it("labels a reasoning override and does not claim the score met a boundary", () => {
@@ -61,14 +61,14 @@ describe("RoutingDecisionCard", () => {
     );
     expect(
       screen.getByText(
-        "Heuristic, REASONING override (2 or more reasoning markers, score of at least the Simple to Medium boundary)",
+        "启发式 REASONING 覆盖（2 个及以上推理标记，得分不低于 Simple 到 Medium 边界）",
       ),
     ).toBeInTheDocument();
     expect(screen.getByText("0.20")).toBeInTheDocument();
     // The score did not decide this tier, so NO band explanation may render at all.
     // Asserting the absence of one specific band would pass vacuously: 0.20 sits in
     // the MEDIUM band, so the REASONING wording is absent either way.
-    expect(screen.queryByText(/SIMPLE|MEDIUM|COMPLEX|at or above/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/\d 及以上|\d 至 \d|低于 \d/)).not.toBeInTheDocument();
   });
 
   it("names the judge model on the LLM classifier path and shows no score", () => {
@@ -85,8 +85,8 @@ describe("RoutingDecisionCard", () => {
         }}
       />,
     );
-    expect(screen.getByText("LLM classifier (claude-haiku)")).toBeInTheDocument();
-    expect(screen.queryByText("Score")).not.toBeInTheDocument();
+    expect(screen.getByText("LLM 分类器（claude-haiku）")).toBeInTheDocument();
+    expect(screen.queryByText("得分")).not.toBeInTheDocument();
   });
 
   it("explains a route that fell back to the default model after the classifier failed", () => {
@@ -103,8 +103,8 @@ describe("RoutingDecisionCard", () => {
         }}
       />,
     );
-    expect(screen.getByText("Default model, LLM classifier failed")).toBeInTheDocument();
-    expect(screen.queryByText("Tier")).not.toBeInTheDocument();
+    expect(screen.getByText("默认模型，LLM 分类器失败")).toBeInTheDocument();
+    expect(screen.queryByText("层级")).not.toBeInTheDocument();
   });
 
   it("explains a route that fell back to the configured fallback tier after the classifier failed", () => {
@@ -120,7 +120,7 @@ describe("RoutingDecisionCard", () => {
         }}
       />,
     );
-    expect(screen.getByText("Fallback tier, LLM classifier failed")).toBeInTheDocument();
+    expect(screen.getByText("兜底层级，LLM 分类器失败")).toBeInTheDocument();
     expect(screen.getByText("SECURITY_REVIEW")).toBeInTheDocument();
   });
 
@@ -130,7 +130,7 @@ describe("RoutingDecisionCard", () => {
         decision={{ ...heuristic, cause: "literal_keyword_match", matched_keyword: "deploy to k8s", score: undefined }}
       />,
     );
-    expect(screen.getByText('Keyword match: "deploy to k8s"')).toBeInTheDocument();
+    expect(screen.getByText("关键词匹配：“deploy to k8s”")).toBeInTheDocument();
   });
 
   it("shows the plan-mode sentinel that floored the tier", () => {
@@ -139,7 +139,7 @@ describe("RoutingDecisionCard", () => {
         decision={{ ...heuristic, cause: "plan_mode", matched_keyword: "Plan mode is active", score: undefined }}
       />,
     );
-    expect(screen.getByText('Plan-mode floor: "Plan mode is active"')).toBeInTheDocument();
+    expect(screen.getByText("计划模式兜底：“Plan mode is active”")).toBeInTheDocument();
   });
 
   it("names the exit_plan_mode tool instead of quoting it as a sentinel", () => {
@@ -148,7 +148,7 @@ describe("RoutingDecisionCard", () => {
         decision={{ ...heuristic, cause: "plan_mode", matched_keyword: "exit_plan_mode", score: undefined }}
       />,
     );
-    expect(screen.getByText("Plan-mode floor (exit_plan_mode tool)")).toBeInTheDocument();
+    expect(screen.getByText("计划模式兜底（exit_plan_mode 工具）")).toBeInTheDocument();
   });
 
   it("does not claim the score chose the tier on a plan-mode floored row", () => {
@@ -156,8 +156,8 @@ describe("RoutingDecisionCard", () => {
     render(
       <RoutingDecisionCard decision={{ ...heuristic, cause: "plan_mode", matched_keyword: "Plan mode is active" }} />,
     );
-    expect(screen.queryByText(/below|to 0|at or above/)).not.toBeInTheDocument();
-    expect(screen.getByText('Plan-mode floor: "Plan mode is active"')).toBeInTheDocument();
+    expect(screen.queryByText(/低于|至 0|及以上/)).not.toBeInTheDocument();
+    expect(screen.getByText("计划模式兜底：“Plan mode is active”")).toBeInTheDocument();
   });
 
   it("names the housekeeping sentinel so an operator can extend the pattern list", () => {
@@ -173,28 +173,26 @@ describe("RoutingDecisionCard", () => {
         }}
       />,
     );
-    expect(
-      screen.getByText('Client housekeeping call: "Write the title in the predominant language of the session"'),
-    ).toBeInTheDocument();
+    expect(screen.getByText("客户端内部维护调用：“Write the title in the predominant language of the session”")).toBeInTheDocument();
   });
 
   it("still labels a housekeeping row when redaction dropped the sentinel", () => {
     // matched_keyword is prompt-quoting, so message-log redaction removes it. The row must
     // still read as a housekeeping decision rather than falling back to the raw cause.
     render(<RoutingDecisionCard decision={{ ...heuristic, cause: "housekeeping", score: undefined }} />);
-    expect(screen.getByText("Client housekeeping call, classifier skipped")).toBeInTheDocument();
+    expect(screen.getByText("客户端内部维护调用，已跳过分类器")).toBeInTheDocument();
     expect(screen.queryByText("housekeeping")).not.toBeInTheDocument();
   });
 
   it("labels a modality pin override instead of showing the raw cause token", () => {
     render(<RoutingDecisionCard decision={{ ...heuristic, cause: "modality_pin_override" }} />);
-    expect(screen.getByText("Overrode session pin for image input")).toBeInTheDocument();
+    expect(screen.getByText("因图像输入覆盖会话固定")).toBeInTheDocument();
     expect(screen.queryByText("modality_pin_override")).not.toBeInTheDocument();
   });
 
   it("labels a modality escalation instead of showing the raw cause token", () => {
     render(<RoutingDecisionCard decision={{ ...heuristic, cause: "modality_escalation" }} />);
-    expect(screen.getByText("Escalated for image input")).toBeInTheDocument();
+    expect(screen.getByText("因图像输入升级")).toBeInTheDocument();
     expect(screen.queryByText("modality_escalation")).not.toBeInTheDocument();
   });
 
@@ -202,7 +200,7 @@ describe("RoutingDecisionCard", () => {
     render(
       <RoutingDecisionCard decision={{ ...heuristic, escalated: true, escalation_keyword: "LITELLM ESCALATE" }} />,
     );
-    expect(screen.getByText('Yes, keyword "LITELLM ESCALATE"')).toBeInTheDocument();
+    expect(screen.getByText("是，关键词“LITELLM ESCALATE”")).toBeInTheDocument();
   });
 
   it("still shows the ask when escalation had nowhere higher to go", () => {
@@ -211,28 +209,28 @@ describe("RoutingDecisionCard", () => {
     render(
       <RoutingDecisionCard decision={{ ...heuristic, escalated: false, escalation_keyword: "LITELLM ESCALATE" }} />,
     );
-    expect(screen.getByText('Requested via "LITELLM ESCALATE"; already at the highest tier')).toBeInTheDocument();
+    expect(screen.getByText("通过“LITELLM ESCALATE”请求升级，但已处于最高层级")).toBeInTheDocument();
   });
 
   it("omits the escalation row when no escalation was requested", () => {
     render(<RoutingDecisionCard decision={heuristic} />);
-    expect(screen.queryByText("Escalated")).not.toBeInTheDocument();
+    expect(screen.queryByText("已升级")).not.toBeInTheDocument();
   });
 
   it("still shows a ceiling escalation after the keyword is redacted away", () => {
     // Under message redaction the keyword is gone but `escalated` survives, so the
     // row must still say an escalation was requested.
     render(<RoutingDecisionCard decision={{ ...heuristic, escalated: false }} />);
-    expect(screen.getByText("Requested; already at the highest tier")).toBeInTheDocument();
+    expect(screen.getByText("已请求升级，但已处于最高层级")).toBeInTheDocument();
   });
 
   it("does not claim the score chose the tier on a redacted override row", () => {
     // `signals` is gone under redaction; the cause alone must suppress the band.
     render(<RoutingDecisionCard decision={{ ...heuristic, cause: "reasoning_override", signals: undefined }} />);
-    expect(screen.queryByText(/SIMPLE|MEDIUM|COMPLEX|at or above/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/\d 及以上|\d 至 \d|低于 \d/)).not.toBeInTheDocument();
     expect(
       screen.getByText(
-        "Heuristic, REASONING override (2 or more reasoning markers, score of at least the Simple to Medium boundary)",
+        "启发式 REASONING 覆盖（2 个及以上推理标记，得分不低于 Simple 到 Medium 边界）",
       ),
     ).toBeInTheDocument();
   });
@@ -250,8 +248,8 @@ describe("RoutingDecisionCard", () => {
 
   it("drops the tier name from the score band on a renamed router", () => {
     render(<RoutingDecisionCard decision={{ ...heuristic, tier_label: "Deep" }} />);
-    expect(screen.getByText("(at or above 0.6)")).toBeInTheDocument();
-    expect(screen.queryByText(/at or above 0\.6, REASONING/)).not.toBeInTheDocument();
+    expect(screen.getByText("(0.6 及以上)")).toBeInTheDocument();
+    expect(screen.queryByText(/0\.6 及以上，REASONING/)).not.toBeInTheDocument();
   });
 
   it("uses the operator's tier name in the reasoning override description", () => {
@@ -260,7 +258,7 @@ describe("RoutingDecisionCard", () => {
     );
     expect(
       screen.getByText(
-        "Heuristic, Deep override (2 or more reasoning markers, score of at least the Simple to Medium boundary)",
+        "启发式 Deep 覆盖（2 个及以上推理标记，得分不低于 Simple 到 Medium 边界）",
       ),
     ).toBeInTheDocument();
   });
@@ -272,7 +270,7 @@ describe("RoutingDecisionCard", () => {
       />,
     );
     expect(
-      screen.getByText("Heuristic, REASONING override (2 or more reasoning markers, score of at least 0.05)"),
+      screen.getByText("启发式 REASONING 覆盖（2 个及以上推理标记，得分不低于 0.05）"),
     ).toBeInTheDocument();
   });
 
@@ -285,7 +283,7 @@ describe("RoutingDecisionCard", () => {
       />,
     );
     expect(
-      screen.getByText("Heuristic, REASONING override (2 or more reasoning markers, score of at least 0)"),
+      screen.getByText("启发式 REASONING 覆盖（2 个及以上推理标记，得分不低于 0）"),
     ).toBeInTheDocument();
   });
 
