@@ -18,14 +18,14 @@ describe("PresidioDetectedEntities", () => {
 
     // Header row values
     expect(screen.getByText("EMAIL_ADDRESS")).toBeInTheDocument();
-    expect(screen.getByText(/Score: 0\.92/)).toBeInTheDocument();
-    expect(screen.getByText("Position: 10-20")).toBeInTheDocument();
+    expect(screen.getByText(/得分：0\.92/)).toBeInTheDocument();
+    expect(screen.getByText("位置：10-20")).toBeInTheDocument();
 
     // Expand details
     await user.click(screen.getByText("EMAIL_ADDRESS"));
-    expect(screen.getByText("Entity Type:")).toBeInTheDocument();
-    expect(screen.getByText("Characters 10-20")).toBeInTheDocument();
-    expect(screen.getByText("Confidence:")).toBeInTheDocument();
+    expect(screen.getByText("实体类型：")).toBeInTheDocument();
+    expect(screen.getByText("字符 10-20")).toBeInTheDocument();
+    expect(screen.getByText("置信度：")).toBeInTheDocument();
     // Recognizer details
     expect(screen.getByText("EmailRecognizer")).toBeInTheDocument();
     expect(screen.getByText("email_v1")).toBeInTheDocument();
@@ -47,9 +47,9 @@ describe("PresidioDetectedEntities", () => {
 
     await user.click(screen.getByText("NAME"));
     // No recognizer/explanation rows
-    expect(screen.queryByText("Recognizer:")).not.toBeInTheDocument();
-    expect(screen.queryByText("Explanation:")).not.toBeInTheDocument();
+    expect(screen.queryByText("识别器：")).not.toBeInTheDocument();
+    expect(screen.queryByText("解释：")).not.toBeInTheDocument();
     // Position still renders
-    expect(screen.getByText("Characters 0-0")).toBeInTheDocument();
+    expect(screen.getByText("字符 0-0")).toBeInTheDocument();
   });
 });

@@ -23,11 +23,11 @@ describe("GuardrailViewer", () => {
     const data = makeGuardrailInformation({ duration: 1.23456, guardrail_status: "success" });
     renderWithProviders(<GuardrailViewer data={data} />);
 
-    expect(screen.getByText("Guardrails & Policy Compliance")).toBeInTheDocument();
+    expect(screen.getByText("护栏与合规策略")).toBeInTheDocument();
     // header shows passed count
-    expect(screen.getByText(/1 Passed/)).toBeInTheDocument();
+    expect(screen.getByText(/1 通过/)).toBeInTheDocument();
     // The PASSED badge in the evaluation card
-    expect(screen.getByText("PASSED")).toBeInTheDocument();
+    expect(screen.getByText("通过")).toBeInTheDocument();
 
     // duration displays in ms format: Math.round(1.23456 * 1000) = 1235
     expect(screen.getByText("1235ms")).toBeInTheDocument();
@@ -41,12 +41,12 @@ describe("GuardrailViewer", () => {
     });
     renderWithProviders(<GuardrailViewer data={data} />);
 
-    expect(screen.getByText(/0 Passed/)).toBeInTheDocument();
-    expect(screen.getByText(/1 Flagged/)).toBeInTheDocument();
-    const badges = screen.getAllByText("FLAGGED");
+    expect(screen.getByText(/0 通过/)).toBeInTheDocument();
+    expect(screen.getByText(/1 已标记/)).toBeInTheDocument();
+    const badges = screen.getAllByText("已标记");
     expect(badges.length).toBeGreaterThan(0);
     expect(badges[0]).toHaveClass("text-warning");
-    expect(screen.queryByText("FAILED")).not.toBeInTheDocument();
+    expect(screen.queryByText("失败")).not.toBeInTheDocument();
   });
 
   it("calculates and displays masked entity totals", async () => {
@@ -57,7 +57,7 @@ describe("GuardrailViewer", () => {
     renderWithProviders(<GuardrailViewer data={data} />);
 
     // In collapsed state, the match count badge is visible
-    expect(screen.getByText("3 matched")).toBeInTheDocument();
+    expect(screen.getByText("3 项匹配")).toBeInTheDocument();
 
     // Expand the evaluation card to see entity details
     await user.click(screen.getByText("pii-rail"));
@@ -70,7 +70,7 @@ describe("GuardrailViewer", () => {
     const data = makeGuardrailInformation({ masked_entity_count: {} });
     renderWithProviders(<GuardrailViewer data={data} />);
 
-    expect(screen.queryByText(/matched/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/项匹配/)).not.toBeInTheDocument();
   });
 
   it("toggles evaluation card open/closed on click", async () => {
@@ -158,20 +158,20 @@ describe("GuardrailViewer", () => {
     });
     renderWithProviders(<GuardrailViewer data={data} />);
     // Header still present
-    expect(screen.getByText("Guardrails & Policy Compliance")).toBeInTheDocument();
+    expect(screen.getByText("护栏与合规策略")).toBeInTheDocument();
 
     // Expand the card
     await user.click(screen.getByText("pii-rail"));
     // No Presidio or Bedrock sections
-    expect(screen.queryByText(/Detected Entities/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Raw Bedrock Guardrail Response/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/检测到的实体/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Bedrock 护栏原始响应/)).not.toBeInTheDocument();
   });
 
   it("renders without crashing when guardrail_mode is null", () => {
     const data = makeGuardrailInformation({ guardrail_mode: null });
     renderWithProviders(<GuardrailViewer data={data} />);
 
-    expect(screen.getByText("Guardrails & Policy Compliance")).toBeInTheDocument();
+    expect(screen.getByText("护栏与合规策略")).toBeInTheDocument();
     // Null mode should display as dash
     expect(screen.getByText("—")).toBeInTheDocument();
   });
@@ -182,7 +182,7 @@ describe("GuardrailViewer", () => {
     });
     renderWithProviders(<GuardrailViewer data={data} />);
 
-    expect(screen.getByText("Guardrails & Policy Compliance")).toBeInTheDocument();
+    expect(screen.getByText("护栏与合规策略")).toBeInTheDocument();
     expect(screen.getByText("PRE-CALL")).toBeInTheDocument();
   });
 
@@ -192,12 +192,12 @@ describe("GuardrailViewer", () => {
     });
     renderWithProviders(<GuardrailViewer data={data} />);
 
-    expect(screen.getByText("Guardrails & Policy Compliance")).toBeInTheDocument();
+    expect(screen.getByText("护栏与合规策略")).toBeInTheDocument();
     // Mode badge shows first element formatted
     expect(screen.getByText("PRE-CALL")).toBeInTheDocument();
     // Entry should appear in both pre-call and post-call timeline sections
-    expect(screen.getByText(/Pre-call guardrail:/)).toBeInTheDocument();
-    expect(screen.getByText(/Post-call guardrail:/)).toBeInTheDocument();
+    expect(screen.getByText(/调用前护栏：/)).toBeInTheDocument();
+    expect(screen.getByText(/调用后护栏：/)).toBeInTheDocument();
   });
 
   it("integration: renders with real Bedrock details without mocks", async () => {
@@ -215,7 +215,7 @@ describe("GuardrailViewer", () => {
     await user.click(screen.getByText("pii-rail"));
 
     // Bedrock summary bits
-    expect(screen.getByText("Outputs")).toBeInTheDocument();
+    expect(screen.getByText("输出")).toBeInTheDocument();
     expect(screen.getByText("ok")).toBeInTheDocument();
   });
 });

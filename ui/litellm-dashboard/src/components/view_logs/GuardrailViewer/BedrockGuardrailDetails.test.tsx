@@ -26,7 +26,7 @@ describe("BedrockGuardrailDetails", () => {
     });
     renderWithProviders(<BedrockGuardrailDetails response={resp} />);
 
-    expect(screen.getByText("Action:")).toBeInTheDocument();
+    expect(screen.getByText("动作：")).toBeInTheDocument();
     expect(screen.getByText("Policy violation")).toBeInTheDocument();
     expect(screen.getByText("[blocked]")).toBeInTheDocument();
   });
@@ -38,8 +38,8 @@ describe("BedrockGuardrailDetails", () => {
     });
     renderWithProviders(<BedrockGuardrailDetails response={resp} />);
 
-    expect(screen.getByText(/text guarded 27\/100/)).toBeInTheDocument();
-    expect(screen.getByText(/images guarded 1\/3/)).toBeInTheDocument();
+    expect(screen.getByText(/文本防护 27\/100/)).toBeInTheDocument();
+    expect(screen.getByText(/图像防护 1\/3/)).toBeInTheDocument();
     expect(screen.getByText(/contentPolicyUnits: 7/)).toBeInTheDocument();
     expect(screen.getByText(/wordPolicyUnits: 1/)).toBeInTheDocument();
   });
@@ -48,7 +48,7 @@ describe("BedrockGuardrailDetails", () => {
     // Using outputs
     let resp = makeBedrockResponse({ outputs: [{ text: "hello" }] });
     const { rerender } = renderWithProviders(<BedrockGuardrailDetails response={resp} />);
-    expect(screen.getByText("Outputs")).toBeInTheDocument();
+    expect(screen.getByText("输出")).toBeInTheDocument();
     expect(screen.getByText("hello")).toBeInTheDocument();
 
     // Using output
@@ -64,38 +64,38 @@ describe("BedrockGuardrailDetails", () => {
     renderWithProviders(<BedrockGuardrailDetails response={resp} />);
 
     // Assessment section present
-    expect(screen.getByText("Assessment #1")).toBeInTheDocument();
+    expect(screen.getByText("评估 #1")).toBeInTheDocument();
 
     // Word policy sections
-    expect(screen.getByText("Word Policy")).toBeInTheDocument();
-    expect(screen.getByText("Custom Words")).toBeInTheDocument();
-    expect(screen.getByText("Managed Word Lists")).toBeInTheDocument();
+    expect(screen.getByText("词语策略")).toBeInTheDocument();
+    expect(screen.getByText("自定义词语")).toBeInTheDocument();
+    expect(screen.getByText("托管词表")).toBeInTheDocument();
 
     // Contextual grounding table headers
-    expect(screen.getByText("Contextual Grounding")).toBeInTheDocument();
-    expect(screen.getAllByText("Score").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Threshold").length).toBeGreaterThan(0);
+    expect(screen.getByText("上下文锚定")).toBeInTheDocument();
+    expect(screen.getAllByText("得分").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("阈值").length).toBeGreaterThan(0);
 
     // Sensitive Info sections
-    expect(screen.getByText("Sensitive Information")).toBeInTheDocument();
-    expect(screen.getByText("PII Entities")).toBeInTheDocument();
-    expect(screen.getByText("Custom Regexes")).toBeInTheDocument();
+    expect(screen.getByText("敏感信息")).toBeInTheDocument();
+    expect(screen.getByText("PII 实体")).toBeInTheDocument();
+    expect(screen.getByText("自定义正则")).toBeInTheDocument();
 
     // Topic Policy
-    expect(screen.getByText("Topic Policy")).toBeInTheDocument();
+    expect(screen.getByText("主题策略")).toBeInTheDocument();
     expect(screen.getByText("weapons")).toBeInTheDocument();
 
     // Invocation Metrics
-    expect(screen.getByText("Invocation Metrics")).toBeInTheDocument();
+    expect(screen.getByText("调用指标")).toBeInTheDocument();
 
     // Raw JSON section exists (closed by default)
-    expect(screen.getByText("Raw Bedrock Guardrail Response")).toBeInTheDocument();
+    expect(screen.getByText("Bedrock 护栏原始响应")).toBeInTheDocument();
   });
 
   it("handles non-text outputs gracefully", () => {
     const resp = makeBedrockResponse({ outputs: [{}, { text: "texty" }] });
     renderWithProviders(<BedrockGuardrailDetails response={resp} />);
-    expect(screen.getByText("(non-text output)")).toBeInTheDocument();
+    expect(screen.getByText("（非文本输出）")).toBeInTheDocument();
     expect(screen.getByText("texty")).toBeInTheDocument();
   });
 
@@ -113,6 +113,6 @@ describe("BedrockGuardrailDetails", () => {
     });
     renderWithProviders(<BedrockGuardrailDetails response={resp} />);
     // No crash, minimal render: Assessment + Invocation Metrics present, but no usage/coverage chips at top
-    expect(screen.getByText("Assessment #1")).toBeInTheDocument();
+    expect(screen.getByText("评估 #1")).toBeInTheDocument();
   });
 });
