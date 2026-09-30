@@ -70,7 +70,7 @@ describe("ProjectDetail", () => {
       mockUseProjectDetails.mockReturnValue({ data: undefined, isLoading: true });
       renderWithProviders(<ProjectDetail projectId="proj-1" onBack={onBack} />);
       expect(document.querySelector('[aria-busy="true"]')).toBeInTheDocument();
-      expect(screen.queryByText("Project not found")).not.toBeInTheDocument();
+      expect(screen.queryByText("未找到项目")).not.toBeInTheDocument();
       expect(screen.queryByRole("heading")).not.toBeInTheDocument();
     });
   });
@@ -79,7 +79,7 @@ describe("ProjectDetail", () => {
     it("should display 'Project not found'", () => {
       mockUseProjectDetails.mockReturnValue({ data: undefined, isLoading: false });
       renderWithProviders(<ProjectDetail projectId="proj-1" onBack={onBack} />);
-      expect(screen.getByText("Project not found")).toBeInTheDocument();
+      expect(screen.getByText("未找到项目")).toBeInTheDocument();
     });
 
     it("should call onBack when the back button is clicked in the not-found state", async () => {
@@ -113,7 +113,7 @@ describe("ProjectDetail", () => {
 
     it("should display 'Active' for a non-blocked project", () => {
       renderWithProviders(<ProjectDetail projectId="proj-1" onBack={onBack} />);
-      expect(screen.getByText("Active")).toBeInTheDocument();
+      expect(screen.getByText("活跃")).toBeInTheDocument();
     });
 
     it("should display 'Blocked' for a blocked project", () => {
@@ -122,7 +122,7 @@ describe("ProjectDetail", () => {
         isLoading: false,
       });
       renderWithProviders(<ProjectDetail projectId="proj-1" onBack={onBack} />);
-      expect(screen.getByText("Blocked")).toBeInTheDocument();
+      expect(screen.getByText("已封禁")).toBeInTheDocument();
     });
 
     it("should call onBack when the back button is clicked", async () => {
@@ -134,12 +134,12 @@ describe("ProjectDetail", () => {
 
     it("should show the current spend amount", () => {
       renderWithProviders(<ProjectDetail projectId="proj-1" onBack={onBack} />);
-      expect(screen.getByText("$12.50")).toBeInTheDocument();
+      expect(screen.getByText("13 tokens")).toBeInTheDocument();
     });
 
     it("should show 'No budget limit' when no max budget is set", () => {
       renderWithProviders(<ProjectDetail projectId="proj-1" onBack={onBack} />);
-      expect(screen.getByText("No budget limit")).toBeInTheDocument();
+      expect(screen.getByText("无预算上限")).toBeInTheDocument();
     });
 
     it("should show the budget limit when one is set", () => {
@@ -151,7 +151,7 @@ describe("ProjectDetail", () => {
         isLoading: false,
       });
       renderWithProviders(<ProjectDetail projectId="proj-1" onBack={onBack} />);
-      expect(screen.getByText("of $100.00 budget")).toBeInTheDocument();
+      expect(screen.getByText("预算上限为 100 tokens")).toBeInTheDocument();
     });
 
     it("should show the project description", () => {
@@ -161,13 +161,13 @@ describe("ProjectDetail", () => {
 
     it("should show an 'Edit Project' button", () => {
       renderWithProviders(<ProjectDetail projectId="proj-1" onBack={onBack} />);
-      expect(screen.getByRole("button", { name: /edit project/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /编辑项目/ })).toBeInTheDocument();
     });
 
     it("should open the edit modal when 'Edit Project' is clicked", async () => {
       const user = userEvent.setup();
       renderWithProviders(<ProjectDetail projectId="proj-1" onBack={onBack} />);
-      await user.click(screen.getByRole("button", { name: /edit project/i }));
+      await user.click(screen.getByRole("button", { name: /编辑项目/ }));
       expect(screen.getByTestId("edit-modal")).toBeInTheDocument();
     });
 
@@ -177,7 +177,7 @@ describe("ProjectDetail", () => {
         isLoading: false,
       });
       renderWithProviders(<ProjectDetail projectId="proj-1" onBack={onBack} />);
-      expect(screen.getByText("No team assigned")).toBeInTheDocument();
+      expect(screen.getByText("未分配团队")).toBeInTheDocument();
     });
 
     describe("Spend by Model chart", () => {
@@ -208,11 +208,11 @@ describe("ProjectDetail", () => {
         expect(yAxisTickLabels(container)).toEqual(["gpt-5.2", "gpt-5.2-codex", "claude-opus-4-8", "claude-sonnet-5"]);
       });
 
-      it("should format value axis ticks as dollars with four decimals", () => {
+      it("should format value axis ticks as token counts", () => {
         mockUseProjectDetails.mockReturnValue({ data: multiModelProject, isLoading: false });
         const { container } = renderWithProviders(<ProjectDetail projectId="proj-1" onBack={onBack} />);
 
-        expect(container.querySelector(".recharts-xAxis-tick-labels")?.textContent).toMatch(/\$\d+\.\d{4}/);
+        expect(container.querySelector(".recharts-xAxis-tick-labels")?.textContent).toMatch(/\d+ tokens/);
       });
 
       it("should scale the chart height at 40px per model with a 120px floor", () => {
@@ -234,7 +234,7 @@ describe("ProjectDetail", () => {
         });
         const { container } = renderWithProviders(<ProjectDetail projectId="proj-1" onBack={onBack} />);
 
-        expect(screen.getByText("No model spend recorded yet")).toBeInTheDocument();
+        expect(screen.getByText("暂无模型消费记录")).toBeInTheDocument();
         expect(container.querySelector('[data-slot="chart"]')).toBeNull();
       });
     });

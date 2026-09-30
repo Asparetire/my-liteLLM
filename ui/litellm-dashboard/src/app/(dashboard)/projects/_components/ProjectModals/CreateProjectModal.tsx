@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FolderPlus } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { toast } from "@/lib/toast";
 import { useZodForm } from "@/lib/forms/useZodForm";
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { UiLoadingSpinner } from "@/components/ui/ui-loading-spinner";
 import { useCreateProject, ProjectCreateParams } from "@/app/(dashboard)/hooks/projects/useCreateProject";
 import { ProjectBaseForm } from "./ProjectBaseForm";
-import { emptyProjectFormValues, projectFormSchema } from "./projectFormSchema";
+import { emptyProjectFormValues, buildProjectFormSchema } from "./projectFormSchema";
 import { buildProjectCreateParams } from "./projectFormUtils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -19,7 +20,19 @@ interface CreateProjectModalProps {
 }
 
 function CreateProjectForm({ onClose }: { onClose: () => void }) {
-  const form = useZodForm(projectFormSchema, { defaultValues: emptyProjectFormValues });
+  const t = useTranslations("projects");
+  const form = useZodForm(
+    buildProjectFormSchema({
+      nameRequired: t("nameRequired"),
+      teamRequired: t("teamRequired"),
+      missingModel: t("missingModel"),
+      missingKey: t("missingKey"),
+      missingValue: t("missingValue"),
+      duplicateModel: t("duplicateModel"),
+      duplicateKey: t("duplicateKey"),
+    }),
+    { defaultValues: emptyProjectFormValues },
+  );
   const createMutation = useCreateProject();
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
@@ -31,12 +44,12 @@ function CreateProjectForm({ onClose }: { onClose: () => void }) {
 
     createMutation.mutate(params, {
       onSuccess: () => {
-        toast.success("Project created successfully");
+        toast.success(t("toastCreated"));
         form.reset(emptyProjectFormValues);
         onClose();
       },
       onError: (error) => {
-        toast.error(error.message || "Failed to create project");
+        toast.error(error.message || t("toastCreateFailed"));
       },
     });
   });
@@ -52,11 +65,11 @@ function CreateProjectForm({ onClose }: { onClose: () => void }) {
 
       <div className="mt-6 flex justify-end gap-2 border-t border-border pt-4">
         <Button type="button" variant="outline" onClick={handleCancel}>
-          Cancel
+          {t("cancel")}
         </Button>
         <Button type="button" onClick={() => void handleSubmit()} disabled={createMutation.isPending}>
           {createMutation.isPending ? <UiLoadingSpinner /> : <FolderPlus />}
-          Create Project
+          {t("createProject")}
         </Button>
       </div>
     </form>
@@ -64,11 +77,12 @@ function CreateProjectForm({ onClose }: { onClose: () => void }) {
 }
 
 export function CreateProjectModal({ isOpen, onClose }: CreateProjectModalProps) {
+  const t = useTranslations("projects");
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-[720px]">
         <DialogHeader>
-          <DialogTitle className="text-lg">Create New Project</DialogTitle>
+          <DialogTitle className="text-lg">{t("createTitle")}</DialogTitle>
         </DialogHeader>
         <CreateProjectForm onClose={onClose} />
       </DialogContent>

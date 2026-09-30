@@ -43,28 +43,28 @@ describe("EditProjectModal", () => {
 
   it("should not render modal content when closed", () => {
     renderWithProviders(<EditProjectModal isOpen={false} project={mockProject} onClose={onClose} />);
-    expect(screen.queryByText("Edit Project")).not.toBeInTheDocument();
+    expect(screen.queryByText("编辑项目")).not.toBeInTheDocument();
   });
 
   it("should render the modal when open", () => {
     renderWithProviders(<EditProjectModal isOpen={true} project={mockProject} onClose={onClose} />);
-    expect(screen.getByText("Edit Project")).toBeInTheDocument();
+    expect(screen.getByText("编辑项目")).toBeInTheDocument();
   });
 
   it("should show a 'Save Changes' submit button", () => {
     renderWithProviders(<EditProjectModal isOpen={true} project={mockProject} onClose={onClose} />);
-    expect(screen.getByRole("button", { name: /save changes/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /保存更改/ })).toBeInTheDocument();
   });
 
   it("should show a 'Cancel' button", () => {
     renderWithProviders(<EditProjectModal isOpen={true} project={mockProject} onClose={onClose} />);
-    expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /取消/ })).toBeInTheDocument();
   });
 
   it("should call onClose when the Cancel button is clicked", async () => {
     const user = userEvent.setup();
     renderWithProviders(<EditProjectModal isOpen={true} project={mockProject} onClose={onClose} />);
-    await user.click(screen.getByRole("button", { name: /cancel/i }));
+    await user.click(screen.getByRole("button", { name: /取消/ }));
     expect(onClose).toHaveBeenCalledOnce();
   });
 

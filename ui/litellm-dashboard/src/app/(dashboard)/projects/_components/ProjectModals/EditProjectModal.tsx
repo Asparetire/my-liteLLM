@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Save } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { toast } from "@/lib/toast";
 import { useZodForm } from "@/lib/forms/useZodForm";
@@ -10,7 +11,7 @@ import { UiLoadingSpinner } from "@/components/ui/ui-loading-spinner";
 import { ProjectResponse } from "@/app/(dashboard)/hooks/projects/useProjects";
 import { useUpdateProject, ProjectUpdateParams } from "@/app/(dashboard)/hooks/projects/useUpdateProject";
 import { ProjectBaseForm } from "./ProjectBaseForm";
-import { projectFormSchema, type ProjectFormValues, type ProjectSubmitValues } from "./projectFormSchema";
+import { buildProjectFormSchema, type ProjectFormValues, type ProjectSubmitValues } from "./projectFormSchema";
 import { buildProjectUpdateParams } from "./projectFormUtils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -70,7 +71,19 @@ export const toFormValues = (project: ProjectResponse): ProjectFormValues => {
 };
 
 function EditProjectForm({ project, onClose, onSuccess }: Omit<EditProjectModalProps, "isOpen">) {
-  const form = useZodForm(projectFormSchema, { defaultValues: toFormValues(project) });
+  const t = useTranslations("projects");
+  const form = useZodForm(
+    buildProjectFormSchema({
+      nameRequired: t("nameRequired"),
+      teamRequired: t("teamRequired"),
+      missingModel: t("missingModel"),
+      missingKey: t("missingKey"),
+      missingValue: t("missingValue"),
+      duplicateModel: t("duplicateModel"),
+      duplicateKey: t("duplicateKey"),
+    }),
+    { defaultValues: toFormValues(project) },
+  );
   const updateMutation = useUpdateProject();
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [advancedEverOpened, setAdvancedEverOpened] = useState(false);
@@ -94,12 +107,12 @@ function EditProjectForm({ project, onClose, onSuccess }: Omit<EditProjectModalP
       { projectId: project.project_id, params },
       {
         onSuccess: () => {
-          toast.success("Project updated successfully");
+          toast.success(t("toastUpdated"));
           onSuccess?.();
           onClose();
         },
         onError: (error) => {
-          toast.error(error.message || "Failed to update project");
+          toast.error(error.message || t("toastUpdateFailed"));
         },
       },
     );
@@ -111,11 +124,11 @@ function EditProjectForm({ project, onClose, onSuccess }: Omit<EditProjectModalP
 
       <div className="mt-6 flex justify-end gap-2 border-t border-border pt-4">
         <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
+          {t("cancel")}
         </Button>
         <Button type="button" onClick={() => void handleSubmit()} disabled={updateMutation.isPending}>
           {updateMutation.isPending ? <UiLoadingSpinner /> : <Save />}
-          Save Changes
+          {t("saveChanges")}
         </Button>
       </div>
     </form>
@@ -123,11 +136,12 @@ function EditProjectForm({ project, onClose, onSuccess }: Omit<EditProjectModalP
 }
 
 export function EditProjectModal({ isOpen, project, onClose, onSuccess }: EditProjectModalProps) {
+  const t = useTranslations("projects");
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-[720px]">
         <DialogHeader>
-          <DialogTitle className="text-lg">Edit Project</DialogTitle>
+          <DialogTitle className="text-lg">{t("editTitle")}</DialogTitle>
         </DialogHeader>
         <EditProjectForm key={project.project_id} project={project} onClose={onClose} onSuccess={onSuccess} />
       </DialogContent>

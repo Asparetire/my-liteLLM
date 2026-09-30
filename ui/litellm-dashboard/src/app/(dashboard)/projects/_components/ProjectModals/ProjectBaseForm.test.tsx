@@ -36,33 +36,33 @@ describe("ProjectBaseForm", () => {
 
   it("should render", () => {
     renderWithProviders(<FormWrapper />);
-    expect(screen.getByLabelText("Project Name")).toBeInTheDocument();
+    expect(screen.getByLabelText("项目名称")).toBeInTheDocument();
   });
 
   it("should show a 'Basic Information' section heading", () => {
     renderWithProviders(<FormWrapper />);
-    expect(screen.getByText("Basic Information")).toBeInTheDocument();
+    expect(screen.getByText("基本信息")).toBeInTheDocument();
   });
 
   it("should show a Project Name input", () => {
     renderWithProviders(<FormWrapper />);
-    expect(screen.getByPlaceholderText("e.g. Customer Support Bot")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("例如：客服机器人")).toBeInTheDocument();
   });
 
   it("should show a Team select", () => {
     renderWithProviders(<FormWrapper />);
-    expect(screen.getByText("Team")).toBeInTheDocument();
+    expect(screen.getByText("团队")).toBeInTheDocument();
   });
 
   it("should show a Description textarea", () => {
     renderWithProviders(<FormWrapper />);
-    expect(screen.getByPlaceholderText("Describe the purpose of this project")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("描述该项目的用途")).toBeInTheDocument();
   });
 
   it("should show the models select as disabled when no team is selected", () => {
     renderWithProviders(<FormWrapper />);
     // The models select should be disabled — its placeholder indicates no team yet
-    expect(screen.getByText("Select a team first")).toBeInTheDocument();
+    expect(screen.getByText("请先选择团队")).toBeInTheDocument();
   });
 
   it("should show available team options when the Team dropdown is opened", async () => {
@@ -75,8 +75,8 @@ describe("ProjectBaseForm", () => {
       isLoading: false,
     });
     renderWithProviders(<FormWrapper />);
-    // The form label "Team" is associated with the combobox input inside the Select
-    await user.click(screen.getByLabelText("Team"));
+    // The form label "团队" is associated with the combobox input inside the Select
+    await user.click(screen.getByLabelText("团队"));
     await waitFor(() => {
       expect(screen.getByText("Engineering")).toBeInTheDocument();
     });
@@ -85,34 +85,34 @@ describe("ProjectBaseForm", () => {
 
   it("should show the Max Budget field", () => {
     renderWithProviders(<FormWrapper />);
-    expect(screen.getByPlaceholderText("0.00")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("0")).toBeInTheDocument();
   });
 
   it("should show the Advanced Settings collapse panel", () => {
     renderWithProviders(<FormWrapper />);
-    expect(screen.getByText("Advanced Settings")).toBeInTheDocument();
+    expect(screen.getByText("高级设置")).toBeInTheDocument();
   });
 
   it("should show a Guardrails field in the Advanced Settings section", async () => {
     const user = userEvent.setup();
     renderWithProviders(<FormWrapper />);
-    await user.click(screen.getByText("Advanced Settings"));
+    await user.click(screen.getByText("高级设置"));
     await waitFor(() => {
-      expect(screen.getByText("Guardrails")).toBeInTheDocument();
+      expect(screen.getByText("护栏")).toBeInTheDocument();
     });
   });
 
   it("should show combined, input, and output TPM limit inputs for a model row", async () => {
     const user = userEvent.setup();
     renderWithProviders(<FormWrapper />);
-    await user.click(screen.getByText("Advanced Settings"));
-    await user.click(screen.getByRole("button", { name: /add model limit/i }));
+    await user.click(screen.getByText("高级设置"));
+    await user.click(screen.getByRole("button", { name: /添加模型限额/ }));
 
-    expect(screen.getByPlaceholderText("TPM Limit")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Input TPM Limit")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Output TPM Limit")).toBeInTheDocument();
-    expect(screen.getByLabelText("TPM Limit")).toBeInTheDocument();
-    expect(screen.getByLabelText("Input TPM Limit")).toBeInTheDocument();
-    expect(screen.getByLabelText("Output TPM Limit")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("TPM 限额")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("输入 TPM 限额")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("输出 TPM 限额")).toBeInTheDocument();
+    expect(screen.getByLabelText("TPM 限额")).toBeInTheDocument();
+    expect(screen.getByLabelText("输入 TPM 限额")).toBeInTheDocument();
+    expect(screen.getByLabelText("输出 TPM 限额")).toBeInTheDocument();
   });
 });

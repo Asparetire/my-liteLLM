@@ -46,15 +46,15 @@ type User = ReturnType<typeof setup>;
 const renderModal = () => renderWithProviders(<CreateProjectModal isOpen onClose={vi.fn()} />);
 
 const pickTeam = async (user: User) => {
-  await user.click(screen.getByLabelText("Team"));
+  await user.click(screen.getByLabelText("团队"));
   await user.click(await screen.findByText("Engineering"));
 };
 
-const submit = async (user: User) => user.click(screen.getByRole("button", { name: /create project/i }));
+const submit = async (user: User) => user.click(screen.getByRole("button", { name: /创建项目/ }));
 
 const expandAdvanced = async (user: User) => {
-  await user.click(screen.getByText("Advanced Settings"));
-  await screen.findByText("Model-Specific Limits");
+  await user.click(screen.getByText("高级设置"));
+  await screen.findByText("模型专属限额");
 };
 
 const params = () => mutate.mock.calls.at(-1)?.[0] as Record<string, unknown>;
@@ -68,7 +68,7 @@ describe("CreateProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Project Name"), { target: { value: "My Project" } });
+    fireEvent.change(screen.getByLabelText("项目名称"), { target: { value: "My Project" } });
     await pickTeam(user);
     await submit(user);
 
@@ -92,7 +92,7 @@ describe("CreateProjectModal submit payload", () => {
     await pickTeam(user);
     await submit(user);
 
-    expect(await screen.findByText("Please enter a project name")).toBeInTheDocument();
+    expect(await screen.findByText("请输入项目名称")).toBeInTheDocument();
     expect(mutate).not.toHaveBeenCalled();
   });
 
@@ -100,10 +100,10 @@ describe("CreateProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Project Name"), { target: { value: "My Project" } });
+    fireEvent.change(screen.getByLabelText("项目名称"), { target: { value: "My Project" } });
     await submit(user);
 
-    expect(await screen.findByText("Please select a team")).toBeInTheDocument();
+    expect(await screen.findByText("请选择团队")).toBeInTheDocument();
     expect(mutate).not.toHaveBeenCalled();
   });
 
@@ -111,10 +111,10 @@ describe("CreateProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Project Name"), { target: { value: "My Project" } });
+    fireEvent.change(screen.getByLabelText("项目名称"), { target: { value: "My Project" } });
     await pickTeam(user);
-    fireEvent.change(screen.getByLabelText("Description"), { target: { value: "Handles support" } });
-    fireEvent.change(screen.getByPlaceholderText("0.00"), { target: { value: "42.567" } });
+    fireEvent.change(screen.getByLabelText("描述"), { target: { value: "Handles support" } });
+    fireEvent.change(screen.getByPlaceholderText("0"), { target: { value: "42.567" } });
     await submit(user);
 
     await waitFor(() => expect(mutate).toHaveBeenCalled());
@@ -126,9 +126,9 @@ describe("CreateProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Project Name"), { target: { value: "My Project" } });
+    fireEvent.change(screen.getByLabelText("项目名称"), { target: { value: "My Project" } });
     await pickTeam(user);
-    await user.click(screen.getByLabelText(/Allowed Models/));
+    await user.click(screen.getByLabelText(/允许的模型/));
     await user.click(await screen.findByTitle("gpt-4"));
     await submit(user);
 
@@ -140,11 +140,11 @@ describe("CreateProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Project Name"), { target: { value: "My Project" } });
+    fireEvent.change(screen.getByLabelText("项目名称"), { target: { value: "My Project" } });
     await pickTeam(user);
-    await user.click(screen.getByLabelText(/Allowed Models/));
+    await user.click(screen.getByLabelText(/允许的模型/));
     await user.click(await screen.findByTitle("gpt-4"));
-    await user.click(await screen.findByTitle("All Team Models"));
+    await user.click(await screen.findByTitle("所有团队模型"));
     await submit(user);
 
     await waitFor(() => expect(mutate).toHaveBeenCalled());
@@ -155,7 +155,7 @@ describe("CreateProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Project Name"), { target: { value: "My Project" } });
+    fireEvent.change(screen.getByLabelText("项目名称"), { target: { value: "My Project" } });
     await pickTeam(user);
     await expandAdvanced(user);
     await user.click(screen.getByRole("switch"));
@@ -169,7 +169,7 @@ describe("CreateProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Project Name"), { target: { value: "My Project" } });
+    fireEvent.change(screen.getByLabelText("项目名称"), { target: { value: "My Project" } });
     await pickTeam(user);
     await expandAdvanced(user);
     await submit(user);
@@ -185,16 +185,16 @@ describe("CreateProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Project Name"), { target: { value: "My Project" } });
+    fireEvent.change(screen.getByLabelText("项目名称"), { target: { value: "My Project" } });
     await pickTeam(user);
     await expandAdvanced(user);
 
-    await user.click(screen.getByRole("button", { name: /add model limit/i }));
-    fireEvent.change(screen.getByPlaceholderText("Model name (e.g. gpt-4)"), { target: { value: "gpt-4" } });
-    fireEvent.change(screen.getByPlaceholderText("TPM Limit"), { target: { value: "100" } });
-    fireEvent.change(screen.getByPlaceholderText("RPM Limit"), { target: { value: "20" } });
-    fireEvent.change(screen.getByPlaceholderText("Input TPM Limit"), { target: { value: "60" } });
-    fireEvent.change(screen.getByPlaceholderText("Output TPM Limit"), { target: { value: "40" } });
+    await user.click(screen.getByRole("button", { name: /添加模型限额/ }));
+    fireEvent.change(screen.getByPlaceholderText("模型名称（例如 gpt-4）"), { target: { value: "gpt-4" } });
+    fireEvent.change(screen.getByPlaceholderText("TPM 限额"), { target: { value: "100" } });
+    fireEvent.change(screen.getByPlaceholderText("RPM 限额"), { target: { value: "20" } });
+    fireEvent.change(screen.getByPlaceholderText("输入 TPM 限额"), { target: { value: "60" } });
+    fireEvent.change(screen.getByPlaceholderText("输出 TPM 限额"), { target: { value: "40" } });
     await submit(user);
 
     await waitFor(() => expect(mutate).toHaveBeenCalled());
@@ -208,13 +208,13 @@ describe("CreateProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Project Name"), { target: { value: "My Project" } });
+    fireEvent.change(screen.getByLabelText("项目名称"), { target: { value: "My Project" } });
     await pickTeam(user);
     await expandAdvanced(user);
 
-    await user.click(screen.getByRole("button", { name: /add key-value pair/i }));
-    fireEvent.change(screen.getByPlaceholderText("Key"), { target: { value: "owner" } });
-    fireEvent.change(screen.getByPlaceholderText("Value"), { target: { value: "platform" } });
+    await user.click(screen.getByRole("button", { name: /添加键值对/ }));
+    fireEvent.change(screen.getByPlaceholderText("键"), { target: { value: "owner" } });
+    fireEvent.change(screen.getByPlaceholderText("值"), { target: { value: "platform" } });
     await submit(user);
 
     await waitFor(() => expect(mutate).toHaveBeenCalled());
@@ -225,11 +225,11 @@ describe("CreateProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Project Name"), { target: { value: "My Project" } });
+    fireEvent.change(screen.getByLabelText("项目名称"), { target: { value: "My Project" } });
     await pickTeam(user);
     await expandAdvanced(user);
 
-    await user.click(screen.getByLabelText("Guardrails"));
+    await user.click(screen.getByLabelText("护栏"));
     await user.click(await screen.findByTitle("pii-guard"));
     await user.keyboard("{Escape}");
     await submit(user);
@@ -242,18 +242,18 @@ describe("CreateProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Project Name"), { target: { value: "My Project" } });
+    fireEvent.change(screen.getByLabelText("项目名称"), { target: { value: "My Project" } });
     await pickTeam(user);
     await expandAdvanced(user);
 
-    await user.click(screen.getByRole("button", { name: /add model limit/i }));
-    await user.click(screen.getByRole("button", { name: /add model limit/i }));
-    const modelInputs = screen.getAllByPlaceholderText("Model name (e.g. gpt-4)");
+    await user.click(screen.getByRole("button", { name: /添加模型限额/ }));
+    await user.click(screen.getByRole("button", { name: /添加模型限额/ }));
+    const modelInputs = screen.getAllByPlaceholderText("模型名称（例如 gpt-4）");
     fireEvent.change(modelInputs[0], { target: { value: "gpt-4" } });
     fireEvent.change(modelInputs[1], { target: { value: "gpt-4" } });
     await submit(user);
 
-    expect(await screen.findByText("Duplicate model")).toBeInTheDocument();
+    expect(await screen.findByText("模型重复")).toBeInTheDocument();
     expect(mutate).not.toHaveBeenCalled();
   });
 });

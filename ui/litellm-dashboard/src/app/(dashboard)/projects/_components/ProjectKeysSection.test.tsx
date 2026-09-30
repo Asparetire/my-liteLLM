@@ -26,7 +26,7 @@ describe("ProjectKeysSection", () => {
   it("should show the Keys card title", () => {
     mockUseKeys.mockReturnValue(emptyKeysResponse);
     renderWithProviders(<ProjectKeysSection projectId="proj-1" />);
-    expect(screen.getByText("Keys")).toBeInTheDocument();
+    expect(screen.getByText("密钥")).toBeInTheDocument();
   });
 
   it("should display the total key count from the API response", () => {
@@ -41,13 +41,13 @@ describe("ProjectKeysSection", () => {
   it("should show 'No keys found' when the project has no keys", () => {
     mockUseKeys.mockReturnValue(emptyKeysResponse);
     renderWithProviders(<ProjectKeysSection projectId="proj-1" />);
-    expect(screen.getByText("No keys found")).toBeInTheDocument();
+    expect(screen.getByText("未找到密钥")).toBeInTheDocument();
   });
 
   it("should render a search input for filtering by key name", () => {
     mockUseKeys.mockReturnValue(emptyKeysResponse);
     renderWithProviders(<ProjectKeysSection projectId="proj-1" />);
-    expect(screen.getByPlaceholderText("Filter by key name...")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("按密钥名称过滤…")).toBeInTheDocument();
   });
 
   it("should call useKeys with the projectId", () => {

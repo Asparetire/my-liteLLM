@@ -3,6 +3,7 @@ import { useTeam } from "@/app/(dashboard)/hooks/teams/useTeams";
 import { BarChart } from "@/components/shared/charts";
 import { ArrowLeftIcon, DollarSignIcon, EditIcon, UsersIcon } from "lucide-react";
 import { formatNumberWithCommas, getSpendString } from "@/utils/dataUtils";
+import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import DefaultProxyAdminTag from "@/components/common_components/DefaultProxyAdminTag";
 import CopyButton from "@/components/shared/CopyButton";
@@ -23,6 +24,7 @@ interface ProjectDetailProps {
 const utilisationTone = (percent: number) => (percent >= 90 ? "over" : percent >= 70 ? "warning" : "default");
 
 export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
+  const t = useTranslations("projects");
   const { data: project, isLoading } = useProjectDetails(projectId);
   const { data: teamInfo } = useTeam(project?.team_id ?? undefined);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -45,7 +47,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
         <div
           role="status"
           aria-busy="true"
-          aria-label="Loading"
+          aria-label={t("loading")}
           className="flex min-h-[300px] items-center justify-center"
         >
           <UiLoadingSpinner className="size-8 text-primary" />
@@ -57,10 +59,10 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
   if (!project) {
     return (
       <div className="p-6 px-12">
-        <Button variant="ghost" size="icon" aria-label="Back" onClick={onBack} className="mb-4">
+        <Button variant="ghost" size="icon" aria-label={t("back")} onClick={onBack} className="mb-4">
           <ArrowLeftIcon className="size-4" />
         </Button>
-        <p className="py-8 text-center text-sm text-muted-foreground">Project not found</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">{t("notFound")}</p>
       </div>
     );
   }
@@ -69,7 +71,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
     <div className="p-6 px-12">
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" aria-label="Back" onClick={onBack}>
+          <Button variant="ghost" size="icon" aria-label={t("back")} onClick={onBack}>
             <ArrowLeftIcon className="size-4" />
           </Button>
           <div>
@@ -79,45 +81,45 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
               </h1>
               <StatusBadge
                 tone={project.blocked ? "error" : "success"}
-                label={project.blocked ? "Blocked" : "Active"}
+                label={project.blocked ? t("statusBlocked") : t("statusActive")}
               />
             </div>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <span>ID: {project.project_id}</span>
-              <CopyButton value={project.project_id} label="Copy project ID" />
+              <CopyButton value={project.project_id} label={t("copyId")} />
             </div>
           </div>
         </div>
         <Button onClick={() => setIsEditModalVisible(true)}>
           <EditIcon className="size-4" />
-          Edit Project
+          {t("editProject")}
         </Button>
       </div>
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Project Details</CardTitle>
+          <CardTitle>{t("details")}</CardTitle>
         </CardHeader>
         <CardContent>
           <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-sm">
-            <dt className="text-muted-foreground">Description</dt>
+            <dt className="text-muted-foreground">{t("description")}</dt>
             <dd className="text-foreground">{project.description || "—"}</dd>
-            <dt className="text-muted-foreground">Created</dt>
+            <dt className="text-muted-foreground">{t("created")}</dt>
             <dd className="flex items-center gap-1 text-foreground">
               {new Date(project.created_at).toLocaleString()}
               {project.created_by && (
                 <>
-                  <span>by</span>
+                  <span>{t("by")}</span>
                   <DefaultProxyAdminTag userId={project.created_by} />
                 </>
               )}
             </dd>
-            <dt className="text-muted-foreground">Last Updated</dt>
+            <dt className="text-muted-foreground">{t("lastUpdated")}</dt>
             <dd className="flex items-center gap-1 text-foreground">
               {new Date(project.updated_at).toLocaleString()}
               {project.updated_by && (
                 <>
-                  <span>by</span>
+                  <span>{t("by")}</span>
                   <DefaultProxyAdminTag userId={project.updated_by} />
                 </>
               )}
@@ -131,14 +133,14 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSignIcon className="size-4" />
-              Budget
+              {t("budget")}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <div>
               <p className="text-[28px] leading-none font-medium text-foreground">{getSpendString(spend)}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {hasLimit ? `of ${formatNumberWithCommas(maxBudget, 0)} tokens budget` : "No budget limit"}
+                {hasLimit ? t("ofBudget", { count: formatNumberWithCommas(maxBudget, 0) }) : t("noBudgetLimit")}
               </p>
             </div>
             {hasLimit && (
@@ -149,7 +151,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                   </MeterTrack>
                 </Meter>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {(Math.round(spendPercent * 10) / 10).toFixed(1)}% utilized
+                  {t("utilized", { percent: (Math.round(spendPercent * 10) / 10).toFixed(1) })}
                 </p>
               </div>
             )}
@@ -158,7 +160,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
 
         <Card className="h-full lg:col-span-2">
           <CardHeader>
-            <CardTitle>Spend by Model</CardTitle>
+            <CardTitle>{t("spendByModel")}</CardTitle>
           </CardHeader>
           <CardContent>
             {modelSpendData.length > 0 ? (
@@ -174,7 +176,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                 style={{ height: Math.max(modelSpendData.length * 40, 120) }}
               />
             ) : (
-              <p className="py-8 text-center text-sm text-muted-foreground">No model spend recorded yet</p>
+              <p className="py-8 text-center text-sm text-muted-foreground">{t("noModelSpend")}</p>
             )}
           </CardContent>
         </Card>
@@ -187,7 +189,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <UsersIcon className="size-4" />
-              Team
+              {t("team")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -204,12 +206,12 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                       <p className="text-base font-medium text-foreground">{teamInfo.team_alias || teamInfo.team_id}</p>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <span>ID: {teamInfo.team_id}</span>
-                        <CopyButton value={teamInfo.team_id} label="Copy team ID" />
+                        <CopyButton value={teamInfo.team_id} label={t("copyTeamId")} />
                       </div>
                     </div>
 
                     <div>
-                      <p className="mb-1 text-xs text-muted-foreground">Models</p>
+                      <p className="mb-1 text-xs text-muted-foreground">{t("colModels")}</p>
                       {(teamInfo.models?.length ?? 0) > 0 ? (
                         <div className="flex max-h-[60px] flex-wrap gap-1 overflow-hidden">
                           {teamInfo.models?.map((m: string) => (
@@ -219,17 +221,19 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                           ))}
                         </div>
                       ) : (
-                        <p className="text-sm text-muted-foreground">All models</p>
+                        <p className="text-sm text-muted-foreground">{t("allModels")}</p>
                       )}
                     </div>
 
                     <div>
                       <div className="mb-0.5 flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">Spend</span>
+                        <span className="text-xs text-muted-foreground">{t("spend")}</span>
                         <span className="text-xs text-foreground">
                           {getSpendString(teamSpend)}
                           <span className="text-muted-foreground">
-                            {teamHasLimit ? ` / ${formatNumberWithCommas(teamBudget, 0)} tokens` : " (Unlimited)"}
+                            {teamHasLimit
+                              ? ` / ${formatNumberWithCommas(teamBudget, 0)} tokens`
+                              : t("unlimitedSuffix")}
                           </span>
                         </span>
                       </div>
@@ -243,7 +247,7 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">Members</span>
+                      <span className="text-xs text-muted-foreground">{t("members")}</span>
                       <span className="text-xs text-foreground">{teamInfo.members_with_roles?.length ?? 0}</span>
                     </div>
                   </div>
@@ -253,13 +257,13 @@ export function ProjectDetail({ projectId, onBack }: ProjectDetailProps) {
               <div
                 role="status"
                 aria-busy="true"
-                aria-label="Loading team"
+                aria-label={t("loadingTeam")}
                 className="flex items-center justify-center p-4"
               >
                 <UiLoadingSpinner className="size-5 text-muted-foreground" />
               </div>
             ) : (
-              <p className="py-8 text-center text-sm text-muted-foreground">No team assigned</p>
+              <p className="py-8 text-center text-sm text-muted-foreground">{t("noTeamAssigned")}</p>
             )}
           </CardContent>
         </Card>

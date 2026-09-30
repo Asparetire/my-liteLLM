@@ -1,6 +1,7 @@
 import { useKeys } from "@/app/(dashboard)/hooks/keys/useKeys";
 import { PaginationState } from "@tanstack/react-table";
 import { KeyIcon, SearchIcon, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
@@ -13,6 +14,7 @@ interface ProjectKeysSectionProps {
 const PAGE_SIZE = 5;
 
 export function ProjectKeysSection({ projectId }: ProjectKeysSectionProps) {
+  const t = useTranslations("projects");
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: PAGE_SIZE });
   const [keyAlias, setKeyAlias] = useState<string>("");
 
@@ -33,7 +35,7 @@ export function ProjectKeysSection({ projectId }: ProjectKeysSectionProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <KeyIcon className="size-4" />
-          Keys
+          {t("keys")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -43,13 +45,13 @@ export function ProjectKeysSection({ projectId }: ProjectKeysSectionProps) {
               <SearchIcon className="size-3.5 text-muted-foreground" />
             </InputGroupAddon>
             <InputGroupInput
-              placeholder="Filter by key name..."
+              placeholder={t("filterKeysPlaceholder")}
               value={keyAlias}
               onChange={(e) => setKeyAlias(e.target.value)}
             />
             {keyAlias && (
               <InputGroupAddon align="inline-end">
-                <InputGroupButton size="icon-xs" aria-label="Clear key filter" onClick={() => setKeyAlias("")}>
+                <InputGroupButton size="icon-xs" aria-label={t("clearKeyFilter")} onClick={() => setKeyAlias("")}>
                   <X />
                 </InputGroupButton>
               </InputGroupAddon>

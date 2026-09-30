@@ -2,6 +2,8 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
+import type { Translator } from "./ProjectsTableColumns";
+
 import DefaultProxyAdminTag from "@/components/common_components/DefaultProxyAdminTag";
 import { KeyResponse } from "@/components/key_team_helpers/key_list";
 import { CellTooltip, DateCell, IdentityCell } from "@/components/shared/table_cells";
@@ -22,12 +24,12 @@ function OwnerCell({ record }: { record: KeyResponse }) {
   );
 }
 
-export const getProjectKeysTableColumns = (): ColumnDef<KeyResponse>[] => [
+export const getProjectKeysTableColumns = (t: Translator): ColumnDef<KeyResponse>[] => [
   {
     id: "key_alias",
     accessorKey: "key_alias",
-    meta: { title: "Key Name" },
-    header: "Key Name",
+    meta: { title: t("keyName") },
+    header: t("keyName"),
     enableSorting: false,
     cell: ({ row }) => (
       <IdentityCell
@@ -39,16 +41,16 @@ export const getProjectKeysTableColumns = (): ColumnDef<KeyResponse>[] => [
   },
   {
     id: "owner",
-    meta: { title: "Owner" },
-    header: "Owner",
+    meta: { title: t("owner") },
+    header: t("owner"),
     enableSorting: false,
     cell: ({ row }) => <OwnerCell record={row.original} />,
   },
   {
     id: "created_at",
     accessorKey: "created_at",
-    meta: { title: "Created" },
-    header: "Created",
+    meta: { title: t("colCreated") },
+    header: t("colCreated"),
     size: 130,
     enableSorting: false,
     cell: ({ row }) => <DateCell value={row.original.created_at} precision="date" />,
@@ -56,10 +58,10 @@ export const getProjectKeysTableColumns = (): ColumnDef<KeyResponse>[] => [
   {
     id: "last_active",
     accessorKey: "last_active",
-    meta: { title: "Last Active" },
-    header: "Last Active",
+    meta: { title: t("lastActive") },
+    header: t("lastActive"),
     size: 130,
     enableSorting: false,
-    cell: ({ row }) => <DateCell value={row.original.last_active} precision="date" fallback="Never" />,
+    cell: ({ row }) => <DateCell value={row.original.last_active} precision="date" fallback={t("never")} />,
   },
 ];

@@ -90,7 +90,7 @@ describe("ProjectKeysTable", () => {
 
   it("should display 'No keys found' when the keys list is empty", () => {
     renderWithProviders(<ProjectKeysTable {...defaultProps} keys={[]} />);
-    expect(screen.getByText("No keys found")).toBeInTheDocument();
+    expect(screen.getByText("未找到密钥")).toBeInTheDocument();
   });
 
   it("should display the key alias when provided", () => {
@@ -154,14 +154,14 @@ describe("ProjectKeysTable", () => {
 
   it("should display 'Never' in the Last Active column when last_active is null", () => {
     renderWithProviders(<ProjectKeysTable {...defaultProps} keys={[makeKey({ last_active: null })]} />);
-    expect(screen.getByText("Never")).toBeInTheDocument();
+    expect(screen.getByText("从未")).toBeInTheDocument();
   });
 
   it("should display a formatted date in the Last Active column when last_active is provided", () => {
     renderWithProviders(
       <ProjectKeysTable {...defaultProps} keys={[makeKey({ last_active: "2024-06-15T10:00:00Z" })]} />,
     );
-    expect(screen.queryByText("Never")).not.toBeInTheDocument();
+    expect(screen.queryByText("从未")).not.toBeInTheDocument();
   });
 
   it("should render multiple keys as separate rows", () => {
@@ -174,7 +174,7 @@ describe("ProjectKeysTable", () => {
   it("should show skeleton rows while loading", () => {
     renderWithProviders(<ProjectKeysTable {...defaultProps} keys={[]} isLoading />);
     expect(screen.getAllByTestId("skeleton-row").length).toBeGreaterThan(0);
-    expect(screen.queryByText("No keys found")).not.toBeInTheDocument();
+    expect(screen.queryByText("未找到密钥")).not.toBeInTheDocument();
   });
 
   it("should show the server-side total in the pagination footer", () => {

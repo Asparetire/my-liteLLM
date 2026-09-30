@@ -72,7 +72,7 @@ const project: ProjectResponse = {
 const renderModal = (data: ProjectResponse = project) =>
   renderWithProviders(<EditProjectModal isOpen project={data} onClose={vi.fn()} />);
 
-const save = async (user: User) => user.click(screen.getByRole("button", { name: /save changes/i }));
+const save = async (user: User) => user.click(screen.getByRole("button", { name: /保存更改/ }));
 
 const variables = () => mutate.mock.calls.at(-1)?.[0] as { projectId: string; params: Record<string, unknown> };
 
@@ -106,7 +106,7 @@ describe("EditProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    const budgetInput = screen.getByRole("spinbutton", { name: "Max Budget (USD)" });
+    const budgetInput = screen.getByRole("spinbutton", { name: "最大预算（tokens）" });
     await user.clear(budgetInput);
     await user.tab();
     expect(budgetInput).toHaveValue(null);
@@ -121,9 +121,9 @@ describe("EditProjectModal submit payload", () => {
     renderModal();
     await screen.findByDisplayValue("My Project");
 
-    await user.click(screen.getByText("Advanced Settings"));
-    await screen.findByText("Model-Specific Limits");
-    await user.click(screen.getByText("Advanced Settings"));
+    await user.click(screen.getByText("高级设置"));
+    await screen.findByText("模型专属限额");
+    await user.click(screen.getByText("高级设置"));
     await save(user);
 
     await waitFor(() => expect(mutate).toHaveBeenCalled());
@@ -164,8 +164,8 @@ describe("EditProjectModal submit payload", () => {
     renderModal();
     await screen.findByDisplayValue("My Project");
 
-    await user.click(screen.getByText("Advanced Settings"));
-    await screen.findByText("Model-Specific Limits");
+    await user.click(screen.getByText("高级设置"));
+    await screen.findByText("模型专属限额");
     await save(user);
 
     await waitFor(() => expect(mutate).toHaveBeenCalled());
@@ -176,10 +176,10 @@ describe("EditProjectModal submit payload", () => {
     const user = setup();
     renderModal();
 
-    await user.clear(screen.getByLabelText("Project Name"));
+    await user.clear(screen.getByLabelText("项目名称"));
     await save(user);
 
-    expect(await screen.findByText("Please enter a project name")).toBeInTheDocument();
+    expect(await screen.findByText("请输入项目名称")).toBeInTheDocument();
     expect(mutate).not.toHaveBeenCalled();
   });
 
@@ -228,9 +228,9 @@ describe("EditProjectModal submit payload", () => {
     renderModal();
     await screen.findByDisplayValue("My Project");
 
-    await user.click(screen.getByText("Advanced Settings"));
-    await screen.findByText("Model-Specific Limits");
-    await user.click(screen.getByRole("button", { name: "Remove model limit 1" }));
+    await user.click(screen.getByText("高级设置"));
+    await screen.findByText("模型专属限额");
+    await user.click(screen.getByRole("button", { name: "移除模型限额 1" }));
     await save(user);
 
     await waitFor(() => expect(mutate).toHaveBeenCalled());
@@ -246,9 +246,9 @@ describe("EditProjectModal submit payload", () => {
     renderModal();
     await screen.findByDisplayValue("My Project");
 
-    await user.click(screen.getByText("Advanced Settings"));
-    await screen.findByText("Model-Specific Limits");
-    await user.clear(screen.getByLabelText("Input TPM Limit"));
+    await user.click(screen.getByText("高级设置"));
+    await screen.findByText("模型专属限额");
+    await user.clear(screen.getByLabelText("输入 TPM 限额"));
     await save(user);
 
     await waitFor(() => expect(mutate).toHaveBeenCalled());
@@ -262,9 +262,9 @@ describe("EditProjectModal submit payload", () => {
     renderModal({ ...project, metadata: { owner: "platform" } } as unknown as ProjectResponse);
     await screen.findByDisplayValue("My Project");
 
-    await user.click(screen.getByText("Advanced Settings"));
-    await screen.findByText("Metadata");
-    await user.click(screen.getByRole("button", { name: "Remove metadata pair 1" }));
+    await user.click(screen.getByText("高级设置"));
+    await screen.findByText("元数据");
+    await user.click(screen.getByRole("button", { name: "移除元数据对 1" }));
     await save(user);
 
     await waitFor(() => expect(mutate).toHaveBeenCalled());
@@ -282,8 +282,8 @@ describe("EditProjectModal submit payload", () => {
     } as unknown as ProjectResponse);
     await screen.findByDisplayValue("My Project");
 
-    await user.click(screen.getByText("Advanced Settings"));
-    await screen.findByText("Model-Specific Limits");
+    await user.click(screen.getByText("高级设置"));
+    await screen.findByText("模型专属限额");
     await save(user);
 
     await waitFor(() => expect(mutate).toHaveBeenCalled());
