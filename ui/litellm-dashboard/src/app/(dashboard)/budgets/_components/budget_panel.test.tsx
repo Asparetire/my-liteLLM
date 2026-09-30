@@ -88,8 +88,8 @@ describe("Budget Panel", () => {
   it("renders the standard page header with the sidebar's Budgets icon", async () => {
     const { container } = renderPanel();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Budgets" })).toBeInTheDocument();
-    expect(screen.getByText("Token usage, TPM and RPM limits you can assign to customers.")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "预算" })).toBeInTheDocument();
+    expect(screen.getByText("可分配给客户的 token 用量、TPM 与 RPM 限额")).toBeInTheDocument();
     expect(container.querySelector(".lucide-wallet")).not.toBeNull();
   });
 
@@ -221,8 +221,8 @@ describe("Budget Panel", () => {
   it("renders an access-denied state when the route rejects the caller", async () => {
     getMock.mockRejectedValue(new ApiError("Only proxy admins can view budgets", 403, FORBIDDEN_PROBLEM));
     renderPanel();
-    expect(await screen.findByText("You do not have access to budgets")).toBeInTheDocument();
-    expect(screen.queryByText("No budgets yet")).not.toBeInTheDocument();
+    expect(await screen.findByText("你没有查看预算的权限")).toBeInTheDocument();
+    expect(screen.queryByText("暂无预算")).not.toBeInTheDocument();
   });
 
   it("deletes a budget from the actions menu", async () => {
@@ -233,8 +233,8 @@ describe("Budget Panel", () => {
 
     await user.click(screen.getByTestId("budget-actions-ecc1869c-6231-4380-a56d-1a0be457477d"));
     await user.click(await screen.findByTestId("budget-action-delete"));
-    await screen.findByText("Delete Budget?");
-    await user.click(screen.getByRole("button", { name: /^delete$/i }));
+    await screen.findByText("删除预算？");
+    await user.click(screen.getByRole("button", { name: /^删除$/ }));
 
     await waitFor(() =>
       expect(budgetDeleteMock).toHaveBeenCalledWith("sk-test", "ecc1869c-6231-4380-a56d-1a0be457477d"),
@@ -250,8 +250,8 @@ describe("Budget Panel", () => {
 
     await user.click(screen.getByTestId("budget-actions-ecc1869c-6231-4380-a56d-1a0be457477d"));
     await user.click(await screen.findByTestId("budget-action-delete"));
-    await screen.findByText("Delete Budget?");
-    await user.click(screen.getByRole("button", { name: /^delete$/i }));
+    await screen.findByText("删除预算？");
+    await user.click(screen.getByRole("button", { name: /^删除$/ }));
 
     await waitFor(() => expect(getMock.mock.calls.length).toBeGreaterThan(before));
   });

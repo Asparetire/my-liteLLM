@@ -23,11 +23,11 @@ const FULL_PAYLOAD = {
 const renderModal = () => render(<BudgetModal isModalVisible={true} setIsModalVisible={vi.fn()} />);
 
 const create = async (user: ReturnType<typeof userEvent.setup>) =>
-  user.click(screen.getByRole("button", { name: "Create Budget" }));
+  user.click(screen.getByRole("button", { name: "创建预算" }));
 
 const openOptionalSettings = async (user: ReturnType<typeof userEvent.setup>) => {
-  await user.click(screen.getByText("Optional Settings"));
-  await screen.findByLabelText("Max Budget (tokens)");
+  await user.click(screen.getByText("可选设置"));
+  await screen.findByLabelText("最大预算（tokens）");
 };
 
 describe("BudgetModal", () => {
@@ -40,9 +40,9 @@ describe("BudgetModal", () => {
     const user = userEvent.setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Budget ID"), { target: { value: "budget-alpha" } });
-    fireEvent.change(screen.getByLabelText("Max Tokens per minute"), { target: { value: "500.567" } });
-    fireEvent.change(screen.getByLabelText("Max Requests per minute"), { target: { value: "7" } });
+    fireEvent.change(screen.getByLabelText("预算 ID"), { target: { value: "budget-alpha" } });
+    fireEvent.change(screen.getByLabelText("每分钟最大 token 数"), { target: { value: "500.567" } });
+    fireEvent.change(screen.getByLabelText("每分钟最大请求数"), { target: { value: "7" } });
     await create(user);
 
     await waitFor(() => expect(createMock).toHaveBeenCalledTimes(1));
@@ -57,14 +57,14 @@ describe("BudgetModal", () => {
     const user = userEvent.setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Budget ID"), { target: { value: "budget-alpha" } });
-    fireEvent.change(screen.getByLabelText("Max Tokens per minute"), { target: { value: "500.567" } });
-    fireEvent.change(screen.getByLabelText("Max Requests per minute"), { target: { value: "7" } });
+    fireEvent.change(screen.getByLabelText("预算 ID"), { target: { value: "budget-alpha" } });
+    fireEvent.change(screen.getByLabelText("每分钟最大 token 数"), { target: { value: "500.567" } });
+    fireEvent.change(screen.getByLabelText("每分钟最大请求数"), { target: { value: "7" } });
 
     await openOptionalSettings(user);
-    fireEvent.change(screen.getByLabelText("Max Budget (tokens)"), { target: { value: "42.567" } });
+    fireEvent.change(screen.getByLabelText("最大预算（tokens）"), { target: { value: "42.567" } });
 
-    await chooseSelectOption(user, screen.getByRole("combobox"), "monthly");
+    await chooseSelectOption(user, screen.getByRole("combobox"), "每月");
 
     await create(user);
 
@@ -76,14 +76,14 @@ describe("BudgetModal", () => {
     const user = userEvent.setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Budget ID"), { target: { value: "budget-alpha" } });
+    fireEvent.change(screen.getByLabelText("预算 ID"), { target: { value: "budget-alpha" } });
 
     await openOptionalSettings(user);
-    fireEvent.change(screen.getByLabelText("Max Budget (tokens)"), { target: { value: "42.567" } });
-    await chooseSelectOption(user, screen.getByRole("combobox"), "monthly");
+    fireEvent.change(screen.getByLabelText("最大预算（tokens）"), { target: { value: "42.567" } });
+    await chooseSelectOption(user, screen.getByRole("combobox"), "每月");
 
-    await user.click(screen.getByText("Optional Settings"));
-    await waitFor(() => expect(screen.queryByLabelText("Max Budget (tokens)")).not.toBeInTheDocument());
+    await user.click(screen.getByText("可选设置"));
+    await waitFor(() => expect(screen.queryByLabelText("最大预算（tokens）")).not.toBeInTheDocument());
     await create(user);
 
     await waitFor(() => expect(createMock).toHaveBeenCalledTimes(1));
@@ -94,9 +94,9 @@ describe("BudgetModal", () => {
     const user = userEvent.setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Budget ID"), { target: { value: "budget-alpha" } });
-    fireEvent.change(screen.getByLabelText("Max Tokens per minute"), { target: { value: "5" } });
-    await user.clear(screen.getByLabelText("Max Tokens per minute"));
+    fireEvent.change(screen.getByLabelText("预算 ID"), { target: { value: "budget-alpha" } });
+    fireEvent.change(screen.getByLabelText("每分钟最大 token 数"), { target: { value: "5" } });
+    await user.clear(screen.getByLabelText("每分钟最大 token 数"));
     await create(user);
 
     await waitFor(() => expect(createMock).toHaveBeenCalledTimes(1));
@@ -110,25 +110,25 @@ describe("BudgetModal", () => {
     const user = userEvent.setup();
     renderModal();
 
-    fireEvent.change(screen.getByLabelText("Max Tokens per minute"), { target: { value: "5" } });
+    fireEvent.change(screen.getByLabelText("每分钟最大 token 数"), { target: { value: "5" } });
     await create(user);
 
-    await waitFor(() => expect(screen.getByLabelText("Budget ID")).toHaveAttribute("aria-invalid", "true"));
+    await waitFor(() => expect(screen.getByLabelText("预算 ID")).toHaveAttribute("aria-invalid", "true"));
     expect(createMock).not.toHaveBeenCalled();
   });
 
   it("keeps a typed Optional Setting when the section is collapsed and reopened, as antd's store did", async () => {
     const user = userEvent.setup();
     renderModal();
-    fireEvent.change(screen.getByLabelText("Budget ID"), { target: { value: "probe-budget" } });
+    fireEvent.change(screen.getByLabelText("预算 ID"), { target: { value: "probe-budget" } });
 
     await openOptionalSettings(user);
-    fireEvent.change(screen.getByLabelText("Max Budget (tokens)"), { target: { value: "42.5" } });
+    fireEvent.change(screen.getByLabelText("最大预算（tokens）"), { target: { value: "42.5" } });
 
-    await user.click(screen.getByText("Optional Settings"));
-    await user.click(screen.getByText("Optional Settings"));
+    await user.click(screen.getByText("可选设置"));
+    await user.click(screen.getByText("可选设置"));
 
-    expect(await screen.findByLabelText("Max Budget (tokens)")).toHaveValue(42.5);
+    expect(await screen.findByLabelText("最大预算（tokens）")).toHaveValue(42.5);
 
     await create(user);
 

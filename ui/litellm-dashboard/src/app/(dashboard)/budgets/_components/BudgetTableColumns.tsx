@@ -2,12 +2,13 @@
 
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { DataTableSortHeader } from "@/components/shared/DataTable";
 import { DateCell, IdCell, MoneyCell } from "@/components/shared/table_cells";
 import type { budgetItem } from "@/app/(dashboard)/hooks/budgets/useBudgets";
+import { BUDGET_DURATION_UNSET } from "@/app/(dashboard)/hooks/budgets/budgetFilters";
 import { buttonVariants } from "@/components/ui/button";
-import { getBudgetDurationLabel } from "@/components/common_components/budget_duration_dropdown";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/cva.config";
+
+export type Translator = (key: string, values?: Record<string, string | number>) => string;
+
+// Display labels for the shared BUDGET_DURATION_FILTER_OPTIONS values; budgetFilters.ts stays untranslated.
+const DURATION_LABEL_KEYS: Record<string, string> = {
+  "1h": "hourly",
+  "24h": "daily",
+  "7d": "weekly",
+  "30d": "monthly",
+  [BUDGET_DURATION_UNSET]: "notSet",
+};
+
+export const durationLabel = (t: Translator, value: string): string => {
+  const key = DURATION_LABEL_KEYS[value];
+  return key ? t(key) : value;
+};
 
 /**
  * Filtering happens on the server, so this never runs as a predicate. It exists to override
@@ -34,10 +51,11 @@ function RateLimitCell({ value }: { value: number | null | undefined }) {
 }
 
 function BudgetDurationCell({ value }: { value: string | null | undefined }) {
+  const t = useTranslations("budgets");
   if (!value) {
-    return <span className="text-muted-foreground">Not set</span>;
+    return <span className="text-muted-foreground">{t("notSet")}</span>;
   }
-  return <span className="whitespace-nowrap">{getBudgetDurationLabel(value)}</span>;
+  return <span className="whitespace-nowrap">{durationLabel(t, value)}</span>;
 }
 
 interface BudgetRowActionsProps {
@@ -47,10 +65,11 @@ interface BudgetRowActionsProps {
 }
 
 function BudgetRowActions({ budget, onEditClick, onDeleteClick }: BudgetRowActionsProps) {
+  const t = useTranslations("budgets");
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label="Open budget actions"
+        aria-label={t("bcOpenActions")}
         data-testid={`budget-actions-${budget.budget_id}`}
         className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "text-muted-foreground")}
       >
@@ -59,7 +78,7 @@ function BudgetRowActions({ budget, onEditClick, onDeleteClick }: BudgetRowActio
       <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuItem data-testid="budget-action-edit" onClick={() => onEditClick(budget)}>
           <Pencil />
-          Edit budget
+          {t("edit_budget")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -68,7 +87,7 @@ function BudgetRowActions({ budget, onEditClick, onDeleteClick }: BudgetRowActio
           onClick={() => onDeleteClick(budget)}
         >
           <Trash2 />
-          Delete budget
+          {t("delete_budget")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -85,18 +104,20 @@ interface BudgetTableColumnsDeps {
   canModify: boolean;
   onEditClick: (budget: budgetItem) => void;
   onDeleteClick: (budget: budgetItem) => void;
+  t: Translator;
 }
 
 export const getBudgetTableColumns = ({
   canModify,
   onEditClick,
   onDeleteClick,
+  t,
 }: BudgetTableColumnsDeps): ColumnDef<budgetItem>[] => [
   {
     id: "budget_id",
     accessorKey: "budget_id",
-    meta: { title: "Budget ID" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Budget ID" />,
+    meta: { title: t("budgetId") },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("budgetId")} />,
     cell: ({ row }) => (
       <IdCell value={row.original.budget_id} variant="plain" truncate={false} copyable className="whitespace-nowrap" />
     ),
@@ -105,8 +126,8 @@ export const getBudgetTableColumns = ({
     id: "max_budget",
     accessorKey: "max_budget",
     filterFn: serverFilter,
-    meta: { title: "Max Budget", numeric: true },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Max Budget" />,
+    meta: { title: t("maxBudget"), numeric: true },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("maxBudget")} />,
     size: 120,
     cell: ({ row }) => <MoneyCell value={row.original.max_budget} showZero emptyText="Unlimited" />,
   },
@@ -130,10 +151,10 @@ export const getBudgetTableColumns = ({
     id: "budget_duration",
     accessorKey: "budget_duration",
     filterFn: serverFilter,
-    meta: { title: "Reset" },
+    meta: { title: t("resetPeriod") },
     // "7d"/"30d" sort lexicographically, not chronologically, so the route does not offer it.
     enableSorting: false,
-    header: ({ column }) => <DataTableSortHeader column={column} title="Reset" />,
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("resetPeriod")} />,
     size: 110,
     cell: ({ row }) => <BudgetDurationCell value={row.original.budget_duration} />,
   },
@@ -141,8 +162,8 @@ export const getBudgetTableColumns = ({
     id: "created_at",
     accessorKey: "created_at",
     filterFn: serverFilter,
-    meta: { title: "Created" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Created" />,
+    meta: { title: t("created") },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("created")} />,
     size: 160,
     cell: ({ row }) => <DateCell value={row.original.created_at} />,
   },
@@ -151,7 +172,7 @@ export const getBudgetTableColumns = ({
         {
           id: "actions",
           meta: { className: "text-right", headerClassName: "text-right" },
-          header: () => <span className="sr-only">Actions</span>,
+          header: () => <span className="sr-only">{t("bcActions")}</span>,
           size: 64,
           enableSorting: false,
           enableHiding: false,
