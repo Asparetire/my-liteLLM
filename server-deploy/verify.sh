@@ -137,7 +137,7 @@ fi
 
 echo; echo "[10] 控制台 /ui/"
 code=$(curl -s -o /dev/null -m 10 -w '%{http_code}' "$BASE_URL/ui/")
-[ "$code" = "200" ] && ok "/ui/ 返回 200（注意：当前仍是上游英文界面）" || bad "/ui/ 返回 $code"
+[ "$code" = "200" ] && ok "/ui/ 返回 200（汉化 UI 已挂载）" || bad "/ui/ 返回 $code"
 
 echo; echo "=========================================================="
 echo " 通过 ${PASS} 项，失败 ${FAIL} 项"
