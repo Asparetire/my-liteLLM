@@ -33,17 +33,17 @@ describe("CreateTagModal", () => {
   it("should render the modal", () => {
     render(<CreateTagModal {...defaultProps} />);
     expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.getByText("Create New Tag")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "创建标签" })).toBeInTheDocument();
   });
 
   it("should submit form with required tag name", async () => {
     const user = userEvent.setup();
     render(<CreateTagModal {...defaultProps} />);
 
-    const tagNameInput = screen.getByLabelText("Tag Name");
+    const tagNameInput = screen.getByLabelText("标签名称");
     fireEvent.change(tagNameInput, { target: { value: "test-tag" } });
 
-    const submitButton = screen.getByRole("button", { name: /Create Tag/i });
+    const submitButton = screen.getByRole("button", { name: /创建标签/ });
     await user.click(submitButton);
 
     expect(mockOnSubmit).toHaveBeenCalledWith({
@@ -55,7 +55,7 @@ describe("CreateTagModal", () => {
     const user = userEvent.setup();
     render(<CreateTagModal {...defaultProps} />);
 
-    const submitButton = screen.getByRole("button", { name: /Create Tag/i });
+    const submitButton = screen.getByRole("button", { name: /创建标签/ });
     await user.click(submitButton);
 
     // Form validation should prevent submission

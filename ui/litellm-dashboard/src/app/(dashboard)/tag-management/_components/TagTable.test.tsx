@@ -46,14 +46,14 @@ describe("TagTable", () => {
 
   it("should render every column header", () => {
     render(<TagTable {...defaultProps} />);
-    for (const header of ["Tag Name", "Description", "Allowed Models", "Created"]) {
+    for (const header of ["标签名称", "描述", "可用模型", "创建时间"]) {
       expect(screen.getByText(header)).toBeInTheDocument();
     }
   });
 
   it("should display the empty state when data is empty", () => {
     render(<TagTable {...defaultProps} />);
-    expect(screen.getByText("No tags yet")).toBeInTheDocument();
+    expect(screen.getByText("暂无标签")).toBeInTheDocument();
   });
 
   it("should display tag name and description", () => {
@@ -74,7 +74,7 @@ describe("TagTable", () => {
       models: [],
     };
     render(<TagTable {...defaultProps} data={[tagWithNoModels]} />);
-    expect(screen.getByText("All Models")).toBeInTheDocument();
+    expect(screen.getByText("全部模型")).toBeInTheDocument();
   });
 
   it("should display formatted created date", () => {

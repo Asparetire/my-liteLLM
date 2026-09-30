@@ -77,11 +77,11 @@ describe("TagManagement delete flow", () => {
     render(<TagManagement accessToken="sk-test" userID="user-1" userRole="Admin" />);
     await screen.findByText("table-loaded");
 
-    expect(screen.queryByText("Tag Information")).not.toBeInTheDocument();
+    expect(screen.queryByText("标签信息")).not.toBeInTheDocument();
 
     await user.click(screen.getByTestId("mock-delete-trigger"));
 
-    expect(await screen.findByText("Tag Information")).toBeInTheDocument();
+    expect(await screen.findByText("标签信息")).toBeInTheDocument();
     expect(screen.getByText("test-tag")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "删除" }));
@@ -95,7 +95,7 @@ describe("TagManagement delete flow", () => {
     await screen.findByText("table-loaded");
 
     await user.click(screen.getByTestId("mock-delete-trigger"));
-    await screen.findByText("Tag Information");
+    await screen.findByText("标签信息");
 
     await user.click(screen.getByRole("button", { name: "取消" }));
 
