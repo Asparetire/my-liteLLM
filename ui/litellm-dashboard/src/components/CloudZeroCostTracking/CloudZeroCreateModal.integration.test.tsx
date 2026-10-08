@@ -42,9 +42,9 @@ describe("CloudZeroCreateModal submit payload", () => {
     renderModal();
 
     fireEvent.change(screen.getByLabelText("CloudZero API Key"), { target: { value: "cz-secret-key" } });
-    fireEvent.change(screen.getByLabelText("Connection ID"), { target: { value: "conn-42" } });
-    fireEvent.change(screen.getByLabelText("Timezone"), { target: { value: "America/New_York" } });
-    await user.click(screen.getByRole("button", { name: "Create" }));
+    fireEvent.change(screen.getByLabelText("连接 ID"), { target: { value: "conn-42" } });
+    fireEvent.change(screen.getByLabelText("时区"), { target: { value: "America/New_York" } });
+    await user.click(screen.getByRole("button", { name: "创建" }));
 
     await vi.waitFor(() =>
       expect(submittedPayload()).toEqual({
@@ -60,8 +60,8 @@ describe("CloudZeroCreateModal submit payload", () => {
     renderModal();
 
     fireEvent.change(screen.getByLabelText("CloudZero API Key"), { target: { value: "cz-secret-key" } });
-    fireEvent.change(screen.getByLabelText("Connection ID"), { target: { value: "conn-42" } });
-    await user.click(screen.getByRole("button", { name: "Create" }));
+    fireEvent.change(screen.getByLabelText("连接 ID"), { target: { value: "conn-42" } });
+    await user.click(screen.getByRole("button", { name: "创建" }));
 
     await vi.waitFor(() =>
       expect(submittedPayload()).toEqual({
@@ -76,10 +76,10 @@ describe("CloudZeroCreateModal submit payload", () => {
     const user = userEvent.setup();
     renderModal();
 
-    await user.click(screen.getByRole("button", { name: "Create" }));
+    await user.click(screen.getByRole("button", { name: "创建" }));
 
-    expect(await screen.findByText("Please enter your CloudZero API key")).toBeInTheDocument();
-    expect(screen.getByText("Please enter your CloudZero connection ID")).toBeInTheDocument();
+    expect(await screen.findByText("请输入你的 CloudZero API Key")).toBeInTheDocument();
+    expect(screen.getByText("请输入你的 CloudZero 连接 ID")).toBeInTheDocument();
     expect(mutate).not.toHaveBeenCalled();
   });
 
@@ -88,7 +88,7 @@ describe("CloudZeroCreateModal submit payload", () => {
     renderModal();
 
     fireEvent.change(screen.getByLabelText("CloudZero API Key"), { target: { value: "cz-secret-key" } });
-    await user.type(screen.getByLabelText("Connection ID"), "conn-42{Enter}");
+    await user.type(screen.getByLabelText("连接 ID"), "conn-42{Enter}");
 
     expect(mutate).not.toHaveBeenCalled();
   });

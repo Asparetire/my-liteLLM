@@ -1,5 +1,6 @@
 import { useCloudZeroSettings } from "@/app/(dashboard)/hooks/cloudzero/useCloudZeroSettings";
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
+import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import CloudZeroEmptyPlaceholder from "./CloudZeroEmptyPlaceholder";
 import { useState } from "react";
@@ -9,6 +10,7 @@ import { createQueryKeys } from "@/app/(dashboard)/hooks/common/queryKeysFactory
 import { CloudZeroIntegrationSettings } from "./CloudZeroIntegrationSettings";
 
 export default function CloudZeroCostTracking() {
+  const t = useTranslations("cloudZero");
   const { accessToken } = useAuthorized();
   const { data: settings, isLoading, error } = useCloudZeroSettings(accessToken);
   const queryClient = useQueryClient();
@@ -29,7 +31,7 @@ export default function CloudZeroCostTracking() {
     return (
       <Card>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Loading CloudZero settings...</p>
+          <p className="text-sm text-muted-foreground">{t("loadingSettings")}</p>
         </CardContent>
       </Card>
     );
@@ -40,7 +42,7 @@ export default function CloudZeroCostTracking() {
       <Card>
         <CardContent>
           <p className="text-sm text-destructive">
-            Error loading CloudZero settings: {error instanceof Error ? error.message : String(error)}
+            {t("loadError", { error: error instanceof Error ? error.message : String(error) })}
           </p>
         </CardContent>
       </Card>

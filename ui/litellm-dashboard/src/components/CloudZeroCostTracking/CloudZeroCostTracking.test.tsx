@@ -47,7 +47,7 @@ describe("CloudZeroCostTracking", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("No CloudZero Integration Found")).toBeInTheDocument();
+      expect(screen.getByText("未找到 CloudZero 集成")).toBeInTheDocument();
     });
   });
 });

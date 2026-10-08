@@ -51,10 +51,10 @@ describe("CloudZeroIntegrationSettings", () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByText("CloudZero Configuration")).toBeInTheDocument();
-    expect(screen.getByText("API Key (Redacted)")).toBeInTheDocument();
-    expect(screen.getByText("Connection ID")).toBeInTheDocument();
-    expect(screen.getByText("Timezone")).toBeInTheDocument();
+    expect(screen.getByText("CloudZero 配置")).toBeInTheDocument();
+    expect(screen.getByText("API 密钥（已脱敏）")).toBeInTheDocument();
+    expect(screen.getByText("连接 ID")).toBeInTheDocument();
+    expect(screen.getByText("时区")).toBeInTheDocument();
   });
 
   it("should display the correct values from settings", () => {

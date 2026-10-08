@@ -1,6 +1,7 @@
 "use client";
 
 import { CircleHelp, Eye, EyeOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
@@ -20,6 +21,7 @@ export const CloudZeroApiKeyInput = React.forwardRef<
   HTMLInputElement,
   Omit<React.ComponentPropsWithoutRef<"input">, "type">
 >(({ className, ...props }, ref) => {
+  const t = useTranslations("cloudZero");
   const [revealed, setRevealed] = React.useState(false);
 
   return (
@@ -29,7 +31,7 @@ export const CloudZeroApiKeyInput = React.forwardRef<
         <InputGroupButton
           size="icon-xs"
           variant="ghost"
-          aria-label={revealed ? "Hide API key" : "Show API key"}
+          aria-label={revealed ? t("hideApiKey") : t("showApiKey")}
           onClick={() => setRevealed((current) => !current)}
         >
           {revealed ? <EyeOff /> : <Eye />}

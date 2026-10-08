@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { z } from "zod/v4";
+import { useTranslations } from "next-intl";
 
 import { useCloudZeroUpdateSettings } from "@/app/(dashboard)/hooks/cloudzero/useCloudZeroSettings";
 import useAuthorized from "@/app/(dashboard)/hooks/useAuthorized";
@@ -23,14 +24,16 @@ interface CloudZeroUpdateModalProps {
   settings: CloudZeroSettings;
 }
 
-const updateSchema = z.object({
-  api_key: z.string(),
-  connection_id: z.string().min(1, "Please enter your CloudZero connection ID"),
-  timezone: z.string(),
-});
-
 export default function CloudZeroUpdateModal({ open, onOk, onCancel, settings }: CloudZeroUpdateModalProps) {
   const { accessToken } = useAuthorized();
+
+  const t = useTranslations("cloudZero");
+
+  const updateSchema = z.object({
+  api_key: z.string(),
+  connection_id: z.string().min(1, t("connectionIdRequired")),
+  timezone: z.string(),
+  });
   const form = useZodForm(updateSchema, { defaultValues: EMPTY_CLOUDZERO_FORM_VALUES });
   const updateMutation = useCloudZeroUpdateSettings(accessToken || "");
 
@@ -49,12 +52,12 @@ export default function CloudZeroUpdateModal({ open, onOk, onCancel, settings }:
   const handleSubmit = (values: CloudZeroFormValues) => {
     updateMutation.mutate(buildCloudZeroPayload(values), {
       onSuccess: () => {
-        toast.success("CloudZero integration updated successfully");
+        toast.success(t("toastUpdated"));
         form.reset(EMPTY_CLOUDZERO_FORM_VALUES);
         onOk();
       },
       onError: (error: Error) => {
-        toast.error(error.message || "Failed to update CloudZero integration");
+        toast.error(error.message || t("toastUpdateFailed"));
       },
     });
   };
@@ -68,7 +71,7 @@ export default function CloudZeroUpdateModal({ open, onOk, onCancel, settings }:
     <Dialog open={open} onOpenChange={(open) => !open && handleCancel()}>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit CloudZero Integration</DialogTitle>
+          <DialogTitle>{t("editTitle")}</DialogTitle>
         </DialogHeader>
         <TooltipProvider>
           <form onSubmit={(event) => event.preventDefault()} noValidate>
@@ -76,19 +79,19 @@ export default function CloudZeroUpdateModal({ open, onOk, onCancel, settings }:
               <FormField
                 control={form.control}
                 name="api_key"
-                label={labelWithHint("CloudZero API Key", "Leave empty to keep the existing API key")}
+                label={labelWithHint(t("apiKeyField"), t("apiKeyKeepHint"))}
               >
                 {({ ref, ...field }) => (
-                  <CloudZeroApiKeyInput {...field} ref={ref} placeholder="Leave empty to keep existing" />
+                  <CloudZeroApiKeyInput {...field} ref={ref} placeholder={t("apiKeyKeepPlaceholder")} />
                 )}
               </FormField>
-              <FormField control={form.control} name="connection_id" label="Connection ID">
-                {({ ref, ...field }) => <Input {...field} ref={ref} placeholder="Enter your CloudZero connection ID" />}
+              <FormField control={form.control} name="connection_id" label={t("connectionIdLabel")}>
+                {({ ref, ...field }) => <Input {...field} ref={ref} placeholder={t("connectionIdPlaceholder")} />}
               </FormField>
               <FormField
                 control={form.control}
                 name="timezone"
-                label={labelWithHint("Timezone", "Timezone for date handling (defaults to UTC if not provided)")}
+                label={labelWithHint(t("timezoneLabel"), t("timezoneHint"))}
               >
                 {({ ref, ...field }) => <Input {...field} ref={ref} placeholder="UTC" />}
               </FormField>
@@ -97,14 +100,14 @@ export default function CloudZeroUpdateModal({ open, onOk, onCancel, settings }:
         </TooltipProvider>
         <DialogFooter>
           <Button variant="outline" onClick={handleCancel} disabled={updateMutation.isPending}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             onClick={() => void form.handleSubmit(handleSubmit)()}
             disabled={updateMutation.isPending}
             aria-busy={updateMutation.isPending}
           >
-            {updateMutation.isPending ? "Updating..." : "Update"}
+            {updateMutation.isPending ? t("updating") : t("update")}
           </Button>
         </DialogFooter>
       </DialogContent>

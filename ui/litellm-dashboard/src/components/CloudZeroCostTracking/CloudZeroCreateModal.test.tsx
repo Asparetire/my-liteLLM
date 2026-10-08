@@ -36,9 +36,9 @@ describe("CloudZeroCreateModal", () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByText("Create CloudZero Integration")).toBeInTheDocument();
+    expect(screen.getByText("创建 CloudZero 集成")).toBeInTheDocument();
     expect(screen.getByLabelText("CloudZero API Key")).toBeInTheDocument();
-    expect(screen.getByLabelText("Connection ID")).toBeInTheDocument();
-    expect(screen.getByLabelText("Timezone")).toBeInTheDocument();
+    expect(screen.getByLabelText("连接 ID")).toBeInTheDocument();
+    expect(screen.getByLabelText("时区")).toBeInTheDocument();
   });
 });

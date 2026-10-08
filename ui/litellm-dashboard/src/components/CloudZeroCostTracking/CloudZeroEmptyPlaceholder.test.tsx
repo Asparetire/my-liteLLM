@@ -7,8 +7,8 @@ describe("CloudZeroEmptyPlaceholder", () => {
     const startCreation = vi.fn();
     render(<CloudZeroEmptyPlaceholder startCreation={startCreation} />);
 
-    expect(screen.getByText("No CloudZero Integration Found")).toBeInTheDocument();
-    expect(screen.getByText(/Connect your CloudZero account/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Add CloudZero Integration" })).toBeInTheDocument();
+    expect(screen.getByText("未找到 CloudZero 集成")).toBeInTheDocument();
+    expect(screen.getByText(/连接你的 CloudZero 账户/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "添加 CloudZero 集成" })).toBeInTheDocument();
   });
 });
