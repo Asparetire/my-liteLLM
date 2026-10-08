@@ -43,8 +43,8 @@ describe("EmailSettings", () => {
   it("renders the heading and the docs link", () => {
     renderWithProviders(<EmailSettings accessToken="sk-test" premiumUser alerts={alerts} />);
 
-    expect(screen.getByText("Email Server Settings")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /LiteLLM Docs: email alerts/ })).toHaveAttribute(
+    expect(screen.getByText("邮件服务器设置")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /LiteLLM 文档：邮件告警/ })).toHaveAttribute(
       "href",
       "https://docs.litellm.ai/docs/proxy/email",
     );
@@ -63,8 +63,8 @@ describe("EmailSettings", () => {
     renderWithProviders(<EmailSettings accessToken="sk-test" premiumUser alerts={alerts} />);
 
     expect(screen.getByText("SMTP_HOST")).toBeInTheDocument();
-    expect(screen.getByText(/Enter the SMTP host address/)).toBeInTheDocument();
-    expect(screen.getByText(/Enter the SMTP port number/)).toBeInTheDocument();
+    expect(screen.getByText(/输入 SMTP 主机地址/)).toBeInTheDocument();
+    expect(screen.getByText(/输入 SMTP 端口号/)).toBeInTheDocument();
   });
 
   it("submits only the fields the admin actually edited", async () => {
@@ -73,7 +73,7 @@ describe("EmailSettings", () => {
 
     await user.clear(inputNamed("SMTP_HOST"));
     fireEvent.change(inputNamed("SMTP_HOST"), { target: { value: "smtp.changed.com" } });
-    await user.click(screen.getByRole("button", { name: "Save Changes" }));
+    await user.click(screen.getByRole("button", { name: "保存更改" }));
 
     await waitFor(() => {
       expect(setCallbacksCall).toHaveBeenCalledWith("sk-test", {
@@ -87,7 +87,7 @@ describe("EmailSettings", () => {
     const user = userEvent.setup();
     renderWithProviders(<EmailSettings accessToken="sk-test" premiumUser alerts={alerts} />);
 
-    await user.click(screen.getByRole("button", { name: "Save Changes" }));
+    await user.click(screen.getByRole("button", { name: "保存更改" }));
 
     await waitFor(() => {
       expect(setCallbacksCall).toHaveBeenCalledWith("sk-test", {
@@ -114,7 +114,7 @@ describe("EmailSettings", () => {
     const user = userEvent.setup();
     renderWithProviders(<EmailSettings accessToken="sk-test" premiumUser alerts={alerts} />);
 
-    await user.click(screen.getByRole("button", { name: "Test Email Alerts" }));
+    await user.click(screen.getByRole("button", { name: "测试邮件告警" }));
 
     await waitFor(() => {
       expect(serviceHealthCheck).toHaveBeenCalledWith("sk-test", "email");
@@ -134,14 +134,14 @@ describe("EmailSettings", () => {
     const passwordInput = inputNamed("SMTP_PASSWORD");
     expect(passwordInput).toHaveAttribute("type", "password");
 
-    const showButtons = screen.getAllByLabelText("Show credential");
+    const showButtons = screen.getAllByLabelText("显示凭据");
     expect(showButtons.length).toBeGreaterThan(0);
 
     await user.click(showButtons[0]);
 
     expect(passwordInput).toHaveAttribute("type", "text");
 
-    const hideButton = screen.getByLabelText("Hide credential");
+    const hideButton = screen.getByLabelText("隐藏凭据");
     await user.click(hideButton);
 
     expect(passwordInput).toHaveAttribute("type", "password");

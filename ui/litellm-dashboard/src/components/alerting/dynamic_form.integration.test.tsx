@@ -77,7 +77,7 @@ const renderForm = (
 };
 
 const submit = async (user: ReturnType<typeof userEvent.setup>) =>
-  user.click(screen.getByRole("button", { name: "Update Settings" }));
+  user.click(screen.getByRole("button", { name: "更新设置" }));
 
 describe("DynamicForm submit payload", () => {
   it("submits nothing when no field has been changed", async () => {
@@ -195,7 +195,7 @@ describe("DynamicForm change notifications", () => {
     const user = userEvent.setup();
     const { handleResetField } = renderForm();
 
-    await user.click(screen.getByRole("button", { name: "Reset region_name" }));
+    await user.click(screen.getByRole("button", { name: "重置 region_name" }));
 
     expect(handleResetField).toHaveBeenCalledWith("region_name", 1);
   });
@@ -209,7 +209,7 @@ describe("DynamicForm premium gating", () => {
       premiumUser: false,
     });
 
-    expect(screen.getByText(/Enterprise Feature/)).toBeInTheDocument();
+    expect(screen.getByText(/企业版功能/)).toBeInTheDocument();
     expect(screen.queryByDisplayValue("us-east")).not.toBeInTheDocument();
 
     await submit(user);
@@ -237,8 +237,8 @@ describe("DynamicForm presentation", () => {
 
     expect(screen.getByText("daily_report_frequency")).toBeInTheDocument();
     expect(screen.getByText("How often the report runs")).toBeInTheDocument();
-    expect(screen.getAllByText("In DB")).toHaveLength(2);
-    expect(screen.getByText("In Config")).toBeInTheDocument();
-    expect(screen.getByText("Not Set")).toBeInTheDocument();
+    expect(screen.getAllByText("数据库中")).toHaveLength(2);
+    expect(screen.getByText("配置文件")).toBeInTheDocument();
+    expect(screen.getByText("未设置")).toBeInTheDocument();
   });
 });
