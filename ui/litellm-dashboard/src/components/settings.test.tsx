@@ -80,7 +80,7 @@ describe("Settings", () => {
     render(<Settings {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Active Logging Callbacks")).toBeInTheDocument();
+      expect(screen.getByText("已启用的日志回调")).toBeInTheDocument();
     });
   });
 
@@ -88,10 +88,10 @@ describe("Settings", () => {
     render(<Settings {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText("CloudZero Cost Tracking")).toBeInTheDocument();
-      expect(screen.getByText("Alerting Types")).toBeInTheDocument();
-      expect(screen.getByText("Alerting Settings")).toBeInTheDocument();
-      expect(screen.getByText("Email Alerts")).toBeInTheDocument();
+      expect(screen.getByText("CloudZero 成本追踪")).toBeInTheDocument();
+      expect(screen.getByText("告警类型")).toBeInTheDocument();
+      expect(screen.getByText("告警设置")).toBeInTheDocument();
+      expect(screen.getByText("邮件告警")).toBeInTheDocument();
     });
   });
 
@@ -143,7 +143,7 @@ describe("Settings", () => {
     render(<Settings {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Active Logging Callbacks")).toBeInTheDocument();
+      expect(screen.getByText("已启用的日志回调")).toBeInTheDocument();
     });
 
     await waitFor(() => {
@@ -154,7 +154,7 @@ describe("Settings", () => {
     await user.click(await screen.findByTestId("callback-action-edit"));
 
     await waitFor(() => {
-      expect(screen.getByText("Edit Callback Settings")).toBeInTheDocument();
+      expect(screen.getByText("编辑回调设置")).toBeInTheDocument();
     });
 
     return user;
@@ -190,7 +190,7 @@ describe("Settings", () => {
 
     await user.clear(screen.getByLabelText("Host"));
     fireEvent.change(screen.getByLabelText("Host"), { target: { value: "https://edited.langfuse.com" } });
-    await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Save Changes" }));
+    await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "保存更改" }));
 
     await waitFor(() => {
       expect(vi.mocked(setCallbacksCall)).toHaveBeenCalledWith("token", {
@@ -213,9 +213,9 @@ describe("Settings", () => {
     });
 
     await user.clear(screen.getByLabelText("Public Key"));
-    await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Save Changes" }));
+    await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "保存更改" }));
 
-    expect(await screen.findByText("Please enter the public key")).toBeInTheDocument();
+    expect(await screen.findByText("请输入Public Key")).toBeInTheDocument();
     expect(vi.mocked(setCallbacksCall)).not.toHaveBeenCalled();
   });
 
@@ -265,7 +265,7 @@ describe("Settings", () => {
     await user.click(await screen.findByRole("option", { name: "http/json" }));
     expect(screen.getByLabelText("Export Protocol")).toHaveTextContent("http/json");
 
-    await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Save Changes" }));
+    await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "保存更改" }));
 
     await waitFor(() => {
       expect(vi.mocked(setCallbacksCall)).toHaveBeenCalledWith(
@@ -288,7 +288,7 @@ describe("Settings", () => {
     expect(await screen.findByLabelText("Endpoint URL")).toHaveValue("http://collector:4318");
     expect(screen.getByLabelText("Export Protocol")).toHaveTextContent("http/json");
 
-    await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Save Changes" }));
+    await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "保存更改" }));
 
     await waitFor(() => {
       expect(vi.mocked(setCallbacksCall)).toHaveBeenCalledWith("token", {
@@ -306,13 +306,13 @@ describe("Settings", () => {
     const user = userEvent.setup();
     render(<Settings {...defaultProps} />);
 
-    await user.click(await screen.findByRole("tab", { name: "Alerting Types" }));
+    await user.click(await screen.findByRole("tab", { name: "告警类型" }));
 
     const webhookInput = document.querySelector('input[name="llm_exceptions"]') as HTMLInputElement;
     expect(webhookInput).not.toBeNull();
     fireEvent.change(webhookInput, { target: { value: "https://hooks.example.com/llm-exceptions" } });
 
-    await user.click(screen.getByRole("button", { name: "Save Changes" }));
+    await user.click(screen.getByRole("button", { name: "保存更改" }));
 
     await waitFor(() => {
       expect(vi.mocked(setCallbacksCall)).toHaveBeenCalledWith("token", {
@@ -348,7 +348,7 @@ describe("Settings", () => {
     await waitFor(() => {
       expect(screen.queryByTestId("skeleton-row")).not.toBeInTheDocument();
     });
-    expect(screen.getByText("No callbacks configured")).toBeInTheDocument();
+    expect(screen.getByText("尚未配置回调")).toBeInTheDocument();
   });
 
   it("should resolve loading without fetching when the user id is missing", async () => {
@@ -358,17 +358,17 @@ describe("Settings", () => {
       expect(screen.queryByTestId("skeleton-row")).not.toBeInTheDocument();
     });
     expect(mockGetCallbacksCall).not.toHaveBeenCalled();
-    expect(screen.getByText("No callbacks configured")).toBeInTheDocument();
+    expect(screen.getByText("尚未配置回调")).toBeInTheDocument();
   });
 
   it("should display CloudZero Cost Tracking tab", async () => {
     render(<Settings {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Active Logging Callbacks")).toBeInTheDocument();
+      expect(screen.getByText("已启用的日志回调")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("CloudZero Cost Tracking")).toBeInTheDocument();
+    expect(screen.getByText("CloudZero 成本追踪")).toBeInTheDocument();
   });
 });
 

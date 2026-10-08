@@ -19,19 +19,19 @@ describe("LoggingCallbacksTable", () => {
 
   it("should render", () => {
     render(<LoggingCallbacksTable callbacks={[]} availableCallbacks={{}} />);
-    expect(screen.getByText("Active Logging Callbacks")).toBeInTheDocument();
+    expect(screen.getByText("已启用的日志回调")).toBeInTheDocument();
   });
 
   it("should show the empty state when there are no callbacks", () => {
     render(<LoggingCallbacksTable callbacks={[]} availableCallbacks={{}} />);
-    expect(screen.getByText("No callbacks configured")).toBeInTheDocument();
-    expect(screen.getByText("Add your first callback to start logging data to external services.")).toBeInTheDocument();
+    expect(screen.getByText("尚未配置回调")).toBeInTheDocument();
+    expect(screen.getByText("添加第一个回调，开始向外部服务记录日志。")).toBeInTheDocument();
   });
 
   it("should show skeleton rows while loading", () => {
     render(<LoggingCallbacksTable callbacks={[]} availableCallbacks={{}} isLoading />);
     expect(screen.getAllByTestId("skeleton-row").length).toBeGreaterThan(0);
-    expect(screen.queryByText("No callbacks configured")).not.toBeInTheDocument();
+    expect(screen.queryByText("尚未配置回调")).not.toBeInTheDocument();
   });
 
   it('should map "otel" to "OpenTelemetry" on the table', () => {
@@ -64,7 +64,7 @@ describe("LoggingCallbacksTable", () => {
     const user = userEvent.setup();
     const onAdd = vi.fn();
     render(<LoggingCallbacksTable callbacks={[]} availableCallbacks={{}} onAdd={onAdd} />);
-    await user.click(screen.getByRole("button", { name: /add callback/i }));
+    await user.click(screen.getByRole("button", { name: /添加回调/ }));
     expect(onAdd).toHaveBeenCalled();
   });
 
@@ -112,13 +112,13 @@ describe("LoggingCallbacksTable", () => {
     );
     expect(screen.getByTestId("callback-actions-langfuse-success")).toBeInTheDocument();
     expect(screen.queryByTestId("callback-actions-datadog-success")).not.toBeInTheDocument();
-    expect(screen.getAllByText("Read only")).toHaveLength(1);
+    expect(screen.getAllByText("只读")).toHaveLength(1);
   });
 
   // Regression: `/get_callbacks` returns the same `name` twice when a
   // callback is registered for both success and failure (e.g. `generic_api`
   // → POST to spend-log on both 200 and 4xx/5xx). The UI used to ignore
-  // the `type` field and render every row as "Success", masking the
+  // the `type` field and render every row as "成功", masking the
   // failure registration. Reading `record.type` fixes the badge AND
   // composing the row id with type avoids React's duplicate-key warning.
   it("renders distinct Success and Failure badges for same-name dual registration", () => {
@@ -138,7 +138,7 @@ describe("LoggingCallbacksTable", () => {
       />,
     );
     expect(screen.getAllByText("Custom Callback API")).toHaveLength(2);
-    expect(screen.getByText("Success")).toBeInTheDocument();
-    expect(screen.getByText("Failure")).toBeInTheDocument();
+    expect(screen.getByText("成功")).toBeInTheDocument();
+    expect(screen.getByText("失败")).toBeInTheDocument();
   });
 });
