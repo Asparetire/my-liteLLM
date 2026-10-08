@@ -68,13 +68,13 @@ const renderModal = (overrides: Partial<React.ComponentProps<typeof RoutingGroup
 };
 
 const typeName = async (user: ReturnType<typeof userEvent.setup>, name: string) => {
-  const input = screen.getByLabelText("Group Name");
+  const input = screen.getByLabelText("组名称");
   await user.clear(input);
   await user.type(input, name);
 };
 
 const setArgs = async (user: ReturnType<typeof userEvent.setup>, json: string) => {
-  const textarea = screen.getByLabelText("Strategy Arguments (JSON)");
+  const textarea = screen.getByLabelText("策略参数（JSON）");
   await user.clear(textarea);
   if (json) {
     await user.type(textarea, json);
@@ -82,14 +82,14 @@ const setArgs = async (user: ReturnType<typeof userEvent.setup>, json: string) =
 };
 
 const pickModels = async (user: ReturnType<typeof userEvent.setup>, ...models: string[]) => {
-  await user.click(screen.getByLabelText("Models"));
+  await user.click(screen.getByLabelText("模型"));
   for (const model of models) {
     await user.click(await screen.findByRole("option", { name: model }));
   }
 };
 
 const pickStrategy = async (user: ReturnType<typeof userEvent.setup>, strategy: string) => {
-  await user.click(screen.getByLabelText("Routing Strategy"));
+  await user.click(screen.getByLabelText("路由策略"));
   await user.click(await screen.findByRole("option", { name: strategy }));
 };
 
@@ -101,7 +101,7 @@ describe("RoutingGroupModal", () => {
     const user = userEvent.setup();
     const { onSubmit } = renderModal({ mode: "edit", initialValue: STORED_GROUP_NULL_ARGS });
 
-    await save(user, "Save Changes");
+    await save(user, "保存更改");
 
     expect(onSubmit).toHaveBeenCalledWith(EXPECTED_NULL_ARGS_PAYLOAD);
   });
@@ -110,7 +110,7 @@ describe("RoutingGroupModal", () => {
     const user = userEvent.setup();
     const { onSubmit } = renderModal({ mode: "edit", initialValue: STORED_GROUP });
 
-    await save(user, "Save Changes");
+    await save(user, "保存更改");
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit.mock.calls[0][0]).toStrictEqual(EXPECTED_STORED_PAYLOAD);
@@ -121,7 +121,7 @@ describe("RoutingGroupModal", () => {
     const { onSubmit } = renderModal({ initialValue: SEEDED_CREATE });
 
     await typeName(user, "fast-chat");
-    await save(user, "Create Group");
+    await save(user, "创建路由组");
 
     const expected: RoutingGroup = {
       group_name: "fast-chat",
@@ -139,8 +139,8 @@ describe("RoutingGroupModal", () => {
       initialValue: { ...STORED_GROUP, routing_strategy: "simple-shuffle" },
     });
 
-    expect(screen.queryByLabelText("Strategy Arguments (JSON)")).not.toBeInTheDocument();
-    await save(user, "Save Changes");
+    expect(screen.queryByLabelText("策略参数（JSON）")).not.toBeInTheDocument();
+    await save(user, "保存更改");
 
     const expected: RoutingGroup = {
       group_name: "already-taken",
@@ -156,7 +156,7 @@ describe("RoutingGroupModal", () => {
     const { onSubmit } = renderModal({ mode: "edit", initialValue: STORED_GROUP });
 
     await setArgs(user, "");
-    await save(user, "Save Changes");
+    await save(user, "保存更改");
 
     expect(onSubmit.mock.calls[0][0]?.routing_strategy_args).toBeNull();
   });
@@ -166,7 +166,7 @@ describe("RoutingGroupModal", () => {
     const { onSubmit } = renderModal({ mode: "edit", initialValue: STORED_GROUP });
 
     await setArgs(user, '{{"ttl": 60, "lowest_latency_buffer": 0}');
-    await save(user, "Save Changes");
+    await save(user, "保存更改");
 
     expect(onSubmit.mock.calls[0][0]?.routing_strategy_args).toStrictEqual({ ttl: 60, lowest_latency_buffer: 0 });
   });
@@ -176,9 +176,9 @@ describe("RoutingGroupModal", () => {
     const { onSubmit } = renderModal({ mode: "edit", initialValue: STORED_GROUP });
 
     await setArgs(user, "not json");
-    await save(user, "Save Changes");
+    await save(user, "保存更改");
 
-    expect(await screen.findByText("Must be valid JSON")).toBeInTheDocument();
+    expect(await screen.findByText("必须是合法的 JSON")).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
@@ -188,9 +188,9 @@ describe("RoutingGroupModal", () => {
       initialValue: { group_name: "", models: ["gemini-pro"], routing_strategy: "simple-shuffle" },
     });
 
-    await save(user, "Create Group");
+    await save(user, "创建路由组");
 
-    expect(await screen.findByText("Group name is required")).toBeInTheDocument();
+    expect(await screen.findByText("请填写组名称")).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
@@ -199,9 +199,9 @@ describe("RoutingGroupModal", () => {
     const { onSubmit } = renderModal();
 
     await typeName(user, "no-models");
-    await save(user, "Create Group");
+    await save(user, "创建路由组");
 
-    expect(await screen.findByText("Select at least one model")).toBeInTheDocument();
+    expect(await screen.findByText("请至少选择一个模型")).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
@@ -212,9 +212,9 @@ describe("RoutingGroupModal", () => {
     });
 
     await typeName(user, "a".repeat(65));
-    await save(user, "Create Group");
+    await save(user, "创建路由组");
 
-    expect(await screen.findByText("Must be 64 characters or fewer")).toBeInTheDocument();
+    expect(await screen.findByText("不能超过 64 个字符")).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
@@ -225,7 +225,7 @@ describe("RoutingGroupModal", () => {
     });
 
     await typeName(user, "team a/fast chat");
-    await save(user, "Create Group");
+    await save(user, "创建路由组");
 
     expect(onSubmit).toHaveBeenCalledWith(EXPECTED_SLASH_AND_SPACE_PAYLOAD);
   });
@@ -237,9 +237,9 @@ describe("RoutingGroupModal", () => {
     });
 
     await typeName(user, "   ");
-    await save(user, "Create Group");
+    await save(user, "创建路由组");
 
-    expect(await screen.findByText("Group name is required")).toBeInTheDocument();
+    expect(await screen.findByText("请填写组名称")).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
@@ -250,18 +250,18 @@ describe("RoutingGroupModal", () => {
     });
 
     await typeName(user, "Other-Group");
-    await save(user, "Create Group");
+    await save(user, "创建路由组");
 
-    expect(await screen.findByText("A group with this name already exists")).toBeInTheDocument();
+    expect(await screen.findByText("已存在同名路由组")).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
   it("locks the name in edit mode and pretty-prints the stored arguments", () => {
     renderModal({ mode: "edit", initialValue: STORED_GROUP });
 
-    expect(screen.getByLabelText("Group Name")).toHaveValue("already-taken");
-    expect(screen.getByLabelText("Group Name")).toBeDisabled();
-    expect(screen.getByLabelText("Strategy Arguments (JSON)")).toHaveValue('{\n  "ttl": 3600\n}');
+    expect(screen.getByLabelText("组名称")).toHaveValue("already-taken");
+    expect(screen.getByLabelText("组名称")).toBeDisabled();
+    expect(screen.getByLabelText("策略参数（JSON）")).toHaveValue('{\n  "ttl": 3600\n}');
   });
 
   it("carries picked models and a picked strategy into the payload", async () => {
@@ -272,7 +272,7 @@ describe("RoutingGroupModal", () => {
     await pickModels(user, "gpt-4o", "claude-sonnet");
     await pickStrategy(user, "latency-based-routing");
     await setArgs(user, '{{"ttl": 99}');
-    await save(user, "Create Group");
+    await save(user, "创建路由组");
 
     const expected: RoutingGroup = {
       group_name: "probe-group",
@@ -292,12 +292,12 @@ describe("RoutingGroupModal", () => {
     await pickStrategy(user, "latency-based-routing");
     await setArgs(user, '{{"ttl": 99}');
     await pickStrategy(user, "simple-shuffle");
-    expect(screen.queryByLabelText("Strategy Arguments (JSON)")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("策略参数（JSON）")).not.toBeInTheDocument();
     await pickStrategy(user, "latency-based-routing");
 
-    expect(screen.getByLabelText("Strategy Arguments (JSON)")).toHaveValue("");
+    expect(screen.getByLabelText("策略参数（JSON）")).toHaveValue("");
 
-    await save(user, "Create Group");
+    await save(user, "创建路由组");
     const expected: RoutingGroup = {
       group_name: "probe-group",
       models: ["gpt-4o"],

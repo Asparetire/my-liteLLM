@@ -42,14 +42,14 @@ describe("RoutingGroupsTable", () => {
 
   it("should render every column header", () => {
     render(<RoutingGroupsTable {...defaultProps} />);
-    for (const header of ["Group Name", "Models", "Strategy"]) {
+    for (const header of ["组名称", "模型", "策略"]) {
       expect(screen.getByText(header)).toBeInTheDocument();
     }
   });
 
   it("should show the empty state when there are no groups", () => {
     render(<RoutingGroupsTable {...defaultProps} />);
-    expect(screen.getByText("No routing groups yet")).toBeInTheDocument();
+    expect(screen.getByText("暂无路由组")).toBeInTheDocument();
   });
 
   it("should render the group name, its models, and a human-readable strategy label", () => {
@@ -58,7 +58,7 @@ describe("RoutingGroupsTable", () => {
     expect(within(row).getByText("prod-group")).toBeInTheDocument();
     expect(within(row).getByText("gpt-4o")).toBeInTheDocument();
     expect(within(row).getByText("claude-sonnet-4-5")).toBeInTheDocument();
-    expect(within(row).getByText("Usage Based")).toBeInTheDocument();
+    expect(within(row).getByText("基于用量")).toBeInTheDocument();
   });
 
   it("should fall back to the raw strategy value when it has no friendly label", () => {
@@ -94,13 +94,13 @@ describe("RoutingGroupsTable", () => {
     const user = userEvent.setup();
     render(<RoutingGroupsTable {...defaultProps} groups={[prodGroup]} />);
 
-    expect(screen.queryByText("How routing works for this group")).not.toBeInTheDocument();
+    expect(screen.queryByText("该组的路由工作方式")).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "prod-group" }));
-    expect(await screen.findByText("How routing works for this group")).toBeInTheDocument();
+    expect(await screen.findByText("该组的路由工作方式")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "prod-group" }));
-    expect(screen.queryByText("How routing works for this group")).not.toBeInTheDocument();
+    expect(screen.queryByText("该组的路由工作方式")).not.toBeInTheDocument();
   });
 
   it("should build the usage snippet from the proxy base url and the group's first model", async () => {
@@ -108,7 +108,7 @@ describe("RoutingGroupsTable", () => {
     render(<RoutingGroupsTable {...defaultProps} groups={[prodGroup]} />);
     await user.click(screen.getByRole("button", { name: "prod-group" }));
 
-    const panel = (await screen.findByText("How routing works for this group")).closest("div")?.parentElement;
+    const panel = (await screen.findByText("该组的路由工作方式")).closest("div")?.parentElement;
     expect(panel?.textContent).toContain("https://proxy.example.com");
     expect(panel?.textContent).toContain("gpt-4o");
   });
@@ -118,8 +118,8 @@ describe("RoutingGroupsTable", () => {
     render(<RoutingGroupsTable {...defaultProps} groups={[prodGroup, devGroup]} />);
 
     await user.click(screen.getByRole("button", { name: "dev-group" }));
-    expect(await screen.findAllByText("How routing works for this group")).toHaveLength(1);
-    expect(within(rowFor("prod-group")).queryByText("How routing works for this group")).not.toBeInTheDocument();
+    expect(await screen.findAllByText("该组的路由工作方式")).toHaveLength(1);
+    expect(within(rowFor("prod-group")).queryByText("该组的路由工作方式")).not.toBeInTheDocument();
   });
 
   it("should edit a group through the actions menu", async () => {
@@ -140,6 +140,6 @@ describe("RoutingGroupsTable", () => {
 
   it("should show skeleton rows instead of the empty state while loading", () => {
     render(<RoutingGroupsTable {...defaultProps} isLoading />);
-    expect(screen.queryByText("No routing groups yet")).not.toBeInTheDocument();
+    expect(screen.queryByText("暂无路由组")).not.toBeInTheDocument();
   });
 });

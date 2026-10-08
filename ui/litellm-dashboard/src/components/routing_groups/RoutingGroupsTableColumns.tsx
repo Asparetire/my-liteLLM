@@ -2,6 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { GitBranch, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { DataTableSortHeader } from "@/components/shared/DataTable";
 import { IdentityCell, ModelsCell } from "@/components/shared/table_cells";
@@ -14,8 +15,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/cva.config";
 
-import { formatStrategyLabel } from "./strategy";
+import { localizedStrategyLabel } from "./strategy";
 import type { RoutingGroup } from "./types";
+
+type Translator = (key: string, values?: Record<string, string | number>) => string;
 
 interface RoutingGroupRowActionsProps {
   group: RoutingGroup;
@@ -24,10 +27,11 @@ interface RoutingGroupRowActionsProps {
 }
 
 function RoutingGroupRowActions({ group, onEdit, onDelete }: RoutingGroupRowActionsProps) {
+  const t = useTranslations("routerSettings");
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label={`Open actions for ${group.group_name}`}
+        aria-label={t("openActionsFor", { name: group.group_name })}
         data-testid={`routing-group-actions-${group.group_name}`}
         className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "text-muted-foreground")}
       >
@@ -36,7 +40,7 @@ function RoutingGroupRowActions({ group, onEdit, onDelete }: RoutingGroupRowActi
       <DropdownMenuContent align="end" className="w-44">
         <DropdownMenuItem data-testid="routing-group-action-edit" onClick={() => onEdit(group)}>
           <Pencil />
-          Edit
+          {t("actionEdit")}
         </DropdownMenuItem>
         <DropdownMenuItem
           variant="destructive"
@@ -44,7 +48,7 @@ function RoutingGroupRowActions({ group, onEdit, onDelete }: RoutingGroupRowActi
           onClick={() => onDelete(group)}
         >
           <Trash2 />
-          Delete
+          {t("actionDelete")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -55,18 +59,20 @@ interface RoutingGroupsTableColumnsDeps {
   onEdit: (group: RoutingGroup) => void;
   onDelete: (group: RoutingGroup) => void;
   onToggleUsage: (group: RoutingGroup) => void;
+  t: Translator;
 }
 
 export const getRoutingGroupsTableColumns = ({
   onEdit,
   onDelete,
   onToggleUsage,
+  t,
 }: RoutingGroupsTableColumnsDeps): ColumnDef<RoutingGroup>[] => [
   {
     id: "group_name",
     accessorKey: "group_name",
-    meta: { title: "Group Name", skeleton: "text" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Group Name" />,
+    meta: { title: t("colGroupName"), skeleton: "text" },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colGroupName")} />,
     size: 240,
     enableSorting: true,
     cell: ({ row }) => (
@@ -75,8 +81,8 @@ export const getRoutingGroupsTableColumns = ({
   },
   {
     id: "models",
-    meta: { title: "Models", skeleton: "chips" },
-    header: "Models",
+    meta: { title: t("colModels"), skeleton: "chips" },
+    header: t("colModels"),
     size: 320,
     enableSorting: false,
     cell: ({ row }) => <ModelsCell models={row.original.models} />,
@@ -84,21 +90,21 @@ export const getRoutingGroupsTableColumns = ({
   {
     id: "routing_strategy",
     accessorKey: "routing_strategy",
-    meta: { title: "Strategy", skeleton: "text" },
-    header: ({ column }) => <DataTableSortHeader column={column} title="Strategy" />,
+    meta: { title: t("colStrategy"), skeleton: "text" },
+    header: ({ column }) => <DataTableSortHeader column={column} title={t("colStrategy")} />,
     size: 180,
     enableSorting: true,
     cell: ({ row }) => (
       <span className="flex items-center gap-1.5 text-sm">
         <GitBranch className="size-4 shrink-0 text-muted-foreground" />
-        {formatStrategyLabel(row.original.routing_strategy)}
+        {localizedStrategyLabel(row.original.routing_strategy, t)}
       </span>
     ),
   },
   {
     id: "actions",
     meta: { className: "text-right", headerClassName: "text-right" },
-    header: () => <span className="sr-only">Actions</span>,
+    header: () => <span className="sr-only">{t("actionsSr")}</span>,
     size: 64,
     enableSorting: false,
     enableHiding: false,
