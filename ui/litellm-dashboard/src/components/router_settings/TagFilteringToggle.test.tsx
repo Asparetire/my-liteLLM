@@ -19,7 +19,7 @@ describe("TagFilteringToggle", () => {
 
   it("should display default label when no metadata is provided", () => {
     render(<TagFilteringToggle enabled={false} routerFieldsMetadata={{}} onToggle={vi.fn()} />);
-    expect(screen.getByText("Enable Tag Filtering")).toBeInTheDocument();
+    expect(screen.getByText("启用标签过滤")).toBeInTheDocument();
   });
 
   it("should name the switch with the metadata label so it is reachable by accessible name", () => {
@@ -45,14 +45,14 @@ describe("TagFilteringToggle", () => {
       },
     };
     render(<TagFilteringToggle enabled={false} routerFieldsMetadata={metadata} onToggle={vi.fn()} />);
-    const link = screen.getByRole("link", { name: /learn more/i });
+    const link = screen.getByRole("link", { name: /了解更多/ });
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute("href", "https://docs.example.com/tag-filtering");
   });
 
   it("should not render a Learn more link when metadata has no link", () => {
     render(<TagFilteringToggle enabled={false} routerFieldsMetadata={baseMetadata} onToggle={vi.fn()} />);
-    expect(screen.queryByRole("link", { name: /learn more/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /了解更多/ })).not.toBeInTheDocument();
   });
 
   it("should reflect the enabled=true state on the switch", () => {

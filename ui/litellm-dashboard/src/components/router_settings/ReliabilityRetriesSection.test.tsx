@@ -16,7 +16,7 @@ const baseSettings = {
 describe("ReliabilityRetriesSection", () => {
   it("should render the section heading", () => {
     render(<ReliabilityRetriesSection routerSettings={{}} routerFieldsMetadata={{}} />);
-    expect(screen.getByText("Reliability & Retries")).toBeInTheDocument();
+    expect(screen.getByText("可靠性与重试")).toBeInTheDocument();
   });
 
   it("should render input fields for non-excluded settings", () => {

@@ -25,7 +25,7 @@ describe("RoutingStrategySelector", () => {
 
   it("should display default label when no metadata is provided", () => {
     render(<RoutingStrategySelector {...baseProps} />);
-    expect(screen.getByText("Routing Strategy")).toBeInTheDocument();
+    expect(screen.getByText("路由策略")).toBeInTheDocument();
   });
 
   it("should display ui_field_name from metadata when provided", () => {

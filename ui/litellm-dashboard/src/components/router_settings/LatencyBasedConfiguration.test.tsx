@@ -5,7 +5,7 @@ import LatencyBasedConfiguration from "./LatencyBasedConfiguration";
 describe("LatencyBasedConfiguration", () => {
   it("should render the section heading", () => {
     render(<LatencyBasedConfiguration routingStrategyArgs={{}} />);
-    expect(screen.getByText("Latency-Based Configuration")).toBeInTheDocument();
+    expect(screen.getByText("延迟路由配置")).toBeInTheDocument();
   });
 
   it("should render default params when no args are provided", () => {
@@ -31,12 +31,12 @@ describe("LatencyBasedConfiguration", () => {
 
   it("should display the TTL parameter explanation", () => {
     render(<LatencyBasedConfiguration routingStrategyArgs={null as any} />);
-    expect(screen.getByText(/sliding window to look back over/i)).toBeInTheDocument();
+    expect(screen.getByText(/回看滑动窗口/)).toBeInTheDocument();
   });
 
   it("should display the lowest_latency_buffer parameter explanation", () => {
     render(<LatencyBasedConfiguration routingStrategyArgs={null as any} />);
-    expect(screen.getByText(/shuffle between deployments within this %/i)).toBeInTheDocument();
+    expect(screen.getByText(/在最低延迟的该百分比范围内随机挑选部署/)).toBeInTheDocument();
   });
 
   it("should render object values stringified into the input", () => {

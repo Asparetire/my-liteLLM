@@ -65,14 +65,14 @@ describe("AddFallbacks", () => {
 
   it("should render the component", () => {
     render(<AddFallbacks {...defaultProps} />);
-    expect(screen.getByRole("button", { name: /add fallbacks/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /添加降级/ })).toBeInTheDocument();
   });
 
   it("should open modal when Add Fallbacks button is clicked", async () => {
     const user = userEvent.setup();
     render(<AddFallbacks {...defaultProps} />);
 
-    const addButton = screen.getByRole("button", { name: /add fallbacks/i });
+    const addButton = screen.getByRole("button", { name: /添加降级/ });
     await user.click(addButton);
 
     await waitFor(() => {
@@ -84,7 +84,7 @@ describe("AddFallbacks", () => {
     const user = userEvent.setup();
     render(<AddFallbacks {...defaultProps} />);
 
-    const addButton = screen.getByRole("button", { name: /add fallbacks/i });
+    const addButton = screen.getByRole("button", { name: /添加降级/ });
     await user.click(addButton);
 
     await waitFor(() => {
@@ -96,14 +96,14 @@ describe("AddFallbacks", () => {
     const user = userEvent.setup();
     render(<AddFallbacks {...defaultProps} />);
 
-    const addButton = screen.getByRole("button", { name: /add fallbacks/i });
+    const addButton = screen.getByRole("button", { name: /添加降级/ });
     await user.click(addButton);
 
     await waitFor(() => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
     });
 
-    const cancelButton = screen.getByRole("button", { name: /cancel/i });
+    const cancelButton = screen.getByRole("button", { name: /取消/ });
     await user.click(cancelButton);
 
     await waitFor(() => {
@@ -115,7 +115,7 @@ describe("AddFallbacks", () => {
     const user = userEvent.setup();
     render(<AddFallbacks {...defaultProps} />);
 
-    const addButton = screen.getByRole("button", { name: /add fallbacks/i });
+    const addButton = screen.getByRole("button", { name: /添加降级/ });
     await user.click(addButton);
 
     await waitFor(() => {
@@ -123,11 +123,11 @@ describe("AddFallbacks", () => {
     });
 
     await waitFor(() => {
-      const saveButton = screen.getByRole("button", { name: /save all configurations/i });
+      const saveButton = screen.getByRole("button", { name: /保存全部配置/ });
       expect(saveButton).toBeInTheDocument();
     });
 
-    const saveButton = screen.getByRole("button", { name: /save all configurations/i });
+    const saveButton = screen.getByRole("button", { name: /保存全部配置/ });
     await user.click(saveButton);
 
     await waitFor(() => {
@@ -139,14 +139,14 @@ describe("AddFallbacks", () => {
     const user = userEvent.setup();
     render(<AddFallbacks {...defaultProps} />);
 
-    const addButton = screen.getByRole("button", { name: /add fallbacks/i });
+    const addButton = screen.getByRole("button", { name: /添加降级/ });
     await user.click(addButton);
 
     await waitFor(() => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
     });
 
-    const saveButton = screen.getByRole("button", { name: /save all configurations/i });
+    const saveButton = screen.getByRole("button", { name: /保存全部配置/ });
     await user.click(saveButton);
 
     await waitFor(() => {
@@ -159,7 +159,7 @@ describe("AddFallbacks", () => {
     mockOnChange.mockResolvedValue(undefined);
     render(<AddFallbacks {...defaultProps} />);
 
-    const addButton = screen.getByRole("button", { name: /add fallbacks/i });
+    const addButton = screen.getByRole("button", { name: /添加降级/ });
     await user.click(addButton);
 
     await waitFor(() => {
@@ -177,7 +177,7 @@ describe("AddFallbacks", () => {
       expect(screen.getByText(/Primary: gpt-4/i)).toBeInTheDocument();
     });
 
-    const saveButton = screen.getByRole("button", { name: /save all configurations/i });
+    const saveButton = screen.getByRole("button", { name: /保存全部配置/ });
     expect(saveButton).toBeEnabled();
     await user.click(saveButton);
 
@@ -196,7 +196,7 @@ describe("AddFallbacks", () => {
     mockOnChange.mockResolvedValue(undefined);
     render(<AddFallbacks {...defaultProps} value={existingFallbacks} />);
 
-    const addButton = screen.getByRole("button", { name: /add fallbacks/i });
+    const addButton = screen.getByRole("button", { name: /添加降级/ });
     await user.click(addButton);
 
     await waitFor(() => {
@@ -214,7 +214,7 @@ describe("AddFallbacks", () => {
       expect(screen.getByText(/Primary: gpt-4/i)).toBeInTheDocument();
     });
 
-    const saveButton = screen.getByRole("button", { name: /save all configurations/i });
+    const saveButton = screen.getByRole("button", { name: /保存全部配置/ });
     await user.click(saveButton);
 
     await waitFor(() => {
@@ -230,14 +230,14 @@ describe("AddFallbacks", () => {
     const user = userEvent.setup();
     render(<AddFallbacks {...defaultProps} />);
 
-    const addButton = screen.getByRole("button", { name: /add fallbacks/i });
+    const addButton = screen.getByRole("button", { name: /添加降级/ });
     await user.click(addButton);
 
     await waitFor(() => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
     });
 
-    const cancelButton = screen.getByRole("button", { name: /cancel/i });
+    const cancelButton = screen.getByRole("button", { name: /取消/ });
     await user.click(cancelButton);
 
     await waitFor(() => {
@@ -258,7 +258,7 @@ describe("AddFallbacks", () => {
     mockOnChange.mockRejectedValue(error);
     render(<AddFallbacks {...defaultProps} />);
 
-    const addButton = screen.getByRole("button", { name: /add fallbacks/i });
+    const addButton = screen.getByRole("button", { name: /添加降级/ });
     await user.click(addButton);
 
     await waitFor(() => {
@@ -276,7 +276,7 @@ describe("AddFallbacks", () => {
       expect(screen.getByText(/Primary: gpt-4/i)).toBeInTheDocument();
     });
 
-    const saveButton = screen.getByRole("button", { name: /save all configurations/i });
+    const saveButton = screen.getByRole("button", { name: /保存全部配置/ });
     await user.click(saveButton);
 
     await waitFor(() => {
@@ -288,7 +288,7 @@ describe("AddFallbacks", () => {
     const user = userEvent.setup();
     render(<AddFallbacks accessToken={mockAccessToken} value={[]} />);
 
-    const addButton = screen.getByRole("button", { name: /add fallbacks/i });
+    const addButton = screen.getByRole("button", { name: /添加降级/ });
     await user.click(addButton);
 
     await waitFor(() => {

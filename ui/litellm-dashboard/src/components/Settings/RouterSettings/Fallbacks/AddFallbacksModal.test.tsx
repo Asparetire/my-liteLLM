@@ -17,9 +17,9 @@ describe("AddFallbacksModal", () => {
     );
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.getByText("Configure Model Fallbacks")).toBeInTheDocument();
+    expect(screen.getByText("配置模型降级")).toBeInTheDocument();
     expect(
-      screen.getByText("Manage multiple fallback chains for different models (up to 5 groups at a time)"),
+      screen.getByText("为不同模型管理多条降级链（一次最多 5 组）"),
     ).toBeInTheDocument();
     expect(screen.getByText("Test Content")).toBeInTheDocument();
   });
@@ -52,7 +52,7 @@ describe("AddFallbacksModal", () => {
       </AddFallbacksModal>,
     );
 
-    expect(screen.getByText("Configure Model Fallbacks")).toBeInTheDocument();
-    expect(screen.getByText(/Manage multiple fallback chains/i)).toBeInTheDocument();
+    expect(screen.getByText("配置模型降级")).toBeInTheDocument();
+    expect(screen.getByText(/为不同模型管理多条降级链/)).toBeInTheDocument();
   });
 });

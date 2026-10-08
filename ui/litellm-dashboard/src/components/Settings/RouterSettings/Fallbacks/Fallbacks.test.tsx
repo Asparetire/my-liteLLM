@@ -171,7 +171,7 @@ describe("Fallbacks", () => {
     await user.click(editButtons[0]);
 
     await waitFor(() => {
-      expect(screen.getByText("Configure Model Fallbacks")).toBeInTheDocument();
+      expect(screen.getByText("配置模型降级")).toBeInTheDocument();
     });
   });
 
@@ -190,7 +190,7 @@ describe("Fallbacks", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("delete-modal")).toBeInTheDocument();
-      expect(screen.getByText("Delete Fallback?")).toBeInTheDocument();
+      expect(screen.getByText("删除降级？")).toBeInTheDocument();
     });
   });
 
@@ -311,7 +311,7 @@ describe("Fallbacks", () => {
     await waitFor(() => {
       expect(screen.getByTestId("add-fallbacks-button")).toBeInTheDocument();
       expect(
-        screen.getByText(/No fallbacks configured. Add fallbacks to automatically try another model/),
+        screen.getByText(/尚未配置降级链。添加降级后/),
       ).toBeInTheDocument();
     });
 
@@ -327,7 +327,7 @@ describe("Fallbacks", () => {
     await waitFor(() => {
       expect(screen.getByTestId("add-fallbacks-button")).toBeInTheDocument();
       expect(
-        screen.getByText(/No fallbacks configured. Add fallbacks to automatically try another model/),
+        screen.getByText(/尚未配置降级链。添加降级后/),
       ).toBeInTheDocument();
     });
   });

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface RoutingStrategySelectorProps {
@@ -16,11 +17,12 @@ const RoutingStrategySelector: React.FC<RoutingStrategySelectorProps> = ({
   routerFieldsMetadata,
   onStrategyChange,
 }) => {
+  const t = useTranslations("routerSettings");
   return (
     <div className="space-y-2 max-w-3xl">
       <div>
         <label className="text-xs font-medium text-foreground uppercase tracking-wide">
-          {routerFieldsMetadata["routing_strategy"]?.ui_field_name || "Routing Strategy"}
+          {routerFieldsMetadata["routing_strategy"]?.ui_field_name || t("strategyFallbackLabel")}
         </label>
         <p className="text-xs text-muted-foreground mt-0.5 mb-2">
           {routerFieldsMetadata["routing_strategy"]?.field_description || ""}

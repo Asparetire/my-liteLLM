@@ -69,8 +69,8 @@ describe("RouterSettings", () => {
 
   it("should render the Save Changes and Reset buttons when authenticated", () => {
     renderWithProviders(<RouterSettings {...defaultProps} />);
-    expect(screen.getByRole("button", { name: /save changes/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /reset/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /保存更改/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /重置/ })).toBeInTheDocument();
   });
 
   it("should fetch callbacks and router settings on mount", async () => {
@@ -103,7 +103,7 @@ describe("RouterSettings", () => {
 
     await findStrategySelect();
 
-    await user.click(screen.getByRole("button", { name: /save changes/i }));
+    await user.click(screen.getByRole("button", { name: /保存更改/ }));
 
     expect(setCallbacksCall).toHaveBeenCalledWith(
       "test-token",
@@ -125,7 +125,7 @@ describe("RouterSettings", () => {
     await user.clear(numRetries);
     fireEvent.change(numRetries, { target: { value: "42" } });
 
-    await user.click(screen.getByRole("button", { name: /save changes/i }));
+    await user.click(screen.getByRole("button", { name: /保存更改/ }));
 
     await waitFor(() =>
       expect(setCallbacksCall).toHaveBeenCalledWith(
@@ -142,9 +142,9 @@ describe("RouterSettings", () => {
     renderWithProviders(<RouterSettings {...defaultProps} />);
 
     await findStrategySelect();
-    await user.click(screen.getByRole("button", { name: /save changes/i }));
+    await user.click(screen.getByRole("button", { name: /保存更改/ }));
 
-    expect(toast.success).toHaveBeenCalledWith("router settings updated successfully");
+    expect(toast.success).toHaveBeenCalledWith("路由设置更新成功");
   });
 
   it("should not render or save routing_groups (owned by the Routing Groups tab)", async () => {
@@ -161,7 +161,7 @@ describe("RouterSettings", () => {
     await findStrategySelect();
     expect(document.querySelector('input[name="routing_groups"]')).toBeNull();
 
-    await user.click(screen.getByRole("button", { name: /save changes/i }));
+    await user.click(screen.getByRole("button", { name: /保存更改/ }));
 
     await waitFor(() =>
       expect(setCallbacksCall).toHaveBeenCalledWith("test-token", {
@@ -176,7 +176,7 @@ describe("RouterSettings", () => {
     renderWithProviders(<RouterSettings {...defaultProps} />);
 
     await findStrategySelect();
-    await user.click(screen.getByRole("button", { name: /save changes/i }));
+    await user.click(screen.getByRole("button", { name: /保存更改/ }));
 
     await waitFor(() => {
       expect(toast.fromError).toHaveBeenCalled();

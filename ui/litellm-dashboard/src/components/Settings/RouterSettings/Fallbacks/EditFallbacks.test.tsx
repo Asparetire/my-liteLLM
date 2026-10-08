@@ -49,7 +49,7 @@ describe("EditFallbacks", () => {
 
   it("prefills the existing fallback chain for the primary model", async () => {
     setup();
-    const chain = await screen.findByRole("list", { name: "Fallback chain" });
+    const chain = await screen.findByRole("list", { name: "降级链" });
     expect(within(chain).getByText("gpt-3.5-turbo")).toBeInTheDocument();
     expect(within(chain).getByText("claude-3-opus")).toBeInTheDocument();
   });
@@ -60,10 +60,10 @@ describe("EditFallbacks", () => {
     const onClose = vi.fn();
     setup({ onChange, onClose });
 
-    const chain = await screen.findByRole("list", { name: "Fallback chain" });
-    await user.click(within(chain).getByRole("button", { name: "Remove gpt-3.5-turbo" }));
+    const chain = await screen.findByRole("list", { name: "降级链" });
+    await user.click(within(chain).getByRole("button", { name: "移除 gpt-3.5-turbo" }));
 
-    await user.click(screen.getByRole("button", { name: /save changes/i }));
+    await user.click(screen.getByRole("button", { name: /保存更改/ }));
 
     await waitFor(() => {
       expect(onChange).toHaveBeenCalledWith([{ "gpt-4": ["claude-3-opus"] }, { "claude-3-opus": ["gpt-4"] }]);
@@ -76,10 +76,10 @@ describe("EditFallbacks", () => {
     const onChange = vi.fn().mockResolvedValue(undefined);
     setup({ fallbackEntry: { "gpt-4": ["gpt-3.5-turbo"] }, onChange });
 
-    const chain = await screen.findByRole("list", { name: "Fallback chain" });
-    await user.click(within(chain).getByRole("button", { name: "Remove gpt-3.5-turbo" }));
+    const chain = await screen.findByRole("list", { name: "降级链" });
+    await user.click(within(chain).getByRole("button", { name: "移除 gpt-3.5-turbo" }));
 
-    const saveButton = screen.getByRole("button", { name: /save changes/i });
+    const saveButton = screen.getByRole("button", { name: /保存更改/ });
     expect(saveButton).toBeDisabled();
     expect(onChange).not.toHaveBeenCalled();
   });

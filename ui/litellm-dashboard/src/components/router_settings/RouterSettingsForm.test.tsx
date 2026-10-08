@@ -21,7 +21,7 @@ const baseProps = {
 describe("RouterSettingsForm", () => {
   it("should render", () => {
     render(<RouterSettingsForm {...baseProps} />);
-    expect(screen.getByText("Routing Settings")).toBeInTheDocument();
+    expect(screen.getByText("路由设置")).toBeInTheDocument();
   });
 
   it("should not show the strategy selector when no strategies are provided", () => {
@@ -45,7 +45,7 @@ describe("RouterSettingsForm", () => {
       availableRoutingStrategies: ["simple-shuffle"],
     };
     render(<RouterSettingsForm {...props} />);
-    expect(screen.queryByText("Latency-Based Configuration")).not.toBeInTheDocument();
+    expect(screen.queryByText("延迟路由配置")).not.toBeInTheDocument();
   });
 
   it("should render LatencyBasedConfiguration when strategy is latency-based-routing", () => {
@@ -59,7 +59,7 @@ describe("RouterSettingsForm", () => {
       availableRoutingStrategies: ["latency-based-routing"],
     };
     render(<RouterSettingsForm {...props} />);
-    expect(screen.getByText("Latency-Based Configuration")).toBeInTheDocument();
+    expect(screen.getByText("延迟路由配置")).toBeInTheDocument();
   });
 
   it("should call onChange with the updated strategy when the selector changes", async () => {
@@ -90,6 +90,6 @@ describe("RouterSettingsForm", () => {
 
   it("should show the Reliability & Retries section", () => {
     render(<RouterSettingsForm {...baseProps} />);
-    expect(screen.getByText("Reliability & Retries")).toBeInTheDocument();
+    expect(screen.getByText("可靠性与重试")).toBeInTheDocument();
   });
 });
