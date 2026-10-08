@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { BarChart } from "@/components/shared/charts";
 import type { ChartTooltipProps } from "@/components/shared/charts/chart_tooltip";
@@ -10,7 +11,7 @@ import type { components } from "@/lib/http/schema";
 
 export type CacheActivityErrorBucket = components["schemas"]["CacheActivityErrorBucket"];
 
-export const FAILED_REQUESTS_SERIES = "Failed requests";
+export const FAILED_REQUESTS_SERIES = "seriesFailed";
 
 export type ErrorClassCount = {
   error_class: string;
@@ -40,6 +41,7 @@ export const groupErrorBuckets = (buckets: readonly CacheActivityErrorBucket[], 
 };
 
 export const ErrorCodeTooltip = ({ active, payload, label }: ChartTooltipProps) => {
+  const t = useTranslations("caching");
   if (!active || !payload || payload.length === 0) return null;
   const datum = payload[0]?.payload as ErrorCodeDatum | undefined;
   if (!datum) return null;
@@ -47,7 +49,7 @@ export const ErrorCodeTooltip = ({ active, payload, label }: ChartTooltipProps) 
   return (
     <div className="min-w-40 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl">
       <p className="mb-1.5 font-medium text-foreground">
-        Error code {String(label)}: {datum[FAILED_REQUESTS_SERIES].toLocaleString()} failed
+        {t("errorCodeSummary", { code: String(label), count: datum[FAILED_REQUESTS_SERIES].toLocaleString() })}
       </p>
       <div className="grid gap-1.5">
         {datum.classes.map((errorClass) => (
@@ -70,16 +72,18 @@ interface ErrorDrilldownCardProps {
   onClose: () => void;
 }
 
-export const ErrorDrilldownCard = ({ callType, buckets, valueFormatter, onClose }: ErrorDrilldownCardProps) => (
+export const ErrorDrilldownCard = ({ callType, buckets, valueFormatter, onClose }: ErrorDrilldownCardProps) => {
+  const t = useTranslations("caching");
+  return (
   <Card className="mt-4">
     <CardHeader className="flex flex-row items-center justify-between">
-      <CardTitle className="text-base font-semibold">Failed requests by error code: {callType}</CardTitle>
-      <Button variant="outline" size="icon-sm" onClick={onClose} aria-label="Close error breakdown">
+      <CardTitle className="text-base font-semibold">{t("drilldownTitle", { callType })}</CardTitle>
+      <Button variant="outline" size="icon-sm" onClick={onClose} aria-label={t("closeDrilldown")}>
         <X />
       </Button>
     </CardHeader>
     <CardContent>
-      <p className="text-sm text-muted-foreground">Hover a bar to see the error classes behind that code.</p>
+      <p className="text-sm text-muted-foreground">{t("drilldownHoverHint")}</p>
       <BarChart
         data={groupErrorBuckets(buckets, callType)}
         index="error_code"
@@ -91,6 +95,7 @@ export const ErrorDrilldownCard = ({ callType, buckets, valueFormatter, onClose 
         yAxisWidth={48}
         className="mt-2"
       />
-    </CardContent>
-  </Card>
-);
+      </CardContent>
+    </Card>
+  );
+};
