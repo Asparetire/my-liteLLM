@@ -36,12 +36,11 @@ import { Input } from "@/components/ui/input";
 import { useZodForm } from "@/lib/forms/useZodForm";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-const AddAllowedIPForm = ({ onSubmit }: { onSubmit: (values: AllowedIPFormValues) => Promise<void> }) => {
+const AddAllowedIPForm = ({ onSubmit }: { onSubmit: (values: { ip: string }) => Promise<void> }) => {
   const t = useTranslations("adminPanel");
   const allowedIPSchema = z.object({
     ip: z.string().min(1, t("ipRequired")),
   });
-  type AllowedIPFormValues = z.infer<typeof allowedIPSchema>;
   const form = useZodForm(allowedIPSchema, { defaultValues: { ip: "" } });
 
   return (
