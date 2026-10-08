@@ -3362,6 +3362,24 @@
     "errorCodeSummary": "Error code {code}: {count} failed",
     "drilldownTitle": "Failed requests by error code: {callType}",
     "closeDrilldown": "Close error breakdown",
-    "drilldownHoverHint": "Hover a bar to see the error classes behind that code."
+    "drilldownHoverHint": "Hover a bar to see the error classes behind that code.",
+    "coordFieldUrlHelp": "Full Redis/Valkey connection URL (e.g. redis://:password@host:6379/1). When set, it takes precedence over Host, Port, Username, and Password.",
+    "coordFieldStartupNodesHelp": "List of startup nodes for Redis Cluster (e.g., [{\"host\": \"127.0.0.1\", \"port\": 7001}])",
+    "coordHeading": "Coordination Redis",
+    "coordDesc": "Redis used to coordinate work across proxy pods: cross-pod rate limits, spend tracking, and the pod lock manager. It is configured independently of the response cache.",
+    "coordRestartNote": "Saved changes take effect on proxy restart.",
+    "coordBadgeHere": "Configured here",
+    "coordBadgeHereTip": "general_settings.coordination_redis is set, so coordination uses its own Redis connection.",
+    "coordBadgeCache": "Borrowed from response cache",
+    "coordBadgeCacheTip": "No coordination Redis is configured; the proxy reuses the response cache's Redis connection.",
+    "coordBadgeEnv": "From REDIS_* environment",
+    "coordBadgeEnvTip": "No coordination Redis is configured; the proxy falls back to the REDIS_* environment variables.",
+    "coordBadgeNone": "Not configured",
+    "coordBadgeNoneTip": "Cross-pod rate limits, spend tracking, and the pod lock manager have no Redis to coordinate through.",
+    "coordToastLoadFailed": "Failed to load coordination Redis settings",
+    "coordToastTestSuccess": "Coordination Redis connection test successful!",
+    "coordToastTestFailed": "Connection test failed: {error}",
+    "coordToastSaveSuccess": "Coordination Redis settings saved. Restart the proxy to apply them.",
+    "coordToastSaveFailed": "Failed to update coordination Redis settings"
   }
 }

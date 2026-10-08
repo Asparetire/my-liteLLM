@@ -35,7 +35,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
 const renderSettings = () => render(<CoordinationRedisSettings />, { wrapper });
 
 const clickSave = async (user: ReturnType<typeof userEvent.setup>) =>
-  user.click(screen.getByRole("button", { name: /save changes/i }));
+  user.click(screen.getByRole("button", { name: /保存更改/ }));
 
 describe("CoordinationRedisSettings", () => {
   beforeEach(() => {
@@ -49,16 +49,16 @@ describe("CoordinationRedisSettings", () => {
     it("should show the connection fields and hide cluster/sentinel fields", async () => {
       renderSettings();
 
-      expect(await screen.findByText("Connection Settings")).toBeInTheDocument();
+      expect(await screen.findByText("连接设置")).toBeInTheDocument();
       expect(screen.getByText("Redis URL")).toBeInTheDocument();
       expect(screen.getByText("SSL")).toBeInTheDocument();
-      expect(screen.queryByText("Startup Nodes")).not.toBeInTheDocument();
-      expect(screen.queryByText("Sentinel Nodes")).not.toBeInTheDocument();
+      expect(screen.queryByText("启动节点")).not.toBeInTheDocument();
+      expect(screen.queryByText("哨兵节点")).not.toBeInTheDocument();
     });
 
     it("should not offer semantic caching, which is a response-cache-only concern", async () => {
       renderSettings();
-      await screen.findByText("Connection Settings");
+      await screen.findByText("连接设置");
       expect(screen.queryByText(/semantic/i)).not.toBeInTheDocument();
     });
   });
@@ -67,8 +67,8 @@ describe("CoordinationRedisSettings", () => {
     it("should reveal the cluster startup nodes field", async () => {
       getSettings.mockResolvedValue(settingsResponse({ startup_nodes: [{ host: "127.0.0.1", port: 7001 }] }));
       renderSettings();
-      expect(await screen.findByText("Startup Nodes")).toBeInTheDocument();
-      expect(screen.queryByText("Sentinel Nodes")).not.toBeInTheDocument();
+      expect(await screen.findByText("启动节点")).toBeInTheDocument();
+      expect(screen.queryByText("哨兵节点")).not.toBeInTheDocument();
     });
   });
 
@@ -76,17 +76,17 @@ describe("CoordinationRedisSettings", () => {
     it("should reveal the sentinel fields", async () => {
       getSettings.mockResolvedValue(settingsResponse({ sentinel_nodes: [["localhost", 26379]] }));
       renderSettings();
-      expect(await screen.findByText("Sentinel Nodes")).toBeInTheDocument();
-      expect(screen.getByText("Service Name")).toBeInTheDocument();
-      expect(screen.getByText("Sentinel Password")).toBeInTheDocument();
+      expect(await screen.findByText("哨兵节点")).toBeInTheDocument();
+      expect(screen.getByText("服务名称")).toBeInTheDocument();
+      expect(screen.getByText("哨兵密码")).toBeInTheDocument();
     });
   });
 
   describe("the source badge", () => {
     it.each([
-      ["coordination_redis", "Configured here"],
-      ["cache_backend", "Borrowed from response cache"],
-      ["environment", "From REDIS_* environment"],
+      ["coordination_redis", "已在此配置"],
+      ["cache_backend", "借用响应缓存"],
+      ["environment", "来自 REDIS_* 环境变量"],
     ] as const)("should render %s as %s", async (source, label) => {
       getSettings.mockResolvedValue(settingsResponse({}, source));
       renderSettings();
@@ -96,12 +96,12 @@ describe("CoordinationRedisSettings", () => {
     it("should render a null source as not configured", async () => {
       getSettings.mockResolvedValue(settingsResponse({}, null));
       renderSettings();
-      expect(await screen.findByTestId("coordination-redis-source")).toHaveTextContent("Not configured");
+      expect(await screen.findByTestId("coordination-redis-source")).toHaveTextContent("未配置");
     });
 
     it("should tell the admin that saved changes need a proxy restart", async () => {
       renderSettings();
-      expect(await screen.findByText(/take effect on proxy restart/i)).toBeInTheDocument();
+      expect(await screen.findByText(/重启后生效/)).toBeInTheDocument();
     });
   });
 
@@ -110,12 +110,12 @@ describe("CoordinationRedisSettings", () => {
       const user = userEvent.setup();
       renderSettings();
 
-      const port = await screen.findByLabelText("Port");
+      const port = await screen.findByLabelText("端口");
       await user.clear(port);
       await user.type(port, "99999");
       await clickSave(user);
 
-      expect(await screen.findByText(/Port must be an integer between 1 and 65535/i)).toBeInTheDocument();
+      expect(await screen.findByText(/端口必须是 1 到 65535 之间的整数/)).toBeInTheDocument();
       expect(updateSettings).not.toHaveBeenCalled();
     });
 
@@ -124,12 +124,12 @@ describe("CoordinationRedisSettings", () => {
       getSettings.mockResolvedValue(settingsResponse({ startup_nodes: [], sentinel_nodes: [["localhost", 26379]] }));
       renderSettings();
 
-      const sentinelNodes = await screen.findByLabelText("Sentinel Nodes");
+      const sentinelNodes = await screen.findByLabelText("哨兵节点");
       await user.clear(sentinelNodes);
       await user.type(sentinelNodes, "not json");
       await clickSave(user);
 
-      expect(await screen.findByText(/Must be a valid JSON array/i)).toBeInTheDocument();
+      expect(await screen.findByText(/必须是合法的 JSON 数组/)).toBeInTheDocument();
       expect(updateSettings).not.toHaveBeenCalled();
     });
   });
@@ -139,7 +139,7 @@ describe("CoordinationRedisSettings", () => {
       const user = userEvent.setup();
       renderSettings();
 
-      await user.type(await screen.findByLabelText("Host"), "coord-redis");
+      await user.type(await screen.findByLabelText("主机"), "coord-redis");
       await clickSave(user);
 
       await waitFor(() =>
@@ -152,7 +152,7 @@ describe("CoordinationRedisSettings", () => {
       getSettings.mockResolvedValue(settingsResponse({ startup_nodes: [{ host: "127.0.0.1", port: 7001 }] }));
       renderSettings();
 
-      await screen.findByLabelText("Startup Nodes");
+      await screen.findByLabelText("启动节点");
       await clickSave(user);
 
       await waitFor(() => expect(updateSettings).toHaveBeenCalled());
@@ -168,7 +168,7 @@ describe("CoordinationRedisSettings", () => {
       );
       renderSettings();
 
-      await waitFor(() => expect(screen.getByLabelText("Host")).toHaveValue("coord-redis"));
+      await waitFor(() => expect(screen.getByLabelText("主机")).toHaveValue("coord-redis"));
       await clickSave(user);
 
       await waitFor(() => expect(updateSettings).toHaveBeenCalled());
@@ -182,9 +182,9 @@ describe("CoordinationRedisSettings", () => {
       getSettings.mockResolvedValue(settingsResponse({ password: REDACTED_VALUE }));
       renderSettings();
 
-      const password = await screen.findByLabelText("Password");
+      const password = await screen.findByLabelText("密码");
       await waitFor(() => expect(password).toHaveValue(""));
-      expect(password).toHaveAttribute("placeholder", expect.stringMatching(/already set/i));
+      expect(password).toHaveAttribute("placeholder", expect.stringMatching(/已设置/));
       expect(screen.queryByDisplayValue(REDACTED_VALUE)).not.toBeInTheDocument();
     });
 
@@ -193,7 +193,7 @@ describe("CoordinationRedisSettings", () => {
       getSettings.mockResolvedValue(settingsResponse({ host: "coord-redis", password: REDACTED_VALUE }));
       renderSettings();
 
-      const password = await screen.findByLabelText("Password");
+      const password = await screen.findByLabelText("密码");
       await waitFor(() => expect(password).toHaveValue(""));
       await user.type(password, "new-secret");
       await clickSave(user);
@@ -206,10 +206,10 @@ describe("CoordinationRedisSettings", () => {
       const user = userEvent.setup();
       renderSettings();
 
-      await screen.findByLabelText("Host");
+      await screen.findByLabelText("主机");
       await clickSave(user);
 
-      await waitFor(() => expect(notifications.success).toHaveBeenCalledWith(expect.stringMatching(/restart/i)));
+      await waitFor(() => expect(notifications.success).toHaveBeenCalledWith(expect.stringMatching(/重启/)));
     });
   });
 
@@ -218,10 +218,10 @@ describe("CoordinationRedisSettings", () => {
       const user = userEvent.setup();
       renderSettings();
 
-      await screen.findByLabelText("Host");
-      await user.click(screen.getByRole("button", { name: /test connection/i }));
+      await screen.findByLabelText("主机");
+      await user.click(screen.getByRole("button", { name: /测试连接/ }));
 
-      await waitFor(() => expect(notifications.success).toHaveBeenCalledWith(expect.stringMatching(/successful/i)));
+      await waitFor(() => expect(notifications.success).toHaveBeenCalledWith(expect.stringMatching(/测试成功/)));
       expect(testConnection).toHaveBeenCalledWith("sk-test", { port: 6379, ssl: false });
     });
 
@@ -230,8 +230,8 @@ describe("CoordinationRedisSettings", () => {
       testConnection.mockResolvedValue({ status: "unhealthy", error: "connection refused" });
       renderSettings();
 
-      await screen.findByLabelText("Host");
-      await user.click(screen.getByRole("button", { name: /test connection/i }));
+      await screen.findByLabelText("主机");
+      await user.click(screen.getByRole("button", { name: /测试连接/ }));
 
       await waitFor(() =>
         expect(notifications.fromError).toHaveBeenCalledWith(expect.stringContaining("connection refused")),

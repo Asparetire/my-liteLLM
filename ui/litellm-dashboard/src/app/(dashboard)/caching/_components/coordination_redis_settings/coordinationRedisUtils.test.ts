@@ -135,10 +135,10 @@ describe("buildCoordinationPayload", () => {
 
 describe("sourceBadge", () => {
   it("should label each backend source value", () => {
-    expect(sourceBadge("coordination_redis").label).toBe("Configured here");
-    expect(sourceBadge("cache_backend").label).toBe("Borrowed from response cache");
-    expect(sourceBadge("environment").label).toBe("From REDIS_* environment");
-    expect(sourceBadge(null).label).toBe("Not configured");
+    expect(sourceBadge("coordination_redis").label).toBe("coordBadgeHere");
+    expect(sourceBadge("cache_backend").label).toBe("coordBadgeCache");
+    expect(sourceBadge("environment").label).toBe("coordBadgeEnv");
+    expect(sourceBadge(null).label).toBe("coordBadgeNone");
   });
 
   it("should tone only a dedicated coordination Redis as success", () => {
@@ -149,6 +149,6 @@ describe("sourceBadge", () => {
   });
 
   it("should fall back to not configured for an unrecognized source", () => {
-    expect(sourceBadge("something_new").label).toBe("Not configured");
+    expect(sourceBadge("something_new").label).toBe("coordBadgeNone");
   });
 });

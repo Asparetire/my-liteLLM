@@ -3362,6 +3362,24 @@
     "errorCodeSummary": "错误码 {code}：{count} 次失败",
     "drilldownTitle": "按错误码统计的失败请求：{callType}",
     "closeDrilldown": "关闭错误细分",
-    "drilldownHoverHint": "悬停在柱条上可查看该错误码背后的错误类别。"
+    "drilldownHoverHint": "悬停在柱条上可查看该错误码背后的错误类别。",
+    "coordFieldUrlHelp": "完整的 Redis/Valkey 连接 URL（如 redis://:password@host:6379/1）。设置后将优先于主机、端口、用户名与密码。",
+    "coordFieldStartupNodesHelp": "Redis 集群的启动节点列表（如 [{\"host\": \"127.0.0.1\", \"port\": 7001}]）",
+    "coordHeading": "协调 Redis",
+    "coordDesc": "用于在代理各 Pod 之间协调工作的 Redis：跨 Pod 速率限制、消费追踪与 Pod 锁管理器。它与响应缓存相互独立配置。",
+    "coordRestartNote": "保存的更改将在代理重启后生效。",
+    "coordBadgeHere": "已在此配置",
+    "coordBadgeHereTip": "已设置 general_settings.coordination_redis，协调功能使用自己独立的 Redis 连接。",
+    "coordBadgeCache": "借用响应缓存",
+    "coordBadgeCacheTip": "未配置协调 Redis；代理复用响应缓存的 Redis 连接。",
+    "coordBadgeEnv": "来自 REDIS_* 环境变量",
+    "coordBadgeEnvTip": "未配置协调 Redis；代理回退使用 REDIS_* 环境变量。",
+    "coordBadgeNone": "未配置",
+    "coordBadgeNoneTip": "跨 Pod 速率限制、消费追踪与 Pod 锁管理器没有可用于协调的 Redis。",
+    "coordToastLoadFailed": "加载协调 Redis 设置失败",
+    "coordToastTestSuccess": "协调 Redis 连接测试成功！",
+    "coordToastTestFailed": "连接测试失败：{error}",
+    "coordToastSaveSuccess": "协调 Redis 设置已保存。重启代理后生效。",
+    "coordToastSaveFailed": "更新协调 Redis 设置失败"
   }
 }

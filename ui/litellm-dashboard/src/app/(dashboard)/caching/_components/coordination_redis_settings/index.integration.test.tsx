@@ -34,7 +34,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
 const renderSettings = () => render(<CoordinationRedisSettings />, { wrapper });
 
 const clickSave = async (user: ReturnType<typeof userEvent.setup>) =>
-  user.click(screen.getByRole("button", { name: /save changes/i }));
+  user.click(screen.getByRole("button", { name: /保存更改/ }));
 describe("CoordinationRedisSettings value retention across redis types", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -50,29 +50,29 @@ describe("CoordinationRedisSettings value retention across redis types", () => {
   it("keeps a value typed into a sentinel-only field when the type is switched away and back", async () => {
     const user = userEvent.setup();
     renderSettings();
-    await screen.findByLabelText("Host");
+    await screen.findByLabelText("主机");
 
-    await pickRedisType(user, /sentinel/i);
-    fireEvent.change(await screen.findByLabelText("Service Name"), { target: { value: "mymaster" } });
+    await pickRedisType(user, /哨兵/);
+    fireEvent.change(await screen.findByLabelText("服务名称"), { target: { value: "mymaster" } });
 
-    await pickRedisType(user, /node/i);
-    await waitFor(() => expect(screen.queryByLabelText("Service Name")).not.toBeInTheDocument());
+    await pickRedisType(user, /单机/);
+    await waitFor(() => expect(screen.queryByLabelText("服务名称")).not.toBeInTheDocument());
 
-    await pickRedisType(user, /sentinel/i);
+    await pickRedisType(user, /哨兵/);
 
-    expect(await screen.findByLabelText("Service Name")).toHaveValue("mymaster");
+    expect(await screen.findByLabelText("服务名称")).toHaveValue("mymaster");
   });
 
   it("leaves a sentinel-only value out of the payload once the type is no longer sentinel", async () => {
     const user = userEvent.setup();
     renderSettings();
-    await screen.findByLabelText("Host");
+    await screen.findByLabelText("主机");
 
-    await pickRedisType(user, /sentinel/i);
-    fireEvent.change(await screen.findByLabelText("Service Name"), { target: { value: "mymaster" } });
+    await pickRedisType(user, /哨兵/);
+    fireEvent.change(await screen.findByLabelText("服务名称"), { target: { value: "mymaster" } });
 
-    await pickRedisType(user, /node/i);
-    await waitFor(() => expect(screen.queryByLabelText("Service Name")).not.toBeInTheDocument());
+    await pickRedisType(user, /单机/);
+    await waitFor(() => expect(screen.queryByLabelText("服务名称")).not.toBeInTheDocument());
 
     await clickSave(user);
 

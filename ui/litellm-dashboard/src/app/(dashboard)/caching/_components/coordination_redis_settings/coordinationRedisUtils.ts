@@ -121,25 +121,25 @@ export interface SourceBadgeDescriptor {
 const SOURCE_BADGES: Readonly<Record<CoordinationRedisSource, SourceBadgeDescriptor>> = {
   coordination_redis: {
     tone: "success",
-    label: "Configured here",
-    tooltip: "general_settings.coordination_redis is set, so coordination uses its own Redis connection.",
+    label: "coordBadgeHere",
+    tooltip: "coordBadgeHereTip",
   },
   cache_backend: {
     tone: "info",
-    label: "Borrowed from response cache",
-    tooltip: "No coordination Redis is configured; the proxy reuses the response cache's Redis connection.",
+    label: "coordBadgeCache",
+    tooltip: "coordBadgeCacheTip",
   },
   environment: {
     tone: "info",
-    label: "From REDIS_* environment",
-    tooltip: "No coordination Redis is configured; the proxy falls back to the REDIS_* environment variables.",
+    label: "coordBadgeEnv",
+    tooltip: "coordBadgeEnvTip",
   },
 };
 
 const NOT_CONFIGURED_BADGE: SourceBadgeDescriptor = {
   tone: "neutral",
-  label: "Not configured",
-  tooltip: "Cross-pod rate limits, spend tracking, and the pod lock manager have no Redis to coordinate through.",
+  label: "coordBadgeNone",
+  tooltip: "coordBadgeNoneTip",
 };
 
 export const sourceBadge = (source: string | null | undefined): SourceBadgeDescriptor => {

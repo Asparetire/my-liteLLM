@@ -4,32 +4,31 @@ import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderWithProviders } from "@/../tests/test-utils";
 import CoordinationRedisTypeSelector from "./CoordinationRedisTypeSelector";
-import { COORDINATION_REDIS_TYPE_DESCRIPTIONS } from "./coordinationRedisFields";
 import { chooseSelectOption } from "../../../../../../tests/test-utils";
 
 describe("CoordinationRedisTypeSelector", () => {
   it("labels the control and shows the current selection", () => {
     renderWithProviders(<CoordinationRedisTypeSelector redisType="node" onTypeChange={vi.fn()} />);
 
-    expect(screen.getByText("Redis Type")).toBeInTheDocument();
+    expect(screen.getByText("Redis 类型")).toBeInTheDocument();
     expect(screen.getByRole("combobox")).toBeInTheDocument();
-    expect(screen.getByText("Node (Single Instance)")).toBeInTheDocument();
+    expect(screen.getByText("单机（单实例）")).toBeInTheDocument();
   });
 
   it("shows the description for the selected type", () => {
     renderWithProviders(<CoordinationRedisTypeSelector redisType="cluster" onTypeChange={vi.fn()} />);
 
-    expect(screen.getByText(COORDINATION_REDIS_TYPE_DESCRIPTIONS.cluster)).toBeInTheDocument();
+    expect(screen.getByText("Redis 集群模式，支持高可用与水平扩展")).toBeInTheDocument();
   });
 
   it("switches the description when the selected type changes", () => {
     const { rerender } = renderWithProviders(<CoordinationRedisTypeSelector redisType="node" onTypeChange={vi.fn()} />);
-    expect(screen.getByText(COORDINATION_REDIS_TYPE_DESCRIPTIONS.node)).toBeInTheDocument();
+    expect(screen.getByText("标准 Redis 单节点/单实例")).toBeInTheDocument();
 
     rerender(<CoordinationRedisTypeSelector redisType="sentinel" onTypeChange={vi.fn()} />);
 
-    expect(screen.getByText(COORDINATION_REDIS_TYPE_DESCRIPTIONS.sentinel)).toBeInTheDocument();
-    expect(screen.queryByText(COORDINATION_REDIS_TYPE_DESCRIPTIONS.node)).not.toBeInTheDocument();
+    expect(screen.getByText("Redis 哨兵模式，支持高可用与自动故障转移")).toBeInTheDocument();
+    expect(screen.queryByText("标准 Redis 单节点/单实例")).not.toBeInTheDocument();
   });
 
   it("reports the newly picked type to the caller", async () => {
@@ -37,7 +36,7 @@ describe("CoordinationRedisTypeSelector", () => {
     const user = userEvent.setup();
     renderWithProviders(<CoordinationRedisTypeSelector redisType="node" onTypeChange={onTypeChange} />);
 
-    await chooseSelectOption(user, screen.getByRole("combobox"), "Cluster");
+    await chooseSelectOption(user, screen.getByRole("combobox"), "集群");
 
     expect(onTypeChange).toHaveBeenCalledTimes(1);
     expect(onTypeChange.mock.calls[0][0]).toBe("cluster");
@@ -49,8 +48,8 @@ describe("CoordinationRedisTypeSelector", () => {
 
     await user.click(screen.getByRole("combobox"));
 
-    expect(await screen.findByText("Cluster")).toBeInTheDocument();
-    expect(screen.getByText("Sentinel")).toBeInTheDocument();
-    expect(screen.getAllByText("Node (Single Instance)").length).toBeGreaterThan(0);
+    expect(await screen.findByText("集群")).toBeInTheDocument();
+    expect(screen.getByText("哨兵")).toBeInTheDocument();
+    expect(screen.getAllByText("单机（单实例）").length).toBeGreaterThan(0);
   });
 });
