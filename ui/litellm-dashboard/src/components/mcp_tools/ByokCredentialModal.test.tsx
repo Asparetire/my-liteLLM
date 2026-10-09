@@ -19,9 +19,9 @@ const jsonResponse = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
 async function fillAndSubmit(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByText("Continue to Authentication"));
-  fireEvent.change(screen.getByPlaceholderText("Enter your API key"), { target: { value: "linear-key" } });
-  await user.click(screen.getByRole("button", { name: /Connect & Authorize/ }));
+  await user.click(screen.getByText("继续进行认证"));
+  fireEvent.change(screen.getByPlaceholderText("输入你的 API 密钥"), { target: { value: "linear-key" } });
+  await user.click(screen.getByRole("button", { name: /连接并授权/ }));
 }
 
 beforeEach(() => {

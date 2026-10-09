@@ -1,5 +1,6 @@
 import React from "react";
 import { CircleAlert, Info } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { z } from "zod/v4";
 import { MCPServer, MCPUserEnvVarsStatus, MCPUserEnvVarSpec } from "@/components/mcp_tools/types";
@@ -31,18 +32,23 @@ interface UserEnvVarsFormProps {
   onSubmit: (values: Record<string, string>) => void;
 }
 
-const buildSchema = (required: readonly MCPUserEnvVarSpec[]) =>
-  z.object(
-    Object.fromEntries(
-      required.map((spec) => [spec.name, spec.is_set ? z.string() : z.string().min(1, `${spec.name} is required`)]),
-    ),
-  );
-
 const emptyValues = (required: readonly MCPUserEnvVarSpec[]): Record<string, string> =>
   Object.fromEntries(required.map((spec) => [spec.name, ""]));
 
 const UserEnvVarsForm: React.FC<UserEnvVarsFormProps> = ({ required, isSaving, onCancel, onSubmit }) => {
-  const form = useZodForm(buildSchema(required), { defaultValues: emptyValues(required) });
+  const t = useTranslations("mcpServers");
+  const tCommon = useTranslations("common");
+  const form = useZodForm(
+    z.object(
+      Object.fromEntries(
+        required.map((spec) => [
+          spec.name,
+          spec.is_set ? z.string() : z.string().min(1, t("envVarFieldRequired", { name: spec.name })),
+        ]),
+      ),
+    ),
+    { defaultValues: emptyValues(required) },
+  );
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -56,7 +62,7 @@ const UserEnvVarsForm: React.FC<UserEnvVarsFormProps> = ({ required, isSaving, o
             label={
               <span className="flex items-center gap-2">
                 <span className="font-mono text-sm font-semibold">{spec.name}</span>
-                {spec.is_set && <Badge variant="secondary">Set</Badge>}
+                {spec.is_set && <Badge variant="secondary">{t("envVarSetBadge")}</Badge>}
               </span>
             }
           >
@@ -65,7 +71,7 @@ const UserEnvVarsForm: React.FC<UserEnvVarsFormProps> = ({ required, isSaving, o
                 {...field}
                 disabled={isSaving}
                 placeholder={
-                  spec.is_set ? "Enter a new value to overwrite" : spec.description || `Enter your ${spec.name}`
+                  spec.is_set ? t("envVarOverwritePlaceholder") : spec.description || t("envVarEnterPlaceholder", { name: spec.name })
                 }
               />
             )}
@@ -74,11 +80,11 @@ const UserEnvVarsForm: React.FC<UserEnvVarsFormProps> = ({ required, isSaving, o
       </FieldGroup>
       <div className="mt-6 flex items-center justify-end gap-2 border-t border-border pt-2">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving}>
-          Cancel
+          {tCommon("cancel")}
         </Button>
         <Button type="submit" disabled={isSaving}>
           {isSaving && <UiLoadingSpinner className="mr-2 size-4" />}
-          Save Credentials
+          {t("saveCredentialsBtn")}
         </Button>
       </div>
     </form>
@@ -93,6 +99,7 @@ const UserEnvVarsForm: React.FC<UserEnvVarsFormProps> = ({ required, isSaving, o
  * description as the placeholder.
  */
 const UserEnvVarsModal: React.FC<UserEnvVarsModalProps> = ({ server, open, accessToken, onClose, onSaved }) => {
+  const t = useTranslations("mcpServers");
   const {
     data: status,
     isLoading,
@@ -106,12 +113,12 @@ const UserEnvVarsModal: React.FC<UserEnvVarsModalProps> = ({ server, open, acces
   const saveMutation = useMutation({
     mutationFn: (values: Record<string, string>) => storeMCPUserEnvVars(accessToken!, server!.server_id, values),
     onSuccess: (saved) => {
-      toast.success("Credentials saved");
+      toast.success(t("toastCredentialsSaved"));
       onSaved?.(saved);
       onClose();
     },
     onError: (err) => {
-      toast.fromError(`Failed to save env vars: ${err instanceof Error ? err.message : String(err)}`);
+      toast.fromError(t("toastEnvVarsSaveFailed", { error: err instanceof Error ? err.message : String(err) }));
     },
   });
 
@@ -124,7 +131,7 @@ const UserEnvVarsModal: React.FC<UserEnvVarsModalProps> = ({ server, open, acces
     saveMutation.mutate(trimmed);
   };
 
-  const displayName = server?.server_name || server?.alias || server?.server_id || "MCP Server";
+  const displayName = server?.server_name || server?.alias || server?.server_id || t("defaultServerName");
   const required = status?.required ?? [];
   const isSaving = saveMutation.isPending;
 
@@ -133,8 +140,8 @@ const UserEnvVarsModal: React.FC<UserEnvVarsModalProps> = ({ server, open, acces
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-[520px]">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <DialogTitle className="text-base font-semibold">Set your credentials</DialogTitle>
-            <StatusBadge tone="info" label="Per-user" />
+            <DialogTitle className="text-base font-semibold">{t("setCredentialsTitle")}</DialogTitle>
+            <StatusBadge tone="info" label={t("perUserBadge")} />
           </div>
           <span className="text-xs text-muted-foreground">{displayName}</span>
         </DialogHeader>
@@ -147,20 +154,16 @@ const UserEnvVarsModal: React.FC<UserEnvVarsModalProps> = ({ server, open, acces
           ) : isError ? (
             <Alert variant="error">
               <CircleAlert />
-              <AlertTitle>Failed to load env vars</AlertTitle>
+              <AlertTitle>{t("loadEnvVarsFailed")}</AlertTitle>
             </Alert>
           ) : required.length === 0 ? (
             <Alert variant="info">
               <Info />
-              <AlertTitle>No per-user fields configured for this server.</AlertTitle>
+              <AlertTitle>{t("noUserFieldsConfigured")}</AlertTitle>
             </Alert>
           ) : (
             <>
-              <span className="block text-sm text-muted-foreground">
-                These values are private to you. Your admin configured this MCP server to require these per-user
-                credentials. Saved values are never shown back; leave an already-set field blank to keep it, or enter a
-                value to set or change it.
-              </span>
+              <span className="block text-sm text-muted-foreground">{t("envVarsPrivacyNote")}</span>
               <UserEnvVarsForm required={required} isSaving={isSaving} onCancel={onClose} onSubmit={handleSave} />
             </>
           )}

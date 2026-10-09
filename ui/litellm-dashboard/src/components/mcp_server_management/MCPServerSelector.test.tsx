@@ -56,7 +56,7 @@ describe("MCPServerSelector no-mcp-servers option", () => {
     await openSelector(user);
 
     expect(optionByLabel("Server One")).toBeDefined();
-    expect(optionByLabel("No MCP Servers")).toBeUndefined();
+    expect(optionByLabel("不使用 MCP 服务器")).toBeUndefined();
   });
 
   it("emits an exclusive sentinel when No MCP Servers is selected", async () => {
@@ -72,7 +72,7 @@ describe("MCPServerSelector no-mcp-servers option", () => {
     );
 
     await openSelector(user);
-    await user.click(optionByLabel("No MCP Servers")!);
+    await user.click(optionByLabel("不使用 MCP 服务器")!);
 
     expect(onChange).toHaveBeenCalledWith({ servers: [NO_MCP_SERVERS_SENTINEL], accessGroups: [], toolsets: [] });
   });
@@ -91,7 +91,7 @@ describe("MCPServerSelector no-mcp-servers option", () => {
     await openSelector(user);
 
     expect(optionByLabel("Server One")).toHaveAttribute("aria-disabled", "true");
-    expect(optionByLabel("No MCP Servers")).not.toHaveAttribute("aria-disabled", "true");
+    expect(optionByLabel("不使用 MCP 服务器")).not.toHaveAttribute("aria-disabled", "true");
   });
 });
 
@@ -110,7 +110,7 @@ describe("MCPServerSelector all-proxy-mcpservers option", () => {
     await openSelector(user);
 
     expect(optionByLabel("Server One")).toBeDefined();
-    expect(optionByLabel("All Proxy MCP Servers")).toBeUndefined();
+    expect(optionByLabel("所有代理 MCP 服务器")).toBeUndefined();
   });
 
   it("emits an exclusive sentinel when All Proxy MCP Servers is selected", async () => {
@@ -126,7 +126,7 @@ describe("MCPServerSelector all-proxy-mcpservers option", () => {
     );
 
     await openSelector(user);
-    await user.click(optionByLabel("All Proxy MCP Servers")!);
+    await user.click(optionByLabel("所有代理 MCP 服务器")!);
 
     expect(onChange).toHaveBeenCalledWith({
       servers: [ALL_PROXY_MCP_SERVERS_SENTINEL],
@@ -149,7 +149,7 @@ describe("MCPServerSelector all-proxy-mcpservers option", () => {
     await openSelector(user);
 
     expect(optionByLabel("Server One")).toHaveAttribute("aria-disabled", "true");
-    expect(optionByLabel("All Proxy MCP Servers")).not.toHaveAttribute("aria-disabled", "true");
+    expect(optionByLabel("所有代理 MCP 服务器")).not.toHaveAttribute("aria-disabled", "true");
   });
 
   it("renders the friendly label, not the raw literal, when the sentinel is already stored but the flag is off", async () => {
@@ -162,7 +162,7 @@ describe("MCPServerSelector all-proxy-mcpservers option", () => {
       />,
     );
 
-    expect(screen.getByLabelText("All Proxy MCP Servers")).toBeInTheDocument();
+    expect(screen.getByLabelText("所有代理 MCP 服务器")).toBeInTheDocument();
     expect(screen.queryByText(ALL_PROXY_MCP_SERVERS_SENTINEL)).not.toBeInTheDocument();
 
     await openSelector(user);

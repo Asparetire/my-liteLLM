@@ -53,11 +53,11 @@ describe("MCPServers", () => {
 
     // Wait for the component to load and check if title renders
     await waitFor(() => {
-      expect(screen.getByText("MCP Servers")).toBeInTheDocument();
+      expect(screen.getByText("MCP 服务器")).toBeInTheDocument();
     });
 
     // Verify the title is rendered
-    expect(screen.getByText("MCP Servers")).toBeInTheDocument();
+    expect(screen.getByText("MCP 服务器")).toBeInTheDocument();
   });
 
   it("should render mocked MCP servers data in the table", async () => {
@@ -104,7 +104,7 @@ describe("MCPServers", () => {
 
     // Wait for the component to load
     await waitFor(() => {
-      expect(screen.getByText("MCP Servers")).toBeInTheDocument();
+      expect(screen.getByText("MCP 服务器")).toBeInTheDocument();
     });
 
     // Wait for the mocked data to render in the table
@@ -176,7 +176,7 @@ describe("MCPServers", () => {
 
     // Wait for the component to load
     await waitFor(() => {
-      expect(screen.getByText("MCP Servers")).toBeInTheDocument();
+      expect(screen.getByText("MCP 服务器")).toBeInTheDocument();
     });
 
     // Verify the health check API was called (without a server ID filter — the hook always
@@ -219,7 +219,7 @@ describe("MCPServers", () => {
 
     // Wait for the component to load
     await waitFor(() => {
-      expect(screen.getByText("MCP Servers")).toBeInTheDocument();
+      expect(screen.getByText("MCP 服务器")).toBeInTheDocument();
     });
 
     // Verify that health check was initiated
@@ -287,7 +287,7 @@ describe("MCPServers", () => {
 
     // Wait for the component to load
     await waitFor(() => {
-      expect(screen.getByText("MCP Servers")).toBeInTheDocument();
+      expect(screen.getByText("MCP 服务器")).toBeInTheDocument();
     });
 
     // Wait for servers to be rendered
@@ -301,7 +301,7 @@ describe("MCPServers", () => {
     expect(screen.getByText("Team A Server 2")).toBeInTheDocument();
 
     // Find the team select by its "Team" label, then the combobox it labels
-    const teamLabel = screen.getByText("Team");
+    const teamLabel = screen.getByText("团队");
     const teamSelect = within(teamLabel.parentElement!).getByRole("combobox");
 
     await userEvent.click(teamSelect);

@@ -1,5 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useMemo } from "react";
 import { CircleHelp } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useForm, type Resolver, type ResolverResult } from "react-hook-form";
 import { FieldGroup } from "@/components/ui/field";
 import { FormField } from "@/components/shared/form/FormField";
@@ -14,8 +15,6 @@ type ToolFormValues = { args: unknown[] };
 const argumentValues = (schema: InputSchema, values: ToolFormValues): Record<string, unknown> =>
   Object.fromEntries(Object.keys(schema.properties ?? {}).map((key, index) => [key, values.args[index]]));
 
-const STRING_SCHEMA_MESSAGES: Readonly<Record<string, string>> = { input: "Please enter input for this tool" };
-
 const BOOLEAN_ITEMS = [
   { value: true, label: "True" },
   { value: false, label: "False" },
@@ -26,16 +25,22 @@ const isBlank = (value: unknown): boolean => value === undefined || value === nu
 const isUnsetArgument = (prop: InputSchemaProperty | undefined, value: unknown): boolean =>
   prop?.type === "string" && prop.enum ? value == null : isBlank(value);
 
-const jsonErrorFor = (prop: InputSchemaProperty, value: unknown): string | null => {
+interface JsonErrorMessages {
+  object: string;
+  array: string;
+  invalid: string;
+}
+
+const jsonErrorFor = (prop: InputSchemaProperty, value: unknown, messages: JsonErrorMessages): string | null => {
   try {
     const parsed = typeof value === "string" ? JSON.parse(value) : value;
     const isValidObject =
       prop.type === "object" && parsed !== null && typeof parsed === "object" && !Array.isArray(parsed);
     const isValidArray = prop.type === "array" && Array.isArray(parsed);
     if (isValidObject || isValidArray) return null;
-    return prop.type === "object" ? "Please enter a JSON object" : "Please enter a JSON array";
+    return prop.type === "object" ? messages.object : messages.array;
   } catch {
-    return "Invalid JSON";
+    return messages.invalid;
   }
 };
 
@@ -44,6 +49,7 @@ type FieldError = { type: string; message: string };
 const collectErrors = (
   actualSchema: InputSchema,
   requiredMessages: Readonly<Record<string, string>>,
+  jsonMessages: JsonErrorMessages,
   values: Record<string, unknown>,
 ): Record<string, FieldError> => {
   const entries = Object.entries(actualSchema.properties ?? {}).flatMap<[string, FieldError]>(([key, prop]) => {
@@ -59,16 +65,20 @@ const collectErrors = (
     }
     if (prop.type !== "object" && prop.type !== "array") return [];
     if (blank) return [];
-    const message = jsonErrorFor(prop, value);
+    const message = jsonErrorFor(prop, value, jsonMessages);
     return message === null ? [] : [[key, { type: "validate", message }]];
   });
   return Object.fromEntries(entries);
 };
 
 const buildResolver =
-  (actualSchema: InputSchema, requiredMessages: Readonly<Record<string, string>> = {}): Resolver<ToolFormValues> =>
+  (
+    actualSchema: InputSchema,
+    requiredMessages: Readonly<Record<string, string>> = {},
+    jsonMessages: JsonErrorMessages,
+  ): Resolver<ToolFormValues> =>
   (values): ResolverResult<ToolFormValues> => {
-    const errors = collectErrors(actualSchema, requiredMessages, argumentValues(actualSchema, values));
+    const errors = collectErrors(actualSchema, requiredMessages, jsonMessages, argumentValues(actualSchema, values));
     if (Object.keys(errors).length === 0) return { values, errors: {} };
     return {
       values: {},
@@ -232,6 +242,7 @@ interface MCPToolArgumentsFormProps {
 
 const MCPToolArgumentsForm = forwardRef<MCPToolArgumentsFormRef, MCPToolArgumentsFormProps>(
   ({ tool, className }, ref) => {
+    const t = useTranslations("mcpServers");
     const schema: InputSchema = useMemo(() => {
       if (typeof tool.inputSchema === "string") {
         return {
@@ -239,14 +250,14 @@ const MCPToolArgumentsForm = forwardRef<MCPToolArgumentsFormRef, MCPToolArgument
           properties: {
             input: {
               type: "string",
-              description: "Input for this tool",
+              description: t("taEnterInput"),
             },
           },
           required: ["input"],
         };
       }
       return tool.inputSchema as InputSchema;
-    }, [tool.inputSchema]);
+    }, [tool.inputSchema, t]);
 
     const actualSchema: InputSchema = useMemo(() => {
       if (schema.properties?.params?.type === "object" && schema.properties.params.properties) {
@@ -265,17 +276,22 @@ const MCPToolArgumentsForm = forwardRef<MCPToolArgumentsFormRef, MCPToolArgument
     );
 
     const isStringSchema = typeof tool.inputSchema === "string";
-    const requiredMessages = isStringSchema ? STRING_SCHEMA_MESSAGES : {};
+    const requiredMessages: Readonly<Record<string, string>> = isStringSchema ? { input: t("taEnterInput") } : {};
+    const jsonMessages: JsonErrorMessages = {
+      object: t("tmJsonObjectRequired"),
+      array: t("tmJsonArrayRequired"),
+      invalid: t("tmInvalidJson"),
+    };
     const form = useForm<ToolFormValues>({
       defaultValues,
-      resolver: buildResolver(actualSchema, requiredMessages),
+      resolver: buildResolver(actualSchema, requiredMessages, jsonMessages),
     });
     const { reset } = form;
 
     useImperativeHandle(ref, () => ({
       getSubmitValues: async () => {
         const values = argumentValues(actualSchema, form.getValues());
-        const errors = collectErrors(actualSchema, requiredMessages, values);
+        const errors = collectErrors(actualSchema, requiredMessages, jsonMessages, values);
         if (Object.keys(errors).length > 0) {
           await form.trigger();
           return Promise.reject({
@@ -308,12 +324,12 @@ const MCPToolArgumentsForm = forwardRef<MCPToolArgumentsFormRef, MCPToolArgument
               name="args.0"
               label={
                 <span>
-                  Input <span className="text-destructive">*</span>
+                  {t("taInput")} <span className="text-destructive">*</span>
                 </span>
               }
             >
               {(field) => (
-                <Input {...field} value={(field.value as string) ?? ""} placeholder="Enter input for this tool" />
+                <Input {...field} value={(field.value as string) ?? ""} placeholder={t("taEnterInput")} />
               )}
             </FormField>
           </FieldGroup>
@@ -324,7 +340,7 @@ const MCPToolArgumentsForm = forwardRef<MCPToolArgumentsFormRef, MCPToolArgument
     if (!actualSchema.properties) {
       return (
         <form onSubmit={(event) => event.preventDefault()} className={className}>
-          <div className="py-4 text-center text-sm text-muted-foreground">No parameters required for this tool.</div>
+          <div className="py-4 text-center text-sm text-muted-foreground">{t("tmNoParams")}</div>
         </form>
       );
     }
@@ -358,15 +374,15 @@ const MCPToolArgumentsForm = forwardRef<MCPToolArgumentsFormRef, MCPToolArgument
                             aria-invalid={field["aria-invalid"]}
                             className="w-full"
                           >
-                            <SelectValue placeholder={`Select ${key}`}>
-                              {field.value === "" ? "Empty string" : undefined}
+                            <SelectValue placeholder={t("taSelectParam", { name: key })}>
+                              {field.value === "" ? t("taEmptyString") : undefined}
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
-                            {!required && <SelectItem value={null}>Select {key}</SelectItem>}
+                            {!required && <SelectItem value={null}>{t("taSelectParam", { name: key })}</SelectItem>}
                             {prop.enum.map((v) => (
                               <SelectItem key={v} value={v}>
-                                {v === "" ? "Empty string" : v}
+                                {v === "" ? t("taEmptyString") : v}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -376,7 +392,11 @@ const MCPToolArgumentsForm = forwardRef<MCPToolArgumentsFormRef, MCPToolArgument
                     if (prop.type === "boolean") {
                       return (
                         <Select
-                          items={required ? BOOLEAN_ITEMS : [{ value: null, label: `Select ${key}` }, ...BOOLEAN_ITEMS]}
+                          items={
+                            required
+                              ? BOOLEAN_ITEMS
+                              : [{ value: null, label: t("taSelectParam", { name: key }) }, ...BOOLEAN_ITEMS]
+                          }
                           value={field.value ?? null}
                           onValueChange={field.onChange}
                         >
@@ -386,10 +406,10 @@ const MCPToolArgumentsForm = forwardRef<MCPToolArgumentsFormRef, MCPToolArgument
                             aria-invalid={field["aria-invalid"]}
                             className="w-full"
                           >
-                            <SelectValue placeholder={`Select ${key}`} />
+                            <SelectValue placeholder={t("taSelectParam", { name: key })} />
                           </SelectTrigger>
                           <SelectContent>
-                            {!required && <SelectItem value={null}>Select {key}</SelectItem>}
+                            {!required && <SelectItem value={null}>{t("taSelectParam", { name: key })}</SelectItem>}
                             <SelectItem value={true}>True</SelectItem>
                             <SelectItem value={false}>False</SelectItem>
                           </SelectContent>
@@ -403,7 +423,7 @@ const MCPToolArgumentsForm = forwardRef<MCPToolArgumentsFormRef, MCPToolArgument
                           type="number"
                           step={prop.type === "integer" ? 1 : undefined}
                           value={(field.value as number | string) ?? ""}
-                          placeholder={prop.description || `Enter ${key}`}
+                          placeholder={prop.description || t("taEnterParam", { name: key })}
                         />
                       );
                     }
@@ -417,7 +437,9 @@ const MCPToolArgumentsForm = forwardRef<MCPToolArgumentsFormRef, MCPToolArgument
                           className="font-mono"
                           placeholder={
                             prop.description ||
-                            (prop.type === "object" ? `Enter JSON object for ${key}` : `Enter JSON array for ${key}`)
+                            (prop.type === "object"
+                              ? t("taEnterJsonObject", { name: key })
+                              : t("taEnterJsonArray", { name: key }))
                           }
                         />
                       );
@@ -426,7 +448,7 @@ const MCPToolArgumentsForm = forwardRef<MCPToolArgumentsFormRef, MCPToolArgument
                       <Input
                         {...field}
                         value={(field.value as string) ?? ""}
-                        placeholder={prop.description || `Enter ${key}`}
+                        placeholder={prop.description || t("taEnterParam", { name: key })}
                       />
                     );
                   }}

@@ -99,7 +99,7 @@ describe("MCPDiscovery", () => {
     expect(screen.getByText("Slack")).toBeInTheDocument();
     expect(groupHeading("Developer Tools")).toHaveLength(1);
     expect(groupHeading("Communication")).toHaveLength(1);
-    expect(screen.getByText("Add MCP Server")).toBeInTheDocument();
+    expect(screen.getByText("添加 MCP 服务器")).toBeInTheDocument();
   });
 
   it("filters the list down to the chosen category", async () => {
@@ -116,7 +116,7 @@ describe("MCPDiscovery", () => {
     render(<MCPDiscovery {...defaultProps} />);
     await screen.findByText("GitHub");
 
-    fireEvent.change(screen.getByPlaceholderText("Search servers..."), { target: { value: "chat" } });
+    fireEvent.change(screen.getByPlaceholderText("搜索服务器..."), { target: { value: "chat" } });
 
     await waitFor(() => expect(screen.queryByText("GitHub")).not.toBeInTheDocument());
     expect(screen.getByText("Slack")).toBeInTheDocument();
@@ -135,7 +135,7 @@ describe("MCPDiscovery", () => {
     const onCustomServer = vi.fn();
     render(<MCPDiscovery {...defaultProps} onCustomServer={onCustomServer} />);
 
-    await userEvent.click(await screen.findByRole("button", { name: "+ Custom Server" }));
+    await userEvent.click(await screen.findByRole("button", { name: "+ 自定义服务器" }));
 
     expect(onCustomServer).toHaveBeenCalled();
   });
@@ -145,7 +145,7 @@ describe("MCPDiscovery", () => {
 
     render(<MCPDiscovery {...defaultProps} />);
 
-    expect(await screen.findByText(/Failed to load servers: registry down/)).toBeInTheDocument();
+    expect(await screen.findByText(/加载服务器失败：registry down/)).toBeInTheDocument();
   });
 
   it("offers the custom-server link when nothing matches", async () => {
@@ -153,7 +153,7 @@ describe("MCPDiscovery", () => {
 
     render(<MCPDiscovery {...defaultProps} />);
 
-    expect(await screen.findByText(/No servers found/)).toBeInTheDocument();
+    expect(await screen.findByText(/未找到服务器/)).toBeInTheDocument();
   });
 
   it("keeps the wide dialog width the antd modal had", async () => {
@@ -175,7 +175,7 @@ describe("MCPDiscovery", () => {
     await screen.findByText("GitHub");
 
     expect(document.querySelector("[data-slot='dialog-close']")).toHaveClass("absolute");
-    expect(screen.getByRole("button", { name: "+ Custom Server" })).toHaveClass("mr-8");
+    expect(screen.getByRole("button", { name: "+ 自定义服务器" })).toHaveClass("mr-8");
   });
 
   it("does not fetch while hidden", () => {

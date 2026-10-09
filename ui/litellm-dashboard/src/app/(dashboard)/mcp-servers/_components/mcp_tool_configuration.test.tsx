@@ -33,10 +33,10 @@ describe("MCPToolConfiguration", () => {
   it("shows legacy unrestricted edit tools enabled in flat view", async () => {
     const onAllowedToolsChange = renderToolConfiguration();
 
-    fireEvent.click(screen.getByText("Flat List"));
+    fireEvent.click(screen.getByText("平铺列表"));
 
-    expect(screen.getByText("2 of 2 tools enabled for user access")).toBeInTheDocument();
-    expect(screen.getAllByText("Enabled")).toHaveLength(2);
+    expect(screen.getByText("2 / 2 个工具已开放用户调用")).toBeInTheDocument();
+    expect(screen.getAllByText("已启用")).toHaveLength(2);
 
     fireEvent.click(screen.getByText("read_user"));
 
@@ -100,13 +100,13 @@ describe("MCPToolConfiguration", () => {
 
     render(<Wrapper />);
 
-    fireEvent.click(screen.getByText("Flat List"));
+    fireEvent.click(screen.getByText("平铺列表"));
     fireEvent.click(screen.getByText("read_user"));
     fireEvent.click(screen.getByText("delete_user"));
 
     await waitFor(() => {
-      expect(screen.getByText("0 of 2 tools enabled for user access")).toBeInTheDocument();
-      expect(screen.getAllByText("Disabled")).toHaveLength(2);
+      expect(screen.getByText("0 / 2 个工具已开放用户调用")).toBeInTheDocument();
+      expect(screen.getAllByText("已禁用")).toHaveLength(2);
     });
   });
 
@@ -134,15 +134,15 @@ describe("MCPToolConfiguration", () => {
 
     render(<Wrapper />);
 
-    fireEvent.click(screen.getByText("Flat List"));
-    fireEvent.click(screen.getAllByTitle("Edit display name and description")[0]);
+    fireEvent.click(screen.getByText("平铺列表"));
+    fireEvent.click(screen.getAllByTitle("编辑显示名称与描述")[0]);
 
     const input = screen.getByPlaceholderText("read_user");
     fireEvent.change(input, { target: { value: "Browse Repo Docs" } });
 
     await waitFor(() => {
       expect(
-        screen.getByText("Only letters, digits, underscores, and hyphens are allowed (no spaces)."),
+        screen.getByText("仅允许字母、数字、下划线和连字符（不能有空格）。"),
       ).toBeInTheDocument();
     });
   });
@@ -171,15 +171,15 @@ describe("MCPToolConfiguration", () => {
 
     render(<Wrapper />);
 
-    fireEvent.click(screen.getByText("Flat List"));
-    fireEvent.click(screen.getAllByTitle("Edit display name and description")[0]);
+    fireEvent.click(screen.getByText("平铺列表"));
+    fireEvent.click(screen.getAllByTitle("编辑显示名称与描述")[0]);
 
     const input = screen.getByPlaceholderText("read_user");
     fireEvent.change(input, { target: { value: "browse_repo_docs" } });
 
     await waitFor(() => {
       expect(
-        screen.queryByText("Only letters, digits, underscores, and hyphens are allowed (no spaces)."),
+        screen.queryByText("仅允许字母、数字、下划线和连字符（不能有空格）。"),
       ).not.toBeInTheDocument();
     });
   });

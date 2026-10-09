@@ -141,8 +141,8 @@ describe("ToolTestPanel defaults", () => {
   it("falls back to a plain input when schema is missing", () => {
     renderPanel("tool_input_schema");
 
-    expect(screen.getByPlaceholderText("Enter input for this tool")).toBeInTheDocument();
-    expect(screen.queryByText("No parameters required")).not.toBeInTheDocument();
+    expect(screen.getByPlaceholderText("请输入该工具的输入")).toBeInTheDocument();
+    expect(screen.queryByText("无需参数")).not.toBeInTheDocument();
   });
 
   it("renders the call button as type=button so a click never also triggers native form submission", () => {
@@ -155,7 +155,7 @@ describe("ToolTestPanel defaults", () => {
 
     renderPanel(schema);
 
-    const callButton = screen.getByRole("button", { name: "Call Tool" });
+    const callButton = screen.getByRole("button", { name: "调用工具" });
     expect(callButton.closest("form")).not.toBeNull();
     expect(callButton).toHaveAttribute("type", "button");
   });
@@ -178,7 +178,7 @@ describe("ToolTestPanel argument payload", () => {
     if (drive) {
       await drive(user);
     }
-    await user.click(screen.getByRole("button", { name: "Call Tool" }));
+    await user.click(screen.getByRole("button", { name: "调用工具" }));
     return onSubmit;
   };
 
@@ -206,8 +206,8 @@ describe("ToolTestPanel argument payload", () => {
       />,
     );
     const user = userEvent.setup();
-    await user.type(screen.getByPlaceholderText("Enter input for this tool"), "  do the thing  ");
-    await user.click(screen.getByRole("button", { name: "Call Tool" }));
+    await user.type(screen.getByPlaceholderText("请输入该工具的输入"), "  do the thing  ");
+    await user.click(screen.getByRole("button", { name: "调用工具" }));
 
     expect(onSubmit).toHaveBeenCalledWith({ input: "do the thing" });
   });
@@ -371,7 +371,7 @@ describe("ToolTestPanel schema changes under a stable tool name", () => {
     expect(screen.getByLabelText("limit")).toHaveValue(5);
 
     await user.type(screen.getByLabelText("query"), "widgets");
-    await user.click(screen.getByRole("button", { name: "Call Tool" }));
+    await user.click(screen.getByRole("button", { name: "调用工具" }));
 
     expect(onSubmit).toHaveBeenCalledWith({ query: "widgets", limit: 5 });
   });
@@ -415,7 +415,7 @@ describe("ToolTestPanel optional union-typed parameters", () => {
       />,
     );
     drive();
-    await userEvent.setup().click(screen.getByRole("button", { name: "Call Tool" }));
+    await userEvent.setup().click(screen.getByRole("button", { name: "调用工具" }));
     return onSubmit;
   };
 
@@ -425,8 +425,8 @@ describe("ToolTestPanel optional union-typed parameters", () => {
     const tags = screen.getByTestId("textarea-tags");
     expect(tags.tagName).toBe("TEXTAREA");
     expect(tags).toHaveValue("");
-    expect(screen.getByPlaceholderText("Enter JSON array for tags")).toBe(tags);
-    expect(screen.queryByPlaceholderText("Enter tags")).not.toBeInTheDocument();
+    expect(screen.getByPlaceholderText("请输入 tags 的 JSON 数组")).toBe(tags);
+    expect(screen.queryByPlaceholderText("请输入 tags")).not.toBeInTheDocument();
   });
 
   it("renders the JSON textarea for an optional object parameter, not a plain text input", () => {
@@ -439,13 +439,13 @@ describe("ToolTestPanel optional union-typed parameters", () => {
 
     const payload = screen.getByTestId<HTMLTextAreaElement>("textarea-payload");
     expect(payload).toHaveValue(JSON.stringify({ id: "" }, null, 2));
-    expect(screen.getByPlaceholderText("Enter JSON object for payload")).toBe(payload);
-    expect(screen.queryByPlaceholderText("Enter payload")).not.toBeInTheDocument();
+    expect(screen.getByPlaceholderText("请输入 payload 的 JSON 对象")).toBe(payload);
+    expect(screen.queryByPlaceholderText("请输入 payload")).not.toBeInTheDocument();
   });
 
   it("sends an optional array parameter as a real array", async () => {
     const onSubmit = await runPanel(() => {
-      fireEvent.change(screen.getByPlaceholderText("Enter message"), { target: { value: "hi" } });
+      fireEvent.change(screen.getByPlaceholderText("请输入 message"), { target: { value: "hi" } });
       fireEvent.change(screen.getByTestId("textarea-tags"), { target: { value: '["a","b"]' } });
     });
 
@@ -455,7 +455,7 @@ describe("ToolTestPanel optional union-typed parameters", () => {
 
   it("omits an optional array parameter the user never filled in", async () => {
     const onSubmit = await runPanel(() => {
-      fireEvent.change(screen.getByPlaceholderText("Enter message"), { target: { value: "hi" } });
+      fireEvent.change(screen.getByPlaceholderText("请输入 message"), { target: { value: "hi" } });
     });
 
     expect(onSubmit).toHaveBeenCalledWith({ message: "hi", repeat: 1, loud: false });
@@ -463,7 +463,7 @@ describe("ToolTestPanel optional union-typed parameters", () => {
 
   it("blocks the call instead of sending comma-separated text as a raw string", async () => {
     const onSubmit = await runPanel(() => {
-      fireEvent.change(screen.getByPlaceholderText("Enter message"), { target: { value: "hi" } });
+      fireEvent.change(screen.getByPlaceholderText("请输入 message"), { target: { value: "hi" } });
       fireEvent.change(screen.getByTestId("textarea-tags"), { target: { value: "a,b" } });
     });
 
@@ -493,15 +493,15 @@ it("should submit an empty enum choice while omitting unset choices and retainin
   );
   await user.selectOptions(
     screen.getByRole("combobox", { name: "mode" }),
-    screen.getByRole("option", { name: "Select mode" }),
+    screen.getByRole("option", { name: "选择 mode" }),
   );
   await chooseSelectOption(user, screen.getByRole("combobox", { name: "active" }), "False");
-  await user.click(screen.getByRole("button", { name: "Call Tool" }));
+  await user.click(screen.getByRole("button", { name: "调用工具" }));
   expect(onSubmit).toHaveBeenLastCalledWith({ active: false });
   await user.selectOptions(
     screen.getByRole("combobox", { name: "mode" }),
-    screen.getByRole("option", { name: "Empty string" }),
+    screen.getByRole("option", { name: "空字符串" }),
   );
-  await user.click(screen.getByRole("button", { name: "Call Tool" }));
+  await user.click(screen.getByRole("button", { name: "调用工具" }));
   expect(onSubmit).toHaveBeenLastCalledWith({ mode: "", active: false });
 });

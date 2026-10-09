@@ -91,9 +91,9 @@ describe("MCPToolArgumentsForm", () => {
     fireEvent.change(field, { target: { value: "invalid" } });
 
     expect(await submitError(ref)).toEqual({
-      errorFields: [{ name: ["filter.options"], errors: ["Invalid JSON"] }],
+      errorFields: [{ name: ["filter.options"], errors: ["JSON 无效"] }],
     });
-    expect(await screen.findByText("Invalid JSON")).toBeInTheDocument();
+    expect(await screen.findByText("JSON 无效")).toBeInTheDocument();
 
     fireEvent.change(field, { target: { value: '{"region":"eu"}' } });
     await expect(submit(ref)).resolves.toEqual({ params: { "filter.options": { region: "eu" } } });
@@ -151,11 +151,11 @@ describe("MCPToolArgumentsForm", () => {
       required: [],
     });
 
-    await user.type(screen.getByPlaceholderText("Enter city"), "berlin");
-    await user.clear(screen.getByPlaceholderText("Enter count"));
-    await user.type(screen.getByPlaceholderText("Enter count"), "7");
-    await user.clear(screen.getByPlaceholderText("Enter ratio"));
-    await user.type(screen.getByPlaceholderText("Enter ratio"), "1.5");
+    await user.type(screen.getByPlaceholderText("请输入 city"), "berlin");
+    await user.clear(screen.getByPlaceholderText("请输入 count"));
+    await user.type(screen.getByPlaceholderText("请输入 count"), "7");
+    await user.clear(screen.getByPlaceholderText("请输入 ratio"));
+    await user.type(screen.getByPlaceholderText("请输入 ratio"), "1.5");
 
     const expected = { city: "berlin", count: 7, ratio: 1.5, verbose: false };
     await expect(submit(ref)).resolves.toEqual(expected);
@@ -165,8 +165,8 @@ describe("MCPToolArgumentsForm", () => {
     const user = userEvent.setup();
     const ref = renderForm({ type: "object", properties: { count: { type: "integer" } }, required: [] });
 
-    await user.clear(screen.getByPlaceholderText("Enter count"));
-    await user.type(screen.getByPlaceholderText("Enter count"), "9.8");
+    await user.clear(screen.getByPlaceholderText("请输入 count"));
+    await user.type(screen.getByPlaceholderText("请输入 count"), "9.8");
 
     await expect(submit(ref)).resolves.toEqual({ count: 9 });
   });
@@ -185,7 +185,7 @@ describe("MCPToolArgumentsForm", () => {
     const user = userEvent.setup();
     const ref = renderForm({ type: "object", properties: { filters: { type: "object" } }, required: [] });
 
-    const textarea = screen.getByPlaceholderText("Enter JSON object for filters");
+    const textarea = screen.getByPlaceholderText("请输入 filters 的 JSON 对象");
     await user.clear(textarea);
     await user.type(textarea, '{{"a": 1}');
 
@@ -196,7 +196,7 @@ describe("MCPToolArgumentsForm", () => {
     const user = userEvent.setup();
     const ref = renderForm({ type: "object", properties: { tags: { type: "array" } }, required: [] });
 
-    const textarea = screen.getByPlaceholderText("Enter JSON array for tags");
+    const textarea = screen.getByPlaceholderText("请输入 tags 的 JSON 数组");
     await user.clear(textarea);
     await user.type(textarea, '[["x","y"]');
 
@@ -207,24 +207,24 @@ describe("MCPToolArgumentsForm", () => {
     const user = userEvent.setup();
     const ref = renderForm({ type: "object", properties: { filters: { type: "object" } }, required: [] });
 
-    const textarea = screen.getByPlaceholderText("Enter JSON object for filters");
+    const textarea = screen.getByPlaceholderText("请输入 filters 的 JSON 对象");
     await user.clear(textarea);
     await user.type(textarea, "not json");
 
     expect(await submitError(ref)).not.toBeNull();
-    expect(await screen.findByText("Invalid JSON")).toBeInTheDocument();
+    expect(await screen.findByText("JSON 无效")).toBeInTheDocument();
   });
 
   it("rejects a JSON array typed into an object field", async () => {
     const user = userEvent.setup();
     const ref = renderForm({ type: "object", properties: { filters: { type: "object" } }, required: [] });
 
-    const textarea = screen.getByPlaceholderText("Enter JSON object for filters");
+    const textarea = screen.getByPlaceholderText("请输入 filters 的 JSON 对象");
     await user.clear(textarea);
     await user.type(textarea, "[[1,2]");
 
     expect(await submitError(ref)).not.toBeNull();
-    expect(await screen.findByText("Please enter a JSON object")).toBeInTheDocument();
+    expect(await screen.findByText("请输入 JSON 对象")).toBeInTheDocument();
   });
 
   it("rejects an empty required field with the per-field message", async () => {
@@ -252,7 +252,7 @@ describe("MCPToolArgumentsForm", () => {
       required: [],
     });
 
-    await user.type(screen.getByPlaceholderText("Enter city"), "oslo");
+    await user.type(screen.getByPlaceholderText("请输入 city"), "oslo");
 
     await expect(submit(ref)).resolves.toEqual({ params: { city: "oslo" } });
   });
@@ -261,7 +261,7 @@ describe("MCPToolArgumentsForm", () => {
     const user = userEvent.setup();
     const ref = renderForm("tool_input_schema");
 
-    await user.type(screen.getByPlaceholderText("Enter input for this tool"), "hello");
+    await user.type(screen.getByPlaceholderText("请输入该工具的输入"), "hello");
 
     await expect(submit(ref)).resolves.toEqual({ input: "hello" });
   });
@@ -270,7 +270,7 @@ describe("MCPToolArgumentsForm", () => {
     const ref = renderForm("tool_input_schema");
 
     expect(await submitError(ref)).not.toBeNull();
-    expect(await screen.findByText("Please enter input for this tool")).toBeInTheDocument();
+    expect(await screen.findByText("请输入该工具的输入")).toBeInTheDocument();
   });
 
   it("seeds a schema default and sends it untouched", async () => {
@@ -286,7 +286,7 @@ describe("MCPToolArgumentsForm", () => {
   it("shows the empty state and submits nothing when the schema has no properties", async () => {
     const ref = renderForm({ type: "object" } as InputSchema);
 
-    expect(screen.getByText("No parameters required for this tool.")).toBeInTheDocument();
+    expect(screen.getByText("该工具无需参数。")).toBeInTheDocument();
     await expect(submit(ref)).resolves.toEqual({});
   });
 });
@@ -301,12 +301,12 @@ it("should distinguish an unset enum from empty string and retain explicit false
     },
   });
   await user.click(screen.getByRole("combobox", { name: "mode" }));
-  await user.click(await screen.findByRole("option", { name: "Select mode" }));
+  await user.click(await screen.findByRole("option", { name: "选择 mode" }));
   await user.click(screen.getByRole("combobox", { name: "active" }));
   await user.click(await screen.findByRole("option", { name: "False" }));
   await expect(submit(ref)).resolves.toEqual({ active: false });
   await user.click(screen.getByRole("combobox", { name: "mode" }));
-  await user.click(await screen.findByRole("option", { name: "Empty string" }));
-  expect(screen.getByRole("combobox", { name: "mode" })).toHaveTextContent("Empty string");
+  await user.click(await screen.findByRole("option", { name: "空字符串" }));
+  expect(screen.getByRole("combobox", { name: "mode" })).toHaveTextContent("空字符串");
   await expect(submit(ref)).resolves.toEqual({ mode: "", active: false });
 });

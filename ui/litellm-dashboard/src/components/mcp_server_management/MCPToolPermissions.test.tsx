@@ -69,8 +69,8 @@ describe("MCPToolPermissions", () => {
       expect(screen.getByText("read_wiki_structure")).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByText("Flat List"));
-    expect(screen.getByRole("radio", { name: "Flat List" })).toBeChecked();
+    await userEvent.click(screen.getByText("平铺列表"));
+    expect(screen.getByRole("radio", { name: "平铺列表" })).toBeChecked();
     expect(await screen.findByText("- Get documentation topics")).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("checkbox", { name: "read_wiki_structure" }));
@@ -130,7 +130,7 @@ describe("MCPToolPermissions", () => {
     });
 
     // Click the Select All button
-    const selectAllButton = screen.getByRole("button", { name: "Select All" });
+    const selectAllButton = screen.getByRole("button", { name: "全选" });
     await userEvent.click(selectAllButton);
 
     // Verify onChange was called with all tools selected
@@ -181,7 +181,7 @@ describe("MCPToolPermissions", () => {
     });
 
     // Click the Deselect All button
-    const deselectAllButton = screen.getByRole("button", { name: "Deselect All" });
+    const deselectAllButton = screen.getByRole("button", { name: "取消全选" });
     await userEvent.click(deselectAllButton);
 
     // Verify onChange was called with no tools selected
@@ -241,7 +241,7 @@ describe("MCPToolPermissions", () => {
       );
 
       await screen.findByText("Group Server");
-      await userEvent.click(screen.getByText("Flat List"));
+      await userEvent.click(screen.getByText("平铺列表"));
 
       const [listIssues, deleteIssue] = screen.getAllByRole("checkbox");
       expect(listIssues).toBeChecked();
@@ -269,8 +269,8 @@ describe("MCPToolPermissions", () => {
 
       expect(await screen.findByText("Direct Server")).toBeInTheDocument();
       expect(await screen.findByText("Group Server")).toBeInTheDocument();
-      expect(screen.getByText("Via access group: production-group")).toBeInTheDocument();
-      expect(screen.queryAllByText(/^Via /)).toHaveLength(1);
+      expect(screen.getByText("经访问组：production-group")).toBeInTheDocument();
+      expect(screen.queryAllByText(/^经/)).toHaveLength(1);
     });
 
     it("renders a toolset server as inherited from that toolset", async () => {
@@ -296,7 +296,7 @@ describe("MCPToolPermissions", () => {
       );
 
       expect(await screen.findByText("Toolset Server")).toBeInTheDocument();
-      expect(screen.getByText("Via toolset: Support Toolset")).toBeInTheDocument();
+      expect(screen.getByText("经工具集：Support Toolset")).toBeInTheDocument();
     });
 
     // The backend adds a toolset's tools to whatever mcp_tool_permissions holds, so showing the
@@ -327,11 +327,11 @@ describe("MCPToolPermissions", () => {
       expect(await screen.findByText("list_issues")).toBeInTheDocument();
       expect(
         screen.getByText(
-          "list_issues is granted by a selected toolset, so it stays allowed here; edit the toolset to revoke it",
+          "list_issues 已由所选工具集授予，因此此处会一直允许；如需撤销请编辑该工具集",
         ),
       ).toBeInTheDocument();
 
-      await userEvent.click(screen.getByText("Flat List"));
+      await userEvent.click(screen.getByText("平铺列表"));
       const [listIssues, deleteIssue] = screen.getAllByRole("checkbox");
       expect(listIssues).toBeChecked();
       expect(listIssues).toBeDisabled();
@@ -426,7 +426,7 @@ describe("MCPToolPermissions", () => {
       );
 
       expect(await screen.findByText("list_issues")).toBeInTheDocument();
-      await userEvent.click(screen.getByText("Select All"));
+      await userEvent.click(screen.getByText("全选"));
 
       expect(mockOnChange).toHaveBeenCalledWith({ [toolsetServer.server_id]: ["delete_issue"] });
     });
@@ -586,7 +586,7 @@ describe("MCPToolPermissions", () => {
       );
 
       expect(await screen.findByText("Group Server")).toBeInTheDocument();
-      expect(screen.getByText("Via tool permissions")).toBeInTheDocument();
+      expect(screen.getByText("经工具权限")).toBeInTheDocument();
     });
 
     it("shows nothing for a principal blocked from every MCP server", async () => {
@@ -621,7 +621,7 @@ describe("MCPToolPermissions", () => {
         />,
       );
 
-      expect(await screen.findByText("Unable to load MCP servers")).toBeInTheDocument();
+      expect(await screen.findByText("无法加载 MCP 服务器")).toBeInTheDocument();
       expect(screen.queryByText(/has 0 servers/)).not.toBeInTheDocument();
     });
 
@@ -640,9 +640,9 @@ describe("MCPToolPermissions", () => {
         />,
       );
 
-      expect(await screen.findByText('Access group "ops_readonly" has 0 servers')).toBeInTheDocument();
+      expect(await screen.findByText('访问组 "ops_readonly" 没有任何服务器')).toBeInTheDocument();
       expect(screen.getByText("Group Server")).toBeInTheDocument();
-      expect(screen.queryByText('Access group "production-group" has 0 servers')).not.toBeInTheDocument();
+      expect(screen.queryByText('访问组 "production-group" 没有任何服务器')).not.toBeInTheDocument();
     });
 
     it("does not call a group empty when its servers are only hidden from the caller's catalog", async () => {
@@ -659,8 +659,8 @@ describe("MCPToolPermissions", () => {
         />,
       );
 
-      expect(await screen.findByText('Access group "ops_readonly" has 0 servers')).toBeInTheDocument();
-      expect(screen.queryByText('Access group "production-group" has 0 servers')).not.toBeInTheDocument();
+      expect(await screen.findByText('访问组 "ops_readonly" 没有任何服务器')).toBeInTheDocument();
+      expect(screen.queryByText('访问组 "production-group" 没有任何服务器')).not.toBeInTheDocument();
     });
 
     it("warns when the selected toolsets cannot be resolved to servers", async () => {
@@ -677,7 +677,7 @@ describe("MCPToolPermissions", () => {
         />,
       );
 
-      expect(await screen.findByText("Unable to load toolsets")).toBeInTheDocument();
+      expect(await screen.findByText("无法加载工具集")).toBeInTheDocument();
     });
   });
 
@@ -728,7 +728,7 @@ describe("MCPToolPermissions", () => {
       );
 
       expect(await screen.findByText("list_issues")).toBeInTheDocument();
-      await userEvent.click(screen.getByRole("button", { name: "Deselect All" }));
+      await userEvent.click(screen.getByRole("button", { name: "取消全选" }));
 
       expect(mockOnChange).toHaveBeenCalledWith({ github_mcp: [] });
     });
@@ -771,7 +771,7 @@ describe("MCPToolPermissions", () => {
       expect(await screen.findByText("list_issues")).toBeInTheDocument();
 
       // Flat view keeps checkbox order identical to the fetched tool order.
-      await userEvent.click(screen.getByText("Flat List"));
+      await userEvent.click(screen.getByText("平铺列表"));
       const [listIssues, createIssue, deleteIssue] = screen.getAllByRole("checkbox");
       expect(listIssues).toBeChecked();
       expect(createIssue).toBeChecked();
@@ -783,7 +783,7 @@ describe("MCPToolPermissions", () => {
       renderWithBothKeys(mockOnChange);
 
       expect(await screen.findByText("list_issues")).toBeInTheDocument();
-      await userEvent.click(screen.getByText("Flat List"));
+      await userEvent.click(screen.getByText("平铺列表"));
       await userEvent.click(screen.getAllByRole("checkbox")[0]);
 
       const written = mockOnChange.mock.calls.at(-1)?.[0] as Record<string, string[]>;
@@ -818,7 +818,7 @@ describe("MCPToolPermissions", () => {
         // so an admin looking at either one has to be told the same thing.
         expect(
           await screen.findAllByText(
-            'Also granted by "github_mcp", which names another server too. Those tools stay allowed here until the servers no longer share that name',
+            '另由 "github_mcp" 授予，该名称同时指向其他服务器。在这些服务器不再共用该名称之前，此处会一直允许这些工具',
           ),
         ).toHaveLength(2);
       },
@@ -845,7 +845,7 @@ describe("MCPToolPermissions", () => {
 
       // The directly selected twin is the first card; both share the display name "github_mcp".
       expect(await screen.findAllByText("list_issues")).toHaveLength(2);
-      await userEvent.click(screen.getAllByText("Select All")[0]);
+      await userEvent.click(screen.getAllByText("全选")[0]);
 
       const written = mockOnChange.mock.calls.at(-1)?.[0] as Record<string, string[]>;
       expect(written["github_mcp"]).toEqual(["list_issues"]);
@@ -871,9 +871,9 @@ describe("MCPToolPermissions", () => {
       );
 
       expect(await screen.findByText("github_mcp")).toBeInTheDocument();
-      expect(screen.getByText("Via access group: production-group")).toBeInTheDocument();
-      expect(screen.queryByText("Via tool permissions")).not.toBeInTheDocument();
-      expect(screen.queryAllByText(/^Via /)).toHaveLength(1);
+      expect(screen.getByText("经访问组：production-group")).toBeInTheDocument();
+      expect(screen.queryByText("经工具权限")).not.toBeInTheDocument();
+      expect(screen.queryAllByText(/^经/)).toHaveLength(1);
     });
   });
 
@@ -905,7 +905,7 @@ describe("MCPToolPermissions", () => {
       const mockOnChange = vi.fn();
       renderCrudView({ [mockServerId]: allCrudToolNames }, mockOnChange);
 
-      const readGroupToggle = await screen.findByRole("checkbox", { name: "Allow all Read tools" });
+      const readGroupToggle = await screen.findByRole("checkbox", { name: "允许全部读取工具" });
       expect(readGroupToggle).toBeChecked();
 
       await userEvent.click(readGroupToggle);
@@ -917,7 +917,7 @@ describe("MCPToolPermissions", () => {
       const mockOnChange = vi.fn();
       renderCrudView({ [mockServerId]: ["list_documents"] }, mockOnChange);
 
-      const readGroupToggle = await screen.findByRole("checkbox", { name: "Allow all Read tools" });
+      const readGroupToggle = await screen.findByRole("checkbox", { name: "允许全部读取工具" });
       expect(readGroupToggle).toBePartiallyChecked();
 
       await userEvent.click(readGroupToggle);
@@ -970,7 +970,7 @@ describe("MCPToolPermissions", () => {
       renderWithProviders(<Harness />);
 
       const deleteTool = await screen.findByRole("checkbox", { name: "delete_document" });
-      const readGroupToggle = screen.getByRole("checkbox", { name: "Allow all Read tools" });
+      const readGroupToggle = screen.getByRole("checkbox", { name: "允许全部读取工具" });
       expect(deleteTool).toBeChecked();
       expect(readGroupToggle).toBeChecked();
 

@@ -45,14 +45,14 @@ const dialogWithButton = async (name: string) => {
 };
 
 const openEditFor = async (user: ReturnType<typeof setup>) => {
-  await user.click(await screen.findByRole("button", { name: "Open toolset actions" }));
-  await user.click(await screen.findByRole("menuitem", { name: "Edit" }));
-  return dialogWithButton("Save Changes");
+  await user.click(await screen.findByRole("button", { name: "打开工具集操作" }));
+  await user.click(await screen.findByRole("menuitem", { name: "编辑" }));
+  return dialogWithButton("保存更改");
 };
 
 const openCreate = async (user: ReturnType<typeof setup>) => {
-  await user.click(screen.getByRole("button", { name: /new toolset/i }));
-  return dialogWithButton("Create Toolset");
+  await user.click(screen.getByRole("button", { name: "新建工具集" }));
+  return dialogWithButton("创建工具集");
 };
 
 describe("MCPToolsetsTab create/edit toolset form", () => {
@@ -71,8 +71,8 @@ describe("MCPToolsetsTab create/edit toolset form", () => {
     fireEvent.change(dialog.getByPlaceholderText("e.g. github-linear-tools"), {
       target: { value: "github-linear-tools" },
     });
-    fireEvent.change(dialog.getByPlaceholderText("Optional description"), { target: { value: "tools for triage" } });
-    await user.click(dialog.getByRole("button", { name: "Create Toolset" }));
+    fireEvent.change(dialog.getByPlaceholderText("可选描述"), { target: { value: "tools for triage" } });
+    await user.click(dialog.getByRole("button", { name: "创建工具集" }));
 
     await waitFor(() => {
       expect(networking.createMCPToolset).toHaveBeenCalledWith("sk-test", {
@@ -93,7 +93,7 @@ describe("MCPToolsetsTab create/edit toolset form", () => {
 
     const dialog = await openCreate(user);
     fireEvent.change(dialog.getByPlaceholderText("e.g. github-linear-tools"), { target: { value: "solo" } });
-    await user.click(dialog.getByRole("button", { name: "Create Toolset" }));
+    await user.click(dialog.getByRole("button", { name: "创建工具集" }));
 
     await waitFor(() => {
       expect(networking.createMCPToolset).toHaveBeenCalledWith("sk-test", {
@@ -109,9 +109,9 @@ describe("MCPToolsetsTab create/edit toolset form", () => {
     renderTab();
 
     const dialog = await openCreate(user);
-    await user.click(dialog.getByRole("button", { name: "Create Toolset" }));
+    await user.click(dialog.getByRole("button", { name: "创建工具集" }));
 
-    expect(await dialog.findByText("Please enter a toolset name")).toBeInTheDocument();
+    expect(await dialog.findByText("请输入工具集名称")).toBeInTheDocument();
     expect(networking.createMCPToolset).not.toHaveBeenCalled();
   });
 
@@ -124,8 +124,8 @@ describe("MCPToolsetsTab create/edit toolset form", () => {
 
     const dialog = await openCreate(user);
     fireEvent.change(dialog.getByPlaceholderText("e.g. github-linear-tools"), { target: { value: "spaced" } });
-    fireEvent.change(dialog.getByPlaceholderText("Optional description"), { target: { value: "  " } });
-    await user.click(dialog.getByRole("button", { name: "Create Toolset" }));
+    fireEvent.change(dialog.getByPlaceholderText("可选描述"), { target: { value: "  " } });
+    await user.click(dialog.getByRole("button", { name: "创建工具集" }));
 
     await waitFor(() => {
       expect(networking.createMCPToolset).toHaveBeenCalledWith("sk-test", {
@@ -152,12 +152,12 @@ describe("MCPToolsetsTab create/edit toolset form", () => {
     const dialog = await openEditFor(user);
     const name = await dialog.findByDisplayValue("existing");
     expect(name).toBe(dialog.getByPlaceholderText("e.g. github-linear-tools"));
-    expect(dialog.getByText("Toolset Name")).toBeInTheDocument();
-    expect(dialog.getByPlaceholderText("Optional description")).toHaveValue("old description");
+    expect(dialog.getByText("工具集名称")).toBeInTheDocument();
+    expect(dialog.getByPlaceholderText("可选描述")).toHaveValue("old description");
 
     await user.clear(name);
     fireEvent.change(name, { target: { value: "renamed" } });
-    await user.click(dialog.getByRole("button", { name: "Save Changes" }));
+    await user.click(dialog.getByRole("button", { name: "保存更改" }));
 
     const expectedUpdate = {
       toolset_id: "ts-1",
@@ -185,9 +185,9 @@ describe("MCPToolsetsTab create/edit toolset form", () => {
 
     const dialog = await openEditFor(user);
     await dialog.findByDisplayValue("no-desc");
-    expect(dialog.getByPlaceholderText("Optional description")).toHaveValue("");
+    expect(dialog.getByPlaceholderText("可选描述")).toHaveValue("");
 
-    await user.click(dialog.getByRole("button", { name: "Save Changes" }));
+    await user.click(dialog.getByRole("button", { name: "保存更改" }));
 
     const expectedUpdate = { toolset_id: "ts-2", toolset_name: "no-desc", description: "", tools: [] };
     await waitFor(() => {

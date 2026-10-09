@@ -159,7 +159,7 @@ describe("MCPServerEdit (stdio)", () => {
       />,
     );
 
-    expect(screen.getByRole("tab", { name: "Server Configuration" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "服务器配置" })).toBeInTheDocument();
   });
 
   it("should allow updating stdio transport configuration", async () => {
@@ -208,13 +208,13 @@ describe("MCPServerEdit (stdio)", () => {
     );
 
     // Stdio section should be visible
-    expect(screen.getByLabelText("Command")).toBeInTheDocument();
+    expect(screen.getByLabelText("命令")).toBeInTheDocument();
 
     // URL field should not be visible when transport=stdio
-    expect(screen.queryByText("MCP Server URL")).not.toBeInTheDocument();
+    expect(screen.queryByText("MCP 服务器 URL")).not.toBeInTheDocument();
 
     // Update env_json
-    const envTextarea = screen.getByLabelText("Environment (JSON object)");
+    const envTextarea = screen.getByLabelText("环境变量（JSON 对象）");
     await act(async () => {
       fireEvent.change(envTextarea, {
         target: {
@@ -223,7 +223,7 @@ describe("MCPServerEdit (stdio)", () => {
       });
     });
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     const saveButton = saveButtons[0];
     await act(async () => {
       fireEvent.click(saveButton);
@@ -268,7 +268,7 @@ describe("MCPServerEdit (delegate auth)", () => {
       />,
     );
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -302,7 +302,7 @@ describe("MCPServerEdit (delegate auth)", () => {
       />,
     );
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -349,7 +349,7 @@ describe("MCPServerEdit (true passthrough warning)", () => {
     renderWithAuthType("oauth_delegate");
 
     await waitFor(() => {
-      expect(screen.getAllByRole("button", { name: "Save Changes" }).length).toBeGreaterThan(0);
+      expect(screen.getAllByRole("button", { name: "保存更改" }).length).toBeGreaterThan(0);
     });
     expect(
       screen.queryByText("True Passthrough disables LiteLLM authentication for this server"),
@@ -370,7 +370,7 @@ describe("MCPServerEdit (true passthrough warning)", () => {
       />,
     );
 
-    await selectOption("Authentication", "True Passthrough (no LiteLLM auth)");
+    await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
 
     await waitFor(() => {
       expect(mockOauth.getTemporaryPayload).toBeTruthy();
@@ -445,9 +445,9 @@ describe("MCPServerEdit (auth type switch)", () => {
       />,
     );
 
-    await selectOption("Authentication", "OAuth Token Exchange (OBO)");
+    await selectOption("认证方式", "OAuth Token Exchange (OBO)");
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -479,7 +479,7 @@ describe("MCPServerEdit (auth type switch)", () => {
       />,
     );
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -522,7 +522,7 @@ describe("MCPServerEdit OAuth token invalidation", () => {
     });
     mockOauth.reset.mockClear();
 
-    await selectOption("Transport Type", "Standard Input/Output (stdio)");
+    await selectOption("传输类型", "Standard Input/Output (stdio)");
 
     await waitFor(() => expect(mockOauth.reset).toHaveBeenCalled());
     expect(mockRemoveToken).toHaveBeenCalledWith("oauth_server_1", undefined);
@@ -640,7 +640,7 @@ describe("MCPServerEdit OAuth token invalidation", () => {
     });
     mockOauth.reset.mockClear();
 
-    await selectOption("Transport Type", "Server-Sent Events (SSE)");
+    await selectOption("传输类型", "Server-Sent Events (SSE)");
 
     expect(mockOauth.reset).not.toHaveBeenCalled();
     expect(mockRemoveToken).not.toHaveBeenCalled();
@@ -713,7 +713,7 @@ describe("MCPServerEdit (tool allowlist)", () => {
       fireEvent.click(screen.getByRole("button", { name: "Disable all tools" }));
     });
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -752,7 +752,7 @@ describe("MCPServerEdit (tool allowlist)", () => {
       fireEvent.click(screen.getByRole("button", { name: "Set tool overrides" }));
     });
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -787,7 +787,7 @@ describe("MCPServerEdit (tool allowlist)", () => {
       fireEvent.click(screen.getByRole("button", { name: "Set invalid tool override" }));
     });
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -869,7 +869,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
       fireEvent.change(textarea, { target: { value: '{"organization": "my-org"}' } });
     });
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -901,7 +901,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
 
     await selectOption("Token Endpoint Auth Method (optional)", "Client Secret Basic");
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -931,7 +931,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
       expect(screen.getByText("Token Endpoint Auth Method (optional)")).toBeInTheDocument();
     });
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -962,7 +962,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
     });
 
     // Leave token_validation_json empty
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -1002,7 +1002,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
       fireEvent.change(textarea, { target: { value: "" } });
     });
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -1036,7 +1036,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
       fireEvent.change(textarea, { target: { value: "{ bad json" } });
     });
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -1069,7 +1069,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
       expect(screen.getByText("Token Storage TTL (seconds, optional)")).toBeInTheDocument();
     });
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -1110,7 +1110,7 @@ describe("MCPServerEdit (resource indicator)", () => {
     await waitFor(() => expect(input).toHaveValue("api://finance-api/.default"));
     return async () => {
       await act(async () => {
-        fireEvent.click(screen.getAllByRole("button", { name: "Save Changes" })[0]);
+        fireEvent.click(screen.getAllByRole("button", { name: "保存更改" })[0]);
       });
       await waitFor(() => {
         expect(networking.updateMCPServer).toHaveBeenCalledTimes(1);
@@ -1247,7 +1247,7 @@ describe("MCPServerEdit (tool list fetch)", () => {
     await waitFor(() => {
       expect(screen.getByTestId("mcp-tool-config")).toHaveAttribute(
         "data-external-error",
-        expect.stringContaining("Authorize with the upstream (browser-only"),
+        expect.stringContaining("请先在上游完成授权"),
       );
     });
     expect(networking.listMCPTools).not.toHaveBeenCalled();
@@ -1276,7 +1276,7 @@ describe("MCPServerEdit (tool list fetch)", () => {
     await waitFor(() => {
       expect(screen.getByTestId("mcp-tool-config")).toHaveAttribute(
         "data-external-error",
-        expect.stringContaining("Authenticate with this server in the Tools tab"),
+        expect.stringContaining("请先在“MCP 工具”标签页完成该服务器的认证"),
       );
     });
     expect(networking.listMCPTools).not.toHaveBeenCalled();
@@ -1312,7 +1312,7 @@ describe("MCPServerEdit (tool list fetch)", () => {
     await waitFor(() => {
       expect(screen.getByTestId("mcp-tool-config")).toHaveAttribute(
         "data-external-error",
-        expect.stringContaining("Authenticate with this server in the Tools tab"),
+        expect.stringContaining("请先在“MCP 工具”标签页完成该服务器的认证"),
       );
     });
     expect(networking.listMCPTools).not.toHaveBeenCalled();
@@ -1374,7 +1374,7 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
     );
 
     await act(async () => {
-      fireEvent.click(screen.getAllByRole("button", { name: "Save Changes" })[0]);
+      fireEvent.click(screen.getAllByRole("button", { name: "保存更改" })[0]);
     });
 
     await waitFor(() => {
@@ -1415,14 +1415,14 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
     );
 
     await act(async () => {
-      fireEvent.click(screen.getAllByRole("button", { name: "Save Changes" })[0]);
+      fireEvent.click(screen.getAllByRole("button", { name: "保存更改" })[0]);
     });
 
     await waitFor(() => {
       expect(networking.storeMCPOAuthUserCredential).toHaveBeenCalled();
     });
-    expect(toast.fromError).toHaveBeenCalledWith("MCP Server updated, but failed to persist OAuth token: write failed");
-    expect(toast.success).not.toHaveBeenCalledWith("MCP Server updated successfully");
+    expect(toast.fromError).toHaveBeenCalledWith("MCP 服务器已更新，但 OAuth token 保存失败: write failed");
+    expect(toast.success).not.toHaveBeenCalledWith("MCP 服务器更新成功");
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
@@ -1450,7 +1450,7 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
       );
 
       await act(async () => {
-        fireEvent.click(screen.getAllByRole("button", { name: "Save Changes" })[0]);
+        fireEvent.click(screen.getAllByRole("button", { name: "保存更改" })[0]);
       });
 
       await waitFor(() => {
@@ -1498,7 +1498,7 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
       );
 
       await act(async () => {
-        fireEvent.click(screen.getAllByRole("button", { name: "Save Changes" })[0]);
+        fireEvent.click(screen.getAllByRole("button", { name: "保存更改" })[0]);
       });
 
       await waitFor(() => expect(networking.updateMCPServer).toHaveBeenCalledTimes(1));
@@ -1558,7 +1558,7 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
       expect(mockRemoveToken).toHaveBeenCalledWith("oauth_server_1", "user-1");
 
       await act(async () => {
-        fireEvent.click(screen.getAllByRole("button", { name: "Save Changes" })[0]);
+        fireEvent.click(screen.getAllByRole("button", { name: "保存更改" })[0]);
       });
 
       await waitFor(() => expect(networking.updateMCPServer).toHaveBeenCalledTimes(1));
@@ -1600,7 +1600,7 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
     );
 
     await act(async () => {
-      fireEvent.click(screen.getAllByRole("button", { name: "Save Changes" })[0]);
+      fireEvent.click(screen.getAllByRole("button", { name: "保存更改" })[0]);
     });
 
     await waitFor(() => expect(networking.updateMCPServer).toHaveBeenCalledTimes(1));
@@ -1707,7 +1707,7 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
     expect(screen.getByRole("checkbox", { name: /Remove the saved OAuth app on save/ })).not.toBeChecked();
 
     await act(async () => {
-      fireEvent.click(screen.getAllByRole("button", { name: "Save Changes" })[0]);
+      fireEvent.click(screen.getAllByRole("button", { name: "保存更改" })[0]);
     });
 
     await waitFor(() => expect(networking.updateMCPServer).toHaveBeenCalledTimes(1));
@@ -1733,9 +1733,9 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
       />,
     );
 
-    await selectOption("Authentication", "OAuth Delegate (client-supplied upstream token)");
+    await selectOption("认证方式", "OAuth Delegate (client-supplied upstream token)");
     mockOauth.tokenResponse = { access_token: "fresh-tok", token_type: "bearer" };
-    await selectOption("Authentication", "True Passthrough (no LiteLLM auth)");
+    await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
 
     await waitFor(() => {
       const withHeaders = vi
@@ -1764,7 +1764,7 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
     );
 
     await act(async () => {
-      fireEvent.click(screen.getAllByRole("button", { name: "Save Changes" })[0]);
+      fireEvent.click(screen.getAllByRole("button", { name: "保存更改" })[0]);
     });
 
     await waitFor(() => {
@@ -1793,7 +1793,7 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
     );
 
     await act(async () => {
-      fireEvent.click(screen.getAllByRole("button", { name: "Save Changes" })[0]);
+      fireEvent.click(screen.getAllByRole("button", { name: "保存更改" })[0]);
     });
 
     await waitFor(() => {
@@ -1822,7 +1822,7 @@ describe("MCPServerEdit oauth2_flow selector", () => {
       />,
     );
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -1878,7 +1878,7 @@ describe("MCPServerEdit oauth2_flow selector", () => {
 
     await selectOption("OAuth Flow Type", "Machine-to-Machine (M2M)");
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -1910,7 +1910,7 @@ describe("MCPServerEdit oauth2_flow selector", () => {
 
     await selectOption("OAuth Flow Type", "Interactive (PKCE)");
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -1968,13 +1968,13 @@ describe("MCPServerEdit OAuth flow prefill display", () => {
   it("warns when a server has no OAuth flow set", () => {
     renderEdit({ oauth2_flow: null, token_url: "https://idp.example.com/oauth/token" });
 
-    expect(screen.getByText("This server has no OAuth flow set")).toBeInTheDocument();
+    expect(screen.getByText("该服务器尚未设置 OAuth 流程")).toBeInTheDocument();
   });
 
   it("does not warn when the flow is already set", () => {
     renderEdit({ oauth2_flow: "client_credentials" });
 
-    expect(screen.queryByText("This server has no OAuth flow set")).not.toBeInTheDocument();
+    expect(screen.queryByText("该服务器尚未设置 OAuth 流程")).not.toBeInTheDocument();
   });
 
   it("never flashes the warning while mounting a server that already has a flow", async () => {
@@ -1982,7 +1982,7 @@ describe("MCPServerEdit OAuth flow prefill display", () => {
     const observer = new MutationObserver((records) => {
       for (const record of records) {
         for (const node of record.addedNodes) {
-          if (node.textContent?.includes("This server has no OAuth flow set")) flashes.push(node);
+          if (node.textContent?.includes("该服务器尚未设置 OAuth 流程")) flashes.push(node);
         }
       }
     });
@@ -1998,18 +1998,18 @@ describe("MCPServerEdit OAuth flow prefill display", () => {
   it("does not warn for a delegate (PKCE passthrough) server even with no flow set", () => {
     renderEdit({ oauth2_flow: null, delegate_auth_to_upstream: true });
 
-    expect(screen.queryByText("This server has no OAuth flow set")).not.toBeInTheDocument();
+    expect(screen.queryByText("该服务器尚未设置 OAuth 流程")).not.toBeInTheDocument();
   });
 
   it("clears the warning once the admin selects a flow", async () => {
     renderEdit({ oauth2_flow: null, token_url: "https://idp.example.com/oauth/token" });
 
-    expect(screen.getByText("This server has no OAuth flow set")).toBeInTheDocument();
+    expect(screen.getByText("该服务器尚未设置 OAuth 流程")).toBeInTheDocument();
 
     await selectOption("OAuth Flow Type", "Machine-to-Machine (M2M)");
 
     await waitFor(() => {
-      expect(screen.queryByText("This server has no OAuth flow set")).not.toBeInTheDocument();
+      expect(screen.queryByText("该服务器尚未设置 OAuth 流程")).not.toBeInTheDocument();
     });
   });
 });
@@ -2041,12 +2041,12 @@ describe("MCPServerEdit (max concurrent requests)", () => {
       />,
     );
 
-    const limitInput = screen.getByPlaceholderText("e.g. 10") as HTMLInputElement;
+    const limitInput = screen.getByPlaceholderText("如 10") as HTMLInputElement;
     expect(limitInput.value).toBe("5");
 
     fireEvent.change(limitInput, { target: { value: "2" } });
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -2075,12 +2075,12 @@ describe("MCPServerEdit (max concurrent requests)", () => {
       />,
     );
 
-    const limitInput = screen.getByPlaceholderText("e.g. 10") as HTMLInputElement;
+    const limitInput = screen.getByPlaceholderText("如 10") as HTMLInputElement;
     expect(limitInput.value).toBe("5");
 
     fireEvent.change(limitInput, { target: { value: "" } });
 
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -2115,7 +2115,7 @@ describe("MCPServerEdit (dcr_bridge toggle)", () => {
   }
 
   async function saveAndGetPayload() {
-    const saveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
       fireEvent.click(saveButtons[0]);
     });
@@ -2139,7 +2139,7 @@ describe("MCPServerEdit (dcr_bridge toggle)", () => {
     renderEdit({ auth_type: authType });
 
     await waitFor(() => {
-      expect(screen.getAllByRole("button", { name: "Save Changes" }).length).toBeGreaterThan(0);
+      expect(screen.getAllByRole("button", { name: "保存更改" }).length).toBeGreaterThan(0);
     });
     expect(screen.queryByText("Gateway-hosted sign-in (DCR bridge)")).not.toBeInTheDocument();
     expect(getDcrToggle()).not.toBeInTheDocument();
@@ -2222,7 +2222,7 @@ describe("MCPServerEdit (dcr_bridge toggle)", () => {
       expect(getDcrToggle()).toBeInTheDocument();
     });
 
-    await selectOption("Authentication", "API Key");
+    await selectOption("认证方式", "API Key");
     await waitFor(() => {
       expect(getDcrToggle()).not.toBeInTheDocument();
     });
@@ -2248,7 +2248,7 @@ describe("MCPServerEdit (dcr_bridge toggle)", () => {
 
     // The field stays mounted across the two client-forwarded modes, so the live toggle value is
     // preserved rather than forced false by the switch.
-    await selectOption("Authentication", "OAuth Delegate (client-supplied upstream token)");
+    await selectOption("认证方式", "OAuth Delegate (client-supplied upstream token)");
     await waitFor(() => {
       expect(getDcrToggle()).toBeInTheDocument();
     });
@@ -2286,12 +2286,12 @@ describe("MCPServerEdit (tab mount contract)", () => {
       />,
     );
 
-    fireEvent.change(screen.getByPlaceholderText("e.g. 10"), { target: { value: "2" } });
+    fireEvent.change(screen.getByPlaceholderText("如 10"), { target: { value: "2" } });
 
-    await userEvent.click(screen.getByRole("tab", { name: "Cost Configuration" }));
+    await userEvent.click(screen.getByRole("tab", { name: "成本配置" }));
     expect(await screen.findByTestId("mcp-cost-config")).toBeInTheDocument();
 
-    const costTabSaveButtons = screen.getAllByRole("button", { name: "Save Changes" });
+    const costTabSaveButtons = screen.getAllByRole("button", { name: "保存更改" });
     expect(costTabSaveButtons).toHaveLength(1);
     await act(async () => {
       fireEvent.click(costTabSaveButtons[0]);

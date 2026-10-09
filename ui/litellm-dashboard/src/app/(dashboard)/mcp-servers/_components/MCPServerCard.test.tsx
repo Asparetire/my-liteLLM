@@ -21,27 +21,27 @@ function renderCard(overrides: Partial<MCPServer>) {
 describe("MCPServerCard OAuth flow indicator", () => {
   it("shows the 'OAuth flow not set' badge for an oauth2 server with no oauth2_flow", () => {
     renderCard({ auth_type: "oauth2", oauth2_flow: null });
-    expect(screen.getByText("OAuth flow not set")).toBeInTheDocument();
+    expect(screen.getByText("OAuth 流程未设置")).toBeInTheDocument();
   });
 
   it("does not show the badge once oauth2_flow is set (client_credentials)", () => {
     renderCard({ auth_type: "oauth2", oauth2_flow: "client_credentials" });
-    expect(screen.queryByText("OAuth flow not set")).not.toBeInTheDocument();
+    expect(screen.queryByText("OAuth 流程未设置")).not.toBeInTheDocument();
   });
 
   it("does not show the badge once oauth2_flow is set (authorization_code)", () => {
     renderCard({ auth_type: "oauth2", oauth2_flow: "authorization_code" });
-    expect(screen.queryByText("OAuth flow not set")).not.toBeInTheDocument();
+    expect(screen.queryByText("OAuth 流程未设置")).not.toBeInTheDocument();
   });
 
   it("does not show the badge for a non-oauth2 server", () => {
     renderCard({ auth_type: "api_key", oauth2_flow: null });
-    expect(screen.queryByText("OAuth flow not set")).not.toBeInTheDocument();
+    expect(screen.queryByText("OAuth 流程未设置")).not.toBeInTheDocument();
   });
 
   it("does not show the badge for a delegate (PKCE passthrough) server", () => {
     renderCard({ auth_type: "oauth2", oauth2_flow: null, delegate_auth_to_upstream: true });
-    expect(screen.queryByText("OAuth flow not set")).not.toBeInTheDocument();
+    expect(screen.queryByText("OAuth 流程未设置")).not.toBeInTheDocument();
   });
 });
 

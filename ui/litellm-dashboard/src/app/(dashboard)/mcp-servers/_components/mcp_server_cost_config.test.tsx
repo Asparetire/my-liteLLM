@@ -12,7 +12,7 @@ describe("MCPServerCostConfig", () => {
   it("renders the default cost field with the current value", () => {
     render(<MCPServerCostConfig value={{ default_cost_per_query: 0.02 }} tools={[]} />);
 
-    expect(screen.getByText("Cost Configuration")).toBeInTheDocument();
+    expect(screen.getByText("费用配置")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("0.0000")).toHaveValue("0.0200");
   });
 
@@ -34,18 +34,18 @@ describe("MCPServerCostConfig", () => {
   it("hides the per-tool section when the server exposes no tools", () => {
     render(<MCPServerCostConfig value={{}} tools={[]} />);
 
-    expect(screen.queryByText("Available Tools")).not.toBeInTheDocument();
+    expect(screen.queryByText("可用工具")).not.toBeInTheDocument();
   });
 
   it("offers a per-tool override for every tool once tools are loaded", async () => {
     render(<MCPServerCostConfig value={{}} tools={tools} />);
 
-    await userEvent.click(screen.getByText("Available Tools"));
+    await userEvent.click(screen.getByText("可用工具"));
 
     expect(screen.getByText("search")).toBeInTheDocument();
     expect(screen.getByText("Search the index")).toBeInTheDocument();
     expect(screen.getByText("fetch")).toBeInTheDocument();
-    expect(screen.getAllByPlaceholderText("Use default")).toHaveLength(2);
+    expect(screen.getAllByPlaceholderText("使用默认")).toHaveLength(2);
   });
 
   it("merges a per-tool override into the existing cost map", async () => {
@@ -58,8 +58,8 @@ describe("MCPServerCostConfig", () => {
       />,
     );
 
-    await userEvent.click(screen.getByText("Available Tools"));
-    fireEvent.change(screen.getAllByPlaceholderText("Use default")[0], { target: { value: "3" } });
+    await userEvent.click(screen.getByText("可用工具"));
+    fireEvent.change(screen.getAllByPlaceholderText("使用默认")[0], { target: { value: "3" } });
 
     expect(onChange).toHaveBeenLastCalledWith({
       default_cost_per_query: 0.01,
@@ -75,13 +75,13 @@ describe("MCPServerCostConfig", () => {
       />,
     );
 
-    expect(screen.getByText("• Default cost: $0.0100 per query")).toBeInTheDocument();
-    expect(screen.getByText("• search: $0.2500 per query")).toBeInTheDocument();
+    expect(screen.getByText("• 默认费用：每次查询 $0.0100")).toBeInTheDocument();
+    expect(screen.getByText("• search：每次查询 $0.2500")).toBeInTheDocument();
   });
 
   it("shows no summary when nothing is configured", () => {
     render(<MCPServerCostConfig value={{}} tools={tools} />);
 
-    expect(screen.queryByText("Cost Summary:")).not.toBeInTheDocument();
+    expect(screen.queryByText("费用汇总：")).not.toBeInTheDocument();
   });
 });

@@ -45,7 +45,7 @@ describe("MCPNetworkSettings", () => {
 
     renderSettings();
 
-    await screen.findByText("Private IP Ranges");
+    await screen.findByText("私有 IP 网段");
     expect(screen.queryByText("should-not-show")).not.toBeInTheDocument();
   });
 
@@ -69,7 +69,7 @@ describe("MCPNetworkSettings", () => {
 
     await userEvent.keyboard("{Enter}");
 
-    await waitFor(() => expect(screen.queryByText("Suggested range:")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText("建议网段：")).not.toBeInTheDocument());
   });
 
   it("adds the suggested range to the list when clicked, and stops suggesting it", async () => {
@@ -78,7 +78,7 @@ describe("MCPNetworkSettings", () => {
     renderSettings();
     await userEvent.click(await screen.findByText("203.0.113.0/24"));
 
-    await waitFor(() => expect(screen.queryByText("Suggested range:")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText("建议网段：")).not.toBeInTheDocument());
     expect(screen.getByText("203.0.113.0/24")).toBeInTheDocument();
   });
 
@@ -88,7 +88,7 @@ describe("MCPNetworkSettings", () => {
     ]);
 
     renderSettings();
-    await userEvent.click(await screen.findByRole("button", { name: /Save/ }));
+    await userEvent.click(await screen.findByRole("button", { name: "保存" }));
 
     await waitFor(() =>
       expect(updateConfigFieldSetting).toHaveBeenCalledWith("tok", "mcp_internal_ip_ranges", ["10.0.0.0/8"]),
@@ -98,7 +98,7 @@ describe("MCPNetworkSettings", () => {
 
   it("clears the setting instead of saving an empty list", async () => {
     renderSettings();
-    await userEvent.click(await screen.findByRole("button", { name: /Save/ }));
+    await userEvent.click(await screen.findByRole("button", { name: "保存" }));
 
     await waitFor(() => expect(deleteConfigFieldSetting).toHaveBeenCalledWith("tok", "mcp_internal_ip_ranges"));
     expect(updateConfigFieldSetting).not.toHaveBeenCalled();

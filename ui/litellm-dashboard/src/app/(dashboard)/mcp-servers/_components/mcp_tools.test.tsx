@@ -29,7 +29,7 @@ vi.mock("@/hooks/useUserMcpOAuthFlow", () => ({
   useUserMcpOAuthFlow: () => ({ startOAuthFlow: vi.fn(), status: "idle", error: null }),
 }));
 
-const GATE_TEXT = "Authentication required";
+const GATE_TEXT = "需要认证";
 // Realistic interactive servers carry a token endpoint; the old heuristic
 // (`oauth2 && !tokenUrl`) mislabeled exactly these as M2M. Setting it here is
 // what makes the passthrough cases fail on the pre-fix code.
@@ -94,7 +94,7 @@ describe("MCPToolsViewer auth gate routing", () => {
     renderViewer({ oauth2_flow: null, delegate_auth_to_upstream: true });
 
     expect(await screen.findByText(GATE_TEXT)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Authorize" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "授权" })).toBeInTheDocument();
     expect(vi.mocked(listMCPTools)).not.toHaveBeenCalled();
     // Passthrough must not consult the per-user DB credential.
     expect(vi.mocked(getMCPOAuthUserCredentialStatus)).not.toHaveBeenCalled();
@@ -122,7 +122,7 @@ describe("MCPToolsViewer auth gate routing", () => {
       renderViewer({ auth_type: authType, oauth2_flow: null, delegate_auth_to_upstream: false });
 
       expect(await screen.findByText(GATE_TEXT)).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Authorize" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "授权" })).toBeInTheDocument();
       expect(vi.mocked(listMCPTools)).not.toHaveBeenCalled();
       expect(vi.mocked(getMCPOAuthUserCredentialStatus)).not.toHaveBeenCalled();
     },
@@ -160,7 +160,7 @@ describe("MCPToolsViewer auth gate routing", () => {
     renderViewer({ oauth2_flow: null, delegate_auth_to_upstream: false });
 
     expect(await screen.findByText(GATE_TEXT)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Authorize" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "授权" })).toBeInTheDocument();
     expect(vi.mocked(listMCPTools)).not.toHaveBeenCalled();
   });
 
@@ -170,7 +170,7 @@ describe("MCPToolsViewer auth gate routing", () => {
     renderViewer({ oauth2_flow: null, delegate_auth_to_upstream: false });
 
     expect(await screen.findByText(GATE_TEXT)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Authorize" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "授权" })).toBeInTheDocument();
     expect(vi.mocked(listMCPTools)).not.toHaveBeenCalled();
   });
 
@@ -203,7 +203,7 @@ describe("MCPToolsViewer auth gate routing", () => {
     renderViewer({ oauth2_flow: null, delegate_auth_to_upstream: false });
 
     expect(await screen.findByText(GATE_TEXT)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Authorize" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "授权" })).toBeInTheDocument();
   });
 
   it("does not gate an M2M server; lists with the LiteLLM key", async () => {

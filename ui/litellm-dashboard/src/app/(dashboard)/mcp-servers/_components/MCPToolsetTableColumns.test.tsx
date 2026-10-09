@@ -2,12 +2,26 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { DataTable } from "@/components/shared/DataTable";
+import zhCN from "../../../../../messages/zh-CN.json";
 import { MCPToolset } from "@/components/mcp_tools/types";
 import { getMCPToolsetTableColumns } from "./MCPToolsetTableColumns";
 
 vi.mock("@/components/networking", () => ({
   getProxyBaseUrl: () => "http://localhost:4000",
 }));
+
+// Resolve through the real zh-CN messages so column header/count assertions pin the
+// translated output, mirroring the deps-injected translator the production caller passes.
+const zhMcpServers = (zhCN as { mcpServers: Record<string, string> }).mcpServers;
+const zhCommon = (zhCN as { common: Record<string, string> }).common;
+const makeTranslator = (dict: Record<string, string>) =>
+  ((key: string, values?: Record<string, string | number>) => {
+    let message = dict[key] ?? key;
+    for (const [name, value] of Object.entries(values ?? {})) {
+      message = message.split(`{${name}}`).join(String(value));
+    }
+    return message;
+  }) as unknown as Parameters<typeof getMCPToolsetTableColumns>[0]["t"];
 
 const mockToolset: MCPToolset = {
   toolset_id: "ts-1",
@@ -29,7 +43,14 @@ const serverPrefixById = new Map([
 ]);
 
 function renderTable({ isAdmin = true, onEditClick = vi.fn(), onDeleteClick = vi.fn() } = {}) {
-  const deps = { isAdmin, serverPrefixById, onEditClick, onDeleteClick };
+  const deps = {
+    t: makeTranslator(zhMcpServers),
+    tCommon: makeTranslator(zhCommon),
+    isAdmin,
+    serverPrefixById,
+    onEditClick,
+    onDeleteClick,
+  };
   render(
     <DataTable
       data={[mockToolset]}
@@ -56,7 +77,7 @@ describe("getMCPToolsetTableColumns", () => {
     expect(screen.getByText("exa-search")).toBeInTheDocument();
     expect(screen.getByText("exa-fetch")).toBeInTheDocument();
     expect(screen.queryByText("exa-crawl")).not.toBeInTheDocument();
-    expect(screen.getByText("+1 more")).toBeInTheDocument();
+    expect(screen.getByText("+1 个")).toBeInTheDocument();
   });
 
   it("opens the edit modal when an admin clicks the toolset name", async () => {

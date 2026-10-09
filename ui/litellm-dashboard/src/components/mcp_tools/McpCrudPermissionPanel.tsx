@@ -10,6 +10,7 @@
  */
 
 import React, { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { CrudOp, MCPToolEntry, CRUD_GROUP_META, groupToolsByCrud } from "../../utils/mcpToolCrudClassification";
@@ -40,6 +41,24 @@ interface McpCrudPermissionPanelProps {
 }
 
 const CRUD_ORDER: CrudOp[] = ["read", "create", "update", "delete", "unknown"];
+
+// CRUD_GROUP_META 的 label/description 是英文源文案，按 op 映射 message key，
+// 由本组件渲染处 t() 解析（沿用批次6 字段配置文件约定）。
+const GROUP_TITLE_KEY: Record<CrudOp, string> = {
+  read: "crudGroupRead",
+  create: "crudGroupCreate",
+  update: "crudGroupUpdate",
+  delete: "crudGroupDelete",
+  unknown: "crudGroupUnknown",
+};
+
+const GROUP_DESC_KEY: Record<CrudOp, string> = {
+  read: "crudGroupReadDesc",
+  create: "crudGroupCreateDesc",
+  update: "crudGroupUpdateDesc",
+  delete: "crudGroupDeleteDesc",
+  unknown: "crudGroupUnknownDesc",
+};
 
 const RISK_BADGE: Record<string, string> = {
   low: "bg-success/15 text-success",
@@ -76,6 +95,7 @@ const McpCrudPermissionPanel: React.FC<McpCrudPermissionPanelProps> = ({
   readOnly = false,
   searchFilter = "",
 }) => {
+  const t = useTranslations("mcpServers");
   const [collapsed, setCollapsed] = useState<Record<CrudOp, boolean>>({
     read: false,
     create: false,
@@ -161,6 +181,7 @@ const McpCrudPermissionPanel: React.FC<McpCrudPermissionPanelProps> = ({
         }
 
         const meta = CRUD_GROUP_META[op];
+        const groupTitle = t(GROUP_TITLE_KEY[op]);
         const fullyAllowed = isGroupFullyAllowed(op);
         const partial = isGroupPartiallyAllowed(op);
         const isCollapsed = collapsed[op];
@@ -179,29 +200,32 @@ const McpCrudPermissionPanel: React.FC<McpCrudPermissionPanelProps> = ({
                 ) : (
                   <ChevronDownIcon className="w-4 h-4 text-muted-foreground shrink-0" />
                 )}
-                <span className="font-semibold text-foreground text-sm">{meta.label}</span>
+                <span className="font-semibold text-foreground text-sm">{groupTitle}</span>
                 <span className={`text-xs px-2 py-0.5 rounded-full ${RISK_BADGE[meta.risk]}`}>
                   {meta.risk === "high"
-                    ? "High Risk"
+                    ? t("riskHigh")
                     : meta.risk === "medium"
-                      ? "Medium Risk"
+                      ? t("riskMedium")
                       : meta.risk === "low"
-                        ? "Safe"
-                        : "Unclassified"}
+                        ? t("riskSafe")
+                        : t("riskUnclassified")}
                 </span>
                 <span className="text-xs text-muted-foreground ml-1">
-                  {group.filter((t) => effectiveAllowed.has(t.name)).length}/{group.length} allowed
+                  {t("allowedCount", {
+                    allowed: group.filter((tool) => effectiveAllowed.has(tool.name)).length,
+                    total: group.length,
+                  })}
                 </span>
               </button>
 
               {!readOnly && (
                 <div className="flex items-center gap-2 ml-4">
                   <p className="text-xs text-muted-foreground">
-                    {fullyAllowed ? "All on" : partial ? "Partial" : "All off"}
+                    {fullyAllowed ? t("groupAllOn") : partial ? t("groupPartial") : t("groupAllOff")}
                   </p>
                   {/* Checkbox supports `indeterminate`; Switch does not. */}
                   <Checkbox
-                    aria-label={`Allow all ${meta.label} tools`}
+                    aria-label={t("allowGroupAria", { group: groupTitle })}
                     checked={fullyAllowed}
                     indeterminate={partial}
                     onCheckedChange={(checked) => toggleGroup(op, checked)}
@@ -214,7 +238,7 @@ const McpCrudPermissionPanel: React.FC<McpCrudPermissionPanelProps> = ({
             {/* Description row */}
             {!isCollapsed && (
               <div className="px-4 pt-2 pb-1 text-xs text-muted-foreground bg-card border-b border-border">
-                {meta.description}
+                {t(GROUP_DESC_KEY[op])}
               </div>
             )}
 
@@ -256,7 +280,7 @@ const McpCrudPermissionPanel: React.FC<McpCrudPermissionPanelProps> = ({
                             allowed ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"
                           }`}
                         >
-                          {allowed ? "on" : "off"}
+                          {allowed ? t("toolOn") : t("toolOff")}
                         </span>
                       </div>
                     );

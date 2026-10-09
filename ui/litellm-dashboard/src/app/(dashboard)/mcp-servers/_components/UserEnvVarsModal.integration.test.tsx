@@ -37,7 +37,7 @@ const renderModal = (status: MCPUserEnvVarsStatus, onSaved = vi.fn(), onClose = 
   return { onSaved, onClose, setOpen };
 };
 
-const save = (user: ReturnType<typeof setup>) => user.click(screen.getByRole("button", { name: "Save Credentials" }));
+const save = (user: ReturnType<typeof setup>) => user.click(screen.getByRole("button", { name: "保存凭据" }));
 
 // Opening the modal remounts the form so nothing carries over from the last time it was open.
 // Settle that remount before handing back a node, or the caller holds a detached one.
@@ -108,7 +108,7 @@ describe("UserEnvVarsModal", () => {
     await fieldAfterOpen(/^API_KEY/);
     await save(user);
 
-    expect(await screen.findByText("API_KEY is required")).toBeInTheDocument();
+    expect(await screen.findByText("API_KEY 为必填项")).toBeInTheDocument();
     expect(networking.storeMCPUserEnvVars).not.toHaveBeenCalled();
   });
 
@@ -134,8 +134,8 @@ describe("UserEnvVarsModal", () => {
   it("renders the overwrite placeholder and a Set marker for an already-set field", async () => {
     renderModal(statusWith([{ name: "API_KEY", description: "Grab it from the console", is_set: true }]));
 
-    expect(await screen.findByPlaceholderText("Enter a new value to overwrite")).toBeInTheDocument();
-    expect(screen.getByText("Set")).toBeInTheDocument();
+    expect(await screen.findByPlaceholderText("输入新值以覆盖")).toBeInTheDocument();
+    expect(screen.getByText("已设置")).toBeInTheDocument();
   });
 
   it("renders the admin description as always-visible help text", async () => {
@@ -174,8 +174,8 @@ describe("UserEnvVarsModal", () => {
   it("reports the empty state instead of a form when nothing is required", async () => {
     renderModal(statusWith([]));
 
-    expect(await screen.findByText("No per-user fields configured for this server.")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Save Credentials" })).not.toBeInTheDocument();
+    expect(await screen.findByText("该服务器未配置用户级字段。")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "保存凭据" })).not.toBeInTheDocument();
   });
 
   it("closes and reports the saved status on success", async () => {
