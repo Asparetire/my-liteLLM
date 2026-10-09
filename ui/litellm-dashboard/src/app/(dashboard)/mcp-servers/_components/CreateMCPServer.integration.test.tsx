@@ -22,7 +22,7 @@ vi.mock("./OpenAPIQuickPicker", () => ({
   default: () => null,
 }));
 
-// Mutable holder so individual tests can simulate "Authorize & Fetch" having
+// Mutable holder so individual tests can simulate "授权并获取" having
 // produced a token before submit, and inspect the reset wiring.
 const oauthHook = vi.hoisted(() => ({
   tokenResponse: null as Record<string, unknown> | null,
@@ -141,7 +141,7 @@ describe("CreateMCPServer", () => {
         target: { value: "https://example.com/mcp" },
       });
     });
-    await selectOption("认证方式", "None");
+    await selectOption("认证方式", "无认证");
 
     vi.mocked(networking.registerMCPServer).mockResolvedValue({
       server_id: "submitted-1",
@@ -211,11 +211,11 @@ describe("CreateMCPServer", () => {
     it("should warn that LiteLLM auth is disabled when True Passthrough is selected", async () => {
       await selectHttpTransport();
 
-      await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
+      await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
 
       await waitFor(() => {
         expect(
-          screen.getByText("True Passthrough disables LiteLLM authentication for this server"),
+          screen.getByText("True Passthrough 将对该服务器禁用 LiteLLM 认证"),
         ).toBeInTheDocument();
       });
     });
@@ -223,17 +223,17 @@ describe("CreateMCPServer", () => {
     it("should not show the True Passthrough warning when OAuth Delegate is selected", async () => {
       await selectHttpTransport();
 
-      await selectOption("认证方式", "OAuth Delegate (client-supplied upstream token)");
+      await selectOption("认证方式", "OAuth Delegate（客户端自带上游令牌）");
 
       await waitFor(() => {
-        expect(screen.getAllByText("OAuth Delegate (client-supplied upstream token)").length).toBeGreaterThan(0);
+        expect(screen.getAllByText("OAuth Delegate（客户端自带上游令牌）").length).toBeGreaterThan(0);
       });
       expect(
-        screen.queryByText("True Passthrough disables LiteLLM authentication for this server"),
+        screen.queryByText("True Passthrough 将对该服务器禁用 LiteLLM 认证"),
       ).not.toBeInTheDocument();
     });
 
-    it.each([["True Passthrough (no LiteLLM auth)"], ["OAuth Delegate (client-supplied upstream token)"]])(
+    it.each([["True Passthrough（无 LiteLLM 认证）"], ["OAuth Delegate（客户端自带上游令牌）"]])(
       "should show the browser-only authorize section when %s is selected",
       async (optionLabel) => {
         await selectHttpTransport();
@@ -241,10 +241,10 @@ describe("CreateMCPServer", () => {
         await selectOption("认证方式", optionLabel);
 
         await waitFor(() => {
-          expect(screen.getByRole("button", { name: "Authorize & Fetch Tools (browser-only)" })).toBeInTheDocument();
+          expect(screen.getByRole("button", { name: "授权并获取工具（仅浏览器）" })).toBeInTheDocument();
         });
-        expect(screen.getByText("OAuth Client ID (optional)")).toBeInTheDocument();
-        expect(screen.getByText("OAuth Client Secret (optional)")).toBeInTheDocument();
+        expect(screen.getByText("OAuth Client ID（可选）")).toBeInTheDocument();
+        expect(screen.getByText("OAuth Client Secret（可选）")).toBeInTheDocument();
       },
     );
 
@@ -256,7 +256,7 @@ describe("CreateMCPServer", () => {
       await waitFor(() => {
         expect(screen.getByText("认证凭据值")).toBeInTheDocument();
       });
-      expect(screen.queryByRole("button", { name: "Authorize & Fetch Tools (browser-only)" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "授权并获取工具（仅浏览器）" })).not.toBeInTheDocument();
     });
 
     it("should not require auth value when creating a server with API Key auth type", async () => {
@@ -402,9 +402,9 @@ describe("CreateMCPServer", () => {
         target: { value: "https://example.com/mcp" },
       });
 
-      await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
+      await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
 
-      // Simulate the browser Authorize & Fetch flow handing back an upstream token.
+      // Simulate the browser 授权并获取 flow handing back an upstream token.
       await waitFor(() => expect(oauthHook.onTokenReceived).toBeTruthy());
       await act(async () => {
         oauthHook.onTokenReceived!({ access_token: "upstream-tok", token_type: "Bearer" }, undefined);
@@ -418,8 +418,8 @@ describe("CreateMCPServer", () => {
     });
 
     it.each([
-      ["true_passthrough", "True Passthrough (no LiteLLM auth)"],
-      ["oauth_delegate", "OAuth Delegate (client-supplied upstream token)"],
+      ["true_passthrough", "True Passthrough（无 LiteLLM 认证）"],
+      ["oauth_delegate", "OAuth Delegate（客户端自带上游令牌）"],
     ])("persists only tool config on create for %s; the token stays browser-held", async (_authType, optionLabel) => {
       oauthHook.tokenResponse = { access_token: "upstream-tok", token_type: "Bearer" };
       await selectHttpTransport();
@@ -482,8 +482,8 @@ describe("CreateMCPServer", () => {
     });
 
     it.each([
-      ["true_passthrough", "True Passthrough (no LiteLLM auth)"],
-      ["oauth_delegate", "OAuth Delegate (client-supplied upstream token)"],
+      ["true_passthrough", "True Passthrough（无 LiteLLM 认证）"],
+      ["oauth_delegate", "OAuth Delegate（客户端自带上游令牌）"],
     ])(
       "persists admin-entered OAuth app credentials on create for %s while the token stays browser-held",
       async (_authType, optionLabel) => {
@@ -501,10 +501,10 @@ describe("CreateMCPServer", () => {
         // Admin declares the org's pre-registered upstream app; unlike the browser-authorized
         // token, this is config and must survive onto the server row so internal users'
         // Tools-page Authorize relays through it (required for non-DCR upstreams like Slack).
-        fireEvent.change(screen.getByPlaceholderText("Leave blank to use dynamic client registration"), {
+        fireEvent.change(screen.getByPlaceholderText("留空则使用动态客户端注册"), {
           target: { value: "org-app-client-id" },
         });
-        fireEvent.change(screen.getByPlaceholderText("Leave blank for public clients / PKCE"), {
+        fireEvent.change(screen.getByPlaceholderText("留空适用于 public client / PKCE"), {
           target: { value: "org-app-secret" },
         });
 
@@ -560,12 +560,12 @@ describe("CreateMCPServer", () => {
         target: { value: "https://example.com/mcp" },
       });
 
-      await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
+      await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
 
-      fireEvent.change(screen.getByPlaceholderText("Leave blank to use dynamic client registration"), {
+      fireEvent.change(screen.getByPlaceholderText("留空则使用动态客户端注册"), {
         target: { value: "org-app-client-id" },
       });
-      fireEvent.change(screen.getByPlaceholderText("Leave blank for public clients / PKCE"), {
+      fireEvent.change(screen.getByPlaceholderText("留空适用于 public client / PKCE"), {
         target: { value: "org-app-secret" },
       });
 
@@ -635,7 +635,7 @@ describe("CreateMCPServer", () => {
       // Switching into a client-forwarded mode changes the identity with auth_type in the changed
       // values, so the preserve carve-out must NOT apply: the minted material would otherwise ride
       // into a mode that now persists credentials onto the server row.
-      await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
+      await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
 
       const switchedServer = {
         server_id: "switched-server",
@@ -767,16 +767,16 @@ describe("CreateMCPServer", () => {
       await selectHttpTransport();
       fillText(getServerNameInput(), "CF_Switch_Keep");
       fillText(screen.getByPlaceholderText("https://your-mcp-server.com"), "https://example.com/mcp");
-      await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
-      fillText(screen.getByPlaceholderText("Leave blank to use dynamic client registration"), "app-id");
-      fillText(screen.getByPlaceholderText("Leave blank for public clients / PKCE"), "app-secret");
+      await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
+      fillText(screen.getByPlaceholderText("留空则使用动态客户端注册"), "app-id");
+      fillText(screen.getByPlaceholderText("留空适用于 public client / PKCE"), "app-secret");
 
       await waitFor(() => expect(oauthHook.onTokenReceived).toBeTruthy());
       await act(async () => {
         oauthHook.onTokenReceived!({ access_token: "cf-tok", token_type: "Bearer" }, undefined);
       });
 
-      await selectOption("认证方式", "OAuth Delegate (client-supplied upstream token)");
+      await selectOption("认证方式", "OAuth Delegate（客户端自带上游令牌）");
 
       const switched = {
         server_id: "cf-switch-keep",
@@ -804,9 +804,9 @@ describe("CreateMCPServer", () => {
       await selectHttpTransport();
       fillText(getServerNameInput(), "CF_Round");
       fillText(screen.getByPlaceholderText("https://your-mcp-server.com"), "https://example.com/mcp");
-      await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
-      fillText(screen.getByPlaceholderText("Leave blank to use dynamic client registration"), "app-id");
-      fillText(screen.getByPlaceholderText("Leave blank for public clients / PKCE"), "app-secret");
+      await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
+      fillText(screen.getByPlaceholderText("留空则使用动态客户端注册"), "app-id");
+      fillText(screen.getByPlaceholderText("留空适用于 public client / PKCE"), "app-secret");
 
       await waitFor(() => expect(oauthHook.onTokenReceived).toBeTruthy());
       await act(async () => {
@@ -814,7 +814,7 @@ describe("CreateMCPServer", () => {
       });
 
       await selectOption("认证方式", "OAuth");
-      await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
+      await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
 
       const cfRoundServer = {
         server_id: "cf-round",
@@ -845,8 +845,8 @@ describe("CreateMCPServer", () => {
       fireEvent.change(screen.getByPlaceholderText("https://your-mcp-server.com"), {
         target: { value: "https://example.com/mcp" },
       });
-      await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
-      fireEvent.change(screen.getByPlaceholderText("Leave blank to use dynamic client registration"), {
+      await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
+      fireEvent.change(screen.getByPlaceholderText("留空则使用动态客户端注册"), {
         target: { value: "app-id" },
       });
 
@@ -862,7 +862,7 @@ describe("CreateMCPServer", () => {
       });
 
       // Keep + warn: the app stays in the field, and a non-blocking warning appears.
-      expect(screen.getByText(/OAuth app entered here was registered for the previous upstream/)).toBeInTheDocument();
+      expect(screen.getByText(/可能已失效/)).toBeInTheDocument();
     });
 
     it("keeps client_secret when only client_id is edited after a client-forwarded authorize", async () => {
@@ -871,11 +871,11 @@ describe("CreateMCPServer", () => {
       fireEvent.change(screen.getByPlaceholderText("https://your-mcp-server.com"), {
         target: { value: "https://example.com/mcp" },
       });
-      await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
-      fireEvent.change(screen.getByPlaceholderText("Leave blank to use dynamic client registration"), {
+      await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
+      fireEvent.change(screen.getByPlaceholderText("留空则使用动态客户端注册"), {
         target: { value: "app-id" },
       });
-      fireEvent.change(screen.getByPlaceholderText("Leave blank for public clients / PKCE"), {
+      fireEvent.change(screen.getByPlaceholderText("留空适用于 public client / PKCE"), {
         target: { value: "app-secret" },
       });
 
@@ -886,7 +886,7 @@ describe("CreateMCPServer", () => {
 
       // Editing only client_id fires an invalidation whose changedValues carries only the client_id
       // sub-field; the preserve + deep-merge re-apply must keep client_secret from being dropped.
-      fireEvent.change(screen.getByPlaceholderText("Leave blank to use dynamic client registration"), {
+      fireEvent.change(screen.getByPlaceholderText("留空则使用动态客户端注册"), {
         target: { value: "app-id2" },
       });
 
@@ -939,7 +939,7 @@ describe("CreateMCPServer", () => {
     it("should not show auth value field when None auth type is selected", async () => {
       await selectHttpTransport();
 
-      await selectOption("认证方式", "None");
+      await selectOption("认证方式", "无认证");
 
       // Auth value field should not appear for "None"
       await waitFor(() => {
@@ -958,7 +958,7 @@ describe("CreateMCPServer", () => {
       const urlInput = screen.getByPlaceholderText("https://your-mcp-server.com");
       fireEvent.change(urlInput, { target: { value: "https://example.com/mcp" } });
 
-      await selectOption("认证方式", "None");
+      await selectOption("认证方式", "无认证");
 
       vi.mocked(networking.createMCPServer).mockResolvedValue({
         server_id: "new-server-1",
@@ -994,22 +994,22 @@ describe("CreateMCPServer", () => {
       // Plain OAuth must not render the token-exchange section.
       await selectOption("认证方式", "OAuth");
       await waitFor(() => {
-        expect(screen.queryByText("Token Exchange Endpoint (optional)")).not.toBeInTheDocument();
+        expect(screen.queryByText("Token Exchange Endpoint（可选）")).not.toBeInTheDocument();
       });
-      expect(screen.queryByText("Subject Token Type (optional)")).not.toBeInTheDocument();
+      expect(screen.queryByText("Subject Token Type（可选）")).not.toBeInTheDocument();
 
       await selectOption("认证方式", "OAuth Token Exchange (OBO)");
       await waitFor(() => {
-        expect(screen.getByText("Token Exchange Endpoint (optional)")).toBeInTheDocument();
+        expect(screen.getByText("Token Exchange Endpoint（可选）")).toBeInTheDocument();
       });
-      expect(screen.getByText("Subject Token Type (optional)")).toBeInTheDocument();
+      expect(screen.getByText("Subject Token Type（可选）")).toBeInTheDocument();
 
       // Switching away hides the section again.
       await selectOption("认证方式", "API Key");
       await waitFor(() => {
-        expect(screen.queryByText("Token Exchange Endpoint (optional)")).not.toBeInTheDocument();
+        expect(screen.queryByText("Token Exchange Endpoint（可选）")).not.toBeInTheDocument();
       });
-      expect(screen.queryByText("Subject Token Type (optional)")).not.toBeInTheDocument();
+      expect(screen.queryByText("Subject Token Type（可选）")).not.toBeInTheDocument();
 
       // Selecting token exchange and then switching transport to stdio unmounts the
       // whole Authentication section (the section-level transport gate), taking the
@@ -1017,13 +1017,13 @@ describe("CreateMCPServer", () => {
       // cannot block a stdio submit because antd does not validate unmounted fields.
       await selectOption("认证方式", "OAuth Token Exchange (OBO)");
       await waitFor(() => {
-        expect(screen.getByText("Token Exchange Endpoint (optional)")).toBeInTheDocument();
+        expect(screen.getByText("Token Exchange Endpoint（可选）")).toBeInTheDocument();
       });
-      await selectOption("传输类型", "Standard Input/Output");
+      await selectOption("传输类型", "标准输入/输出");
       await waitFor(() => {
-        expect(screen.queryByText("Token Exchange Endpoint (optional)")).not.toBeInTheDocument();
+        expect(screen.queryByText("Token Exchange Endpoint（可选）")).not.toBeInTheDocument();
       });
-      expect(screen.queryByText("Subject Token Type (optional)")).not.toBeInTheDocument();
+      expect(screen.queryByText("Subject Token Type（可选）")).not.toBeInTheDocument();
     });
 
     it("sends max_concurrent_requests in the create payload when set", async () => {
@@ -1037,7 +1037,7 @@ describe("CreateMCPServer", () => {
       const urlInput = screen.getByPlaceholderText("https://your-mcp-server.com");
       fireEvent.change(urlInput, { target: { value: "https://example.com/mcp" } });
 
-      await selectOption("认证方式", "None");
+      await selectOption("认证方式", "无认证");
 
       const limitInput = screen.getByPlaceholderText("如 10");
       fireEvent.change(limitInput, { target: { value: "5" } });
@@ -1088,10 +1088,10 @@ describe("CreateMCPServer", () => {
       fireEvent.change(screen.getByPlaceholderText("https://idp.example.com/oauth2/token"), {
         target: { value: "https://idp.example.com/oauth2/token" },
       });
-      fireEvent.change(screen.getByPlaceholderText("Enter OAuth client ID"), {
+      fireEvent.change(screen.getByPlaceholderText("输入 OAuth client ID"), {
         target: { value: "te-client-id" },
       });
-      fireEvent.change(screen.getByPlaceholderText("Enter OAuth client secret"), {
+      fireEvent.change(screen.getByPlaceholderText("输入 OAuth client secret"), {
         target: { value: "te-client-secret" },
       });
 
@@ -1133,22 +1133,22 @@ describe("CreateMCPServer", () => {
       // The sibling OBO mode must not render the ID-JAG section.
       await selectOption("认证方式", "OAuth Token Exchange (OBO)");
       await waitFor(() => {
-        expect(screen.queryByText("Org Token Endpoint (leg 1)")).not.toBeInTheDocument();
+        expect(screen.queryByText("Org Token Endpoint（第 1 段）")).not.toBeInTheDocument();
       });
-      expect(screen.queryByText("Resource Token Endpoint (leg 2)")).not.toBeInTheDocument();
+      expect(screen.queryByText("Resource Token Endpoint（第 2 段）")).not.toBeInTheDocument();
 
       await selectOption("认证方式", "ID-JAG (Okta Cross App Access)");
       await waitFor(() => {
-        expect(screen.getByText("Org Token Endpoint (leg 1)")).toBeInTheDocument();
+        expect(screen.getByText("Org Token Endpoint（第 1 段）")).toBeInTheDocument();
       });
-      expect(screen.getByText("Resource Token Endpoint (leg 2)")).toBeInTheDocument();
-      expect(screen.getByText("Client Private Key (PEM)")).toBeInTheDocument();
+      expect(screen.getByText("Resource Token Endpoint（第 2 段）")).toBeInTheDocument();
+      expect(screen.getByText("Client Private Key（PEM）")).toBeInTheDocument();
 
       await selectOption("认证方式", "API Key");
       await waitFor(() => {
-        expect(screen.queryByText("Org Token Endpoint (leg 1)")).not.toBeInTheDocument();
+        expect(screen.queryByText("Org Token Endpoint（第 1 段）")).not.toBeInTheDocument();
       });
-      expect(screen.queryByText("Resource Token Endpoint (leg 2)")).not.toBeInTheDocument();
+      expect(screen.queryByText("Resource Token Endpoint（第 2 段）")).not.toBeInTheDocument();
     });
 
     it("routes ID-JAG config to the backend payload with both legs and the private key", async () => {
@@ -1171,7 +1171,7 @@ describe("CreateMCPServer", () => {
       fireEvent.change(screen.getByPlaceholderText("https://upstream.example.com/oauth2/token"), {
         target: { value: "https://jira.example.com/oauth2/token" },
       });
-      fireEvent.change(screen.getByPlaceholderText("Enter OAuth client ID"), {
+      fireEvent.change(screen.getByPlaceholderText("输入 OAuth client ID"), {
         target: { value: "id-jag-client" },
       });
       fireEvent.change(screen.getByPlaceholderText("-----BEGIN PRIVATE KEY-----"), {
@@ -1234,7 +1234,7 @@ describe("CreateMCPServer", () => {
       fireEvent.change(screen.getByPlaceholderText("https://upstream.example.com/oauth2/token"), {
         target: { value: "https://jira.example.com/oauth2/token" },
       });
-      fireEvent.change(screen.getByPlaceholderText("Enter OAuth client ID"), {
+      fireEvent.change(screen.getByPlaceholderText("输入 OAuth client ID"), {
         target: { value: "id-jag-client" },
       });
 
@@ -1243,7 +1243,7 @@ describe("CreateMCPServer", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("Provide either a client secret or a client private key")).toBeInTheDocument();
+        expect(screen.getByText("请填写 client secret 或 client private key 之一")).toBeInTheDocument();
       });
       expect(networking.createMCPServer).not.toHaveBeenCalled();
     });
@@ -1264,15 +1264,15 @@ describe("CreateMCPServer", () => {
         expect(screen.getByPlaceholderText("https://idp.example.com/oauth2/token")).toBeInTheDocument();
       });
 
-      await selectOption("Profile", "Microsoft Entra OBO");
+      await selectOption("交换协议类型", "Microsoft Entra OBO");
 
       fireEvent.change(screen.getByPlaceholderText("https://idp.example.com/oauth2/token"), {
         target: { value: "https://login.microsoftonline.com/tenant/oauth2/v2.0/token" },
       });
-      fireEvent.change(screen.getByPlaceholderText("Enter OAuth client ID"), {
+      fireEvent.change(screen.getByPlaceholderText("输入 OAuth client ID"), {
         target: { value: "entra-client" },
       });
-      fireEvent.change(screen.getByPlaceholderText("Enter OAuth client secret"), {
+      fireEvent.change(screen.getByPlaceholderText("输入 OAuth client secret"), {
         target: { value: "entra-secret" },
       });
 
@@ -1284,7 +1284,7 @@ describe("CreateMCPServer", () => {
       });
       await waitFor(() => {
         expect(
-          screen.getByText("Microsoft Entra OBO requires a scope, e.g. api://<app-id>/.default"),
+          screen.getByText("Microsoft Entra OBO 需要至少一个 scope，如 api://<app-id>/.default"),
         ).toBeInTheDocument();
       });
       expect(networking.createMCPServer).not.toHaveBeenCalled();
@@ -1301,7 +1301,7 @@ describe("CreateMCPServer", () => {
       const urlInput = screen.getByPlaceholderText("https://your-mcp-server.com");
       fireEvent.change(urlInput, { target: { value: "https://example.com/mcp" } });
 
-      await selectOption("认证方式", "None");
+      await selectOption("认证方式", "无认证");
 
       await act(async () => {
         fireEvent.click(screen.getByRole("button", { name: "Disable all tools" }));
@@ -1349,13 +1349,13 @@ describe("CreateMCPServer", () => {
 
       // Wait for OAuthFormFields to render (OAuth Flow Type selector is the sentinel)
       await waitFor(() => {
-        expect(screen.getByText("OAuth Flow Type")).toBeInTheDocument();
+        expect(screen.getByText("OAuth 流程类型")).toBeInTheDocument();
       });
 
       // OAuthFormFields defaults to INTERACTIVE, so the new fields should appear
       await waitFor(() => {
-        expect(screen.getByText("Token Validation Rules (optional)")).toBeInTheDocument();
-        expect(screen.getByText("Token Storage TTL (seconds, optional)")).toBeInTheDocument();
+        expect(screen.getByText("Token 校验规则（可选）")).toBeInTheDocument();
+        expect(screen.getByText("Token 存储 TTL（秒，可选）")).toBeInTheDocument();
       });
     }
 
@@ -1364,7 +1364,7 @@ describe("CreateMCPServer", () => {
       // Asserted in setupOAuthInteractive
     });
 
-    it("invalidates the held token when the auth mode changes after Authorize & Fetch", async () => {
+    it("invalidates the held token when the auth mode changes after 授权并获取", async () => {
       await setupOAuthInteractive();
       const urlInput = screen.getByPlaceholderText("https://your-mcp-server.com");
       await act(async () => {
@@ -1376,7 +1376,7 @@ describe("CreateMCPServer", () => {
       oauthHook.reset.mockClear();
 
       // Switching the Authentication mode changes the OAuth identity, so the held token is discarded.
-      await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
+      await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
 
       await waitFor(() => expect(oauthHook.reset).toHaveBeenCalled());
     });
@@ -1496,7 +1496,7 @@ describe("CreateMCPServer", () => {
       expect(payload.token_validation).toEqual({ organization: "my-org", "team.id": "42" });
     });
 
-    it("invalidates the DCR client and OAuth flow when the MCP URL changes after Authorize & Fetch", async () => {
+    it("invalidates the DCR client and OAuth flow when the MCP URL changes after 授权并获取", async () => {
       await setupOAuthInteractive();
 
       const nameInput = document.getElementById("server_name") as HTMLInputElement;
@@ -1543,15 +1543,15 @@ describe("CreateMCPServer", () => {
       expect(payload.credentials?.client_secret).toBeUndefined();
     });
 
-    it("invalidates the DCR client and OAuth flow when the OpenAPI spec URL changes after Authorize & Fetch", async () => {
+    it("invalidates the DCR client and OAuth flow when the OpenAPI spec URL changes after 授权并获取", async () => {
       render(<CreateMCPServer {...defaultProps} />);
-      await selectOption("传输类型", "OpenAPI Spec");
+      await selectOption("传输类型", "OpenAPI 规范");
       await waitFor(() => {
         expect(screen.getByPlaceholderText("https://petstore3.swagger.io/api/v3/openapi.json")).toBeInTheDocument();
       });
       await selectOption("认证方式", "OAuth");
       await waitFor(() => {
-        expect(screen.getByText("OAuth Flow Type")).toBeInTheDocument();
+        expect(screen.getByText("OAuth 流程类型")).toBeInTheDocument();
       });
 
       const nameInput = document.getElementById("server_name") as HTMLInputElement;
@@ -1599,15 +1599,15 @@ describe("CreateMCPServer", () => {
       expect(payload.credentials?.client_secret).toBeUndefined();
     });
 
-    it("invalidates the DCR client and OAuth flow when the transport changes after Authorize & Fetch", async () => {
+    it("invalidates the DCR client and OAuth flow when the transport changes after 授权并获取", async () => {
       render(<CreateMCPServer {...defaultProps} />);
-      await selectOption("传输类型", "OpenAPI Spec");
+      await selectOption("传输类型", "OpenAPI 规范");
       await waitFor(() => {
         expect(screen.getByPlaceholderText("https://petstore3.swagger.io/api/v3/openapi.json")).toBeInTheDocument();
       });
       await selectOption("认证方式", "OAuth");
       await waitFor(() => {
-        expect(screen.getByText("OAuth Flow Type")).toBeInTheDocument();
+        expect(screen.getByText("OAuth 流程类型")).toBeInTheDocument();
       });
 
       const nameInput = document.getElementById("server_name") as HTMLInputElement;
@@ -1688,7 +1688,7 @@ describe("CreateMCPServer", () => {
         fireEvent.change(urlInput, { target: { value: "https://example.com/mcp" } });
       });
 
-      await selectOption("Token Endpoint Auth Method (optional)", "Client Secret Basic");
+      await selectOption("Token Endpoint 认证方式（可选）", "Client Secret Basic");
 
       const submitButton = screen.getByRole("button", { name: "添加 MCP 服务器" });
       await act(async () => {
@@ -1707,7 +1707,7 @@ describe("CreateMCPServer", () => {
     // the sibling test above still proves the select reaches credentials.token_endpoint_auth_method.
 
     it("persists access + refresh token to the DB on submit for OBO mode", async () => {
-      // "Authorize & Fetch" produced a token before submit.
+      // "授权并获取" produced a token before submit.
       oauthHook.tokenResponse = {
         access_token: "obo-access-token",
         refresh_token: "obo-refresh-token",
@@ -1779,7 +1779,7 @@ describe("CreateMCPServer", () => {
       // Either the inline form validation message or the notification fires —
       // both indicate the submit was blocked.
       await waitFor(() => {
-        const inlineError = screen.queryByText("Must be valid JSON");
+        const inlineError = screen.queryByText("必须是有效的 JSON");
         const notCalled = !vi.mocked(networking.createMCPServer).mock.calls.length;
         expect(inlineError !== null || notCalled).toBe(true);
       });
@@ -1810,7 +1810,7 @@ describe("CreateMCPServer", () => {
       });
       await selectOption("认证方式", "OAuth");
       await waitFor(() => {
-        expect(screen.getByText("OAuth Flow Type")).toBeInTheDocument();
+        expect(screen.getByText("OAuth 流程类型")).toBeInTheDocument();
       });
 
       const urlInput = screen.getByPlaceholderText("https://your-mcp-server.com");
@@ -1818,7 +1818,7 @@ describe("CreateMCPServer", () => {
         fireEvent.change(urlInput, { target: { value: "https://server-a.example.com/mcp" } });
       });
 
-      // Simulate "Authorize & Fetch Token" completing for server A.
+      // Simulate "授权并获取 Token" completing for server A.
       await act(async () => {
         oauthHook.onTokenReceived?.({ access_token: "stale-token-A", expires_in: 3600 });
       });
@@ -1864,7 +1864,7 @@ describe("CreateMCPServer", () => {
       });
       await selectOption("认证方式", "OAuth");
       await waitFor(() => {
-        expect(screen.getByText("OAuth Flow Type")).toBeInTheDocument();
+        expect(screen.getByText("OAuth 流程类型")).toBeInTheDocument();
       });
 
       const urlInput = screen.getByPlaceholderText("https://your-mcp-server.com");
@@ -1895,7 +1895,7 @@ describe("CreateMCPServer", () => {
     });
 
     it("does not reset an in-flight OAuth resume when mounted with the modal closed (post-redirect restore)", () => {
-      // After the "Authorize & Fetch Token" redirect the page reloads and this
+      // After the "授权并获取 Token" redirect the page reloads and this
       // component mounts with isModalVisible=false while useMcpOAuthFlow is still
       // exchanging the authorization code. Calling reset() during that mount bumps
       // the hook's reset version and the fetched token is silently discarded, so
@@ -1915,7 +1915,7 @@ describe("CreateMCPServer", () => {
     it("should not show auth type or URL fields", async () => {
       render(<CreateMCPServer {...defaultProps} />);
 
-      await selectOption("传输类型", "Standard Input/Output");
+      await selectOption("传输类型", "标准输入/输出");
 
       // Auth and URL fields should not be present for stdio
       await waitFor(() => {
@@ -2015,7 +2015,7 @@ describe("CreateMCPServer oauth2_flow persistence", () => {
     await setupHttpServerForm();
     await selectOption("认证方式", "OAuth");
     await waitFor(() => {
-      expect(screen.getByText("OAuth Flow Type")).toBeInTheDocument();
+      expect(screen.getByText("OAuth 流程类型")).toBeInTheDocument();
     });
 
     const payload = await submitCreate();
@@ -2028,17 +2028,17 @@ describe("CreateMCPServer oauth2_flow persistence", () => {
     await setupHttpServerForm();
     await selectOption("认证方式", "OAuth");
     await waitFor(() => {
-      expect(screen.getByText("OAuth Flow Type")).toBeInTheDocument();
+      expect(screen.getByText("OAuth 流程类型")).toBeInTheDocument();
     });
-    await selectOption("OAuth Flow Type", "Machine-to-Machine (M2M)");
+    await selectOption("OAuth 流程类型", "Machine-to-Machine (M2M)");
     await waitFor(() => {
-      expect(screen.getByPlaceholderText("Enter OAuth client ID")).toBeInTheDocument();
+      expect(screen.getByPlaceholderText("输入 OAuth client ID")).toBeInTheDocument();
     });
     await act(async () => {
-      fireEvent.change(screen.getByPlaceholderText("Enter OAuth client ID"), { target: { value: "cid" } });
+      fireEvent.change(screen.getByPlaceholderText("输入 OAuth client ID"), { target: { value: "cid" } });
     });
     await act(async () => {
-      fireEvent.change(screen.getByPlaceholderText("Enter OAuth client secret"), { target: { value: "csecret" } });
+      fireEvent.change(screen.getByPlaceholderText("输入 OAuth client secret"), { target: { value: "csecret" } });
     });
     await act(async () => {
       fireEvent.change(screen.getByPlaceholderText("https://auth.example.com/oauth/token"), {
@@ -2104,7 +2104,7 @@ describe("CreateMCPServer dcr_bridge toggle", () => {
     return payload;
   }
 
-  it.each([["True Passthrough (no LiteLLM auth)"], ["OAuth Delegate (client-supplied upstream token)"]])(
+  it.each([["True Passthrough（无 LiteLLM 认证）"], ["OAuth Delegate（客户端自带上游令牌）"]])(
     "renders the toggle default-checked when %s is selected",
     async (optionLabel) => {
       await setupHttpServerForm();
@@ -2119,7 +2119,7 @@ describe("CreateMCPServer dcr_bridge toggle", () => {
     },
   );
 
-  it.each([["None"], ["API Key"], ["OAuth"]])("does not render the toggle for %s", async (optionLabel) => {
+  it.each([["无认证"], ["API Key"], ["OAuth"]])("does not render the toggle for %s", async (optionLabel) => {
     await setupHttpServerForm();
 
     await selectOption("认证方式", optionLabel);
@@ -2133,21 +2133,21 @@ describe("CreateMCPServer dcr_bridge toggle", () => {
   it("renders the toggle between the OAuth client fields and the Authorize button", async () => {
     await setupHttpServerForm();
 
-    await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
+    await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
 
     await waitFor(() => {
       expect(getDcrToggle()).toBeInTheDocument();
     });
     const toggle = getDcrToggle() as HTMLElement;
-    const secretInput = screen.getByPlaceholderText("Leave blank for public clients / PKCE");
-    const authorizeButton = screen.getByRole("button", { name: "Authorize & Fetch Tools (browser-only)" });
+    const secretInput = screen.getByPlaceholderText("留空适用于 public client / PKCE");
+    const authorizeButton = screen.getByRole("button", { name: "授权并获取工具（仅浏览器）" });
     expect(secretInput.compareDocumentPosition(toggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(toggle.compareDocumentPosition(authorizeButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it.each([
-    ["true_passthrough", "True Passthrough (no LiteLLM auth)"],
-    ["oauth_delegate", "OAuth Delegate (client-supplied upstream token)"],
+    ["true_passthrough", "True Passthrough（无 LiteLLM 认证）"],
+    ["oauth_delegate", "OAuth Delegate（客户端自带上游令牌）"],
   ])("sends dcr_bridge: true by default on create for %s", async (authType, optionLabel) => {
     vi.mocked(networking.createMCPServer).mockResolvedValue({ ...createdServer, auth_type: authType });
     await setupHttpServerForm();
@@ -2163,7 +2163,7 @@ describe("CreateMCPServer dcr_bridge toggle", () => {
   it("sends an explicit dcr_bridge: false when the toggle is unchecked", async () => {
     vi.mocked(networking.createMCPServer).mockResolvedValue({ ...createdServer, auth_type: "oauth_delegate" });
     await setupHttpServerForm();
-    await selectOption("认证方式", "OAuth Delegate (client-supplied upstream token)");
+    await selectOption("认证方式", "OAuth Delegate（客户端自带上游令牌）");
     await waitFor(() => {
       expect(getDcrToggle()).toBeInTheDocument();
     });
@@ -2184,7 +2184,7 @@ describe("CreateMCPServer dcr_bridge toggle", () => {
   it("forces dcr_bridge: false when the auth type is switched away after toggling", async () => {
     vi.mocked(networking.createMCPServer).mockResolvedValue({ ...createdServer, auth_type: "none" });
     await setupHttpServerForm();
-    await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
+    await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
     await waitFor(() => {
       expect(getDcrToggle()).toBeInTheDocument();
     });
@@ -2192,7 +2192,7 @@ describe("CreateMCPServer dcr_bridge toggle", () => {
       fireEvent.click(getDcrToggle()!);
     });
 
-    await selectOption("认证方式", "None");
+    await selectOption("认证方式", "无认证");
     await waitFor(() => {
       expect(getDcrToggle()).not.toBeInTheDocument();
     });
@@ -2204,7 +2204,7 @@ describe("CreateMCPServer dcr_bridge toggle", () => {
   it("preserves the toggle value when switching between the two client-forwarded modes", async () => {
     vi.mocked(networking.createMCPServer).mockResolvedValue({ ...createdServer, auth_type: "oauth_delegate" });
     await setupHttpServerForm();
-    await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
+    await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
     await waitFor(() => {
       expect(getDcrToggle()).toBeInTheDocument();
     });
@@ -2212,7 +2212,7 @@ describe("CreateMCPServer dcr_bridge toggle", () => {
 
     // The field is mounted in both client-forwarded modes, so switching between them keeps the
     // live toggle value rather than forcing it back to the default or to false.
-    await selectOption("认证方式", "OAuth Delegate (client-supplied upstream token)");
+    await selectOption("认证方式", "OAuth Delegate（客户端自带上游令牌）");
     await waitFor(() => {
       expect(getDcrToggle()).toBeInTheDocument();
     });

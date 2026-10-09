@@ -176,7 +176,7 @@ function SubmissionRulesPanel({ requiredFields, onChange, onSave, isSaving }: Su
                   className="inline-flex items-center gap-1 text-xs bg-info/10 text-info border border-info/20 px-2 py-0.5 rounded-full"
                 >
                   <CheckIcon className="h-3 w-3" />
-                  {f.label}
+                  {t(f.labelKey)}
                 </span>
               ))}
             </div>
@@ -195,9 +195,9 @@ function SubmissionRulesPanel({ requiredFields, onChange, onSave, isSaving }: Su
           <p className="text-xs text-muted-foreground mb-4">{t("submissionRulesDesc")}</p>
           <div className="grid grid-cols-2 gap-x-8 gap-y-5">
             {FIELD_GROUPS.map((group) => (
-              <div key={group.label}>
+              <div key={group.labelKey}>
                 <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                  {group.label}
+                  {t(group.labelKey)}
                 </div>
                 <div className="space-y-2">
                   {group.fields.map((field) => {
@@ -212,9 +212,9 @@ function SubmissionRulesPanel({ requiredFields, onChange, onSave, isSaving }: Su
                         />
                         <div>
                           <div className="text-sm font-medium text-foreground group-hover:text-info transition-colors">
-                            {field.label}
+                            {t(field.labelKey)}
                           </div>
-                          <div className="text-xs text-muted-foreground">{field.description}</div>
+                          <div className="text-xs text-muted-foreground">{t(field.descriptionKey)}</div>
                         </div>
                       </label>
                     );
@@ -263,8 +263,7 @@ function MCPServerCard({ server, onApprove, onReject, requiredFields }: MCPServe
 
   const checks = MCP_REQUIRED_FIELD_DEFS.filter((f) => requiredFields.includes(f.key)).map((f) => ({
     key: f.key,
-    label: f.label,
-    description: f.description,
+    labelKey: f.labelKey,
     passed: f.check(server),
   }));
   const passCount = checks.filter((c) => c.passed).length;
@@ -426,7 +425,9 @@ function MCPServerCard({ server, onApprove, onReject, requiredFields }: MCPServe
                     <XIcon className="h-3 w-3 text-destructive" />
                   )}
                 </div>
-                <span className={`text-sm flex-1 ${c.passed ? "text-foreground" : "text-foreground"}`}>{c.label}</span>
+                <span className={`text-sm flex-1 ${c.passed ? "text-foreground" : "text-foreground"}`}>
+                  {t(c.labelKey)}
+                </span>
                 <span className={`text-xs ${c.passed ? "text-success" : "text-destructive"}`}>
                   {c.passed ? t("checkPasses") : t("checkMissing")}
                 </span>

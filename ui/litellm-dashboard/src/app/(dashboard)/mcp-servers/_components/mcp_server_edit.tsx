@@ -104,6 +104,8 @@ const MCPServerEdit: React.FC<MCPServerEditProps> = ({
 }) => {
   const t = useTranslations("mcpServers");
   const tCommon = useTranslations("common");
+  const transportItems = TRANSPORT_ITEMS.map((item) => ({ ...item, label: t(item.labelKey) }));
+  const authTypeItems = AUTH_TYPE_ITEMS.map((item) => ({ ...item, label: t(item.labelKey) }));
   const initialStaticHeaders = React.useMemo(() => {
     if (!mcpServer.static_headers) {
       return [];
@@ -851,7 +853,7 @@ const MCPServerEdit: React.FC<MCPServerEditProps> = ({
                 >
                   {(control) => (
                     <Select
-                      items={TRANSPORT_ITEMS}
+                      items={transportItems}
                       value={(control.value as string | undefined) ?? null}
                       onValueChange={handleTransportSelected(control.onChange)}
                     >
@@ -859,7 +861,7 @@ const MCPServerEdit: React.FC<MCPServerEditProps> = ({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {TRANSPORT_ITEMS.map((item) => (
+                        {transportItems.map((item) => (
                           <SelectItem key={item.value} value={item.value}>
                             {item.label}
                           </SelectItem>
@@ -949,12 +951,12 @@ const MCPServerEdit: React.FC<MCPServerEditProps> = ({
                       rules={{ validate: { required: requiredRule(t("editRuleAuthRequired")) } }}
                     >
                       {(control) => (
-                        <Select {...selectControl<string>(control)} items={AUTH_TYPE_ITEMS}>
+                        <Select {...selectControl<string>(control)} items={authTypeItems}>
                           <SelectTrigger {...selectTriggerControl(control)} className="w-full">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {AUTH_TYPE_ITEMS.map((item) => (
+                            {authTypeItems.map((item) => (
                               <SelectItem key={item.value} value={item.value}>
                                 {item.label}
                               </SelectItem>

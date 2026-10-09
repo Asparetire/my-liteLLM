@@ -36,7 +36,7 @@ describe("OpenAPIQuickPicker", () => {
 
     expect(await screen.findByRole("button", { name: /Stripe/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /GitHub/ })).toBeInTheDocument();
-    expect(screen.getByText("Popular APIs")).toBeInTheDocument();
+    expect(screen.getByText("常用 API")).toBeInTheDocument();
   });
 
   it("passes the whole registry entry to onSelect when one is clicked", async () => {

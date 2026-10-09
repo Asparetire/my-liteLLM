@@ -4,63 +4,63 @@ import { MCPServer } from "@/components/mcp_tools/types";
 
 export interface RequiredFieldDef {
   key: string;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   check: (server: MCPServer) => boolean;
 }
 
 export interface FieldGroup {
-  label: string;
+  labelKey: string;
   fields: RequiredFieldDef[];
 }
 
 export const FIELD_GROUPS: FieldGroup[] = [
   {
-    label: "Documentation",
+    labelKey: "standardsGroupDocumentation",
     fields: [
       {
         key: "description",
-        label: "Description",
-        description: "Must have a non-empty description",
+        labelKey: "standardsFieldDescriptionLabel",
+        descriptionKey: "standardsFieldDescriptionDesc",
         check: (s) => !!s.description?.trim(),
       },
       {
         key: "alias",
-        label: "Alias",
-        description: "Must have a display alias",
+        labelKey: "standardsFieldAliasLabel",
+        descriptionKey: "standardsFieldAliasDesc",
         check: (s) => !!s.alias?.trim(),
       },
     ],
   },
   {
-    label: "Source",
+    labelKey: "standardsGroupSource",
     fields: [
       {
         key: "source_url",
-        label: "GitHub / Source URL",
-        description: "Must link to a source repository",
+        labelKey: "standardsFieldSourceUrlLabel",
+        descriptionKey: "standardsFieldSourceUrlDesc",
         check: (s) => !!s.source_url?.trim(),
       },
     ],
   },
   {
-    label: "Connection",
+    labelKey: "standardsGroupConnection",
     fields: [
       {
         key: "url",
-        label: "Server URL",
-        description: "Must have a URL configured",
+        labelKey: "standardsFieldUrlLabel",
+        descriptionKey: "standardsFieldUrlDesc",
         check: (s) => !!s.url?.trim(),
       },
     ],
   },
   {
-    label: "Security",
+    labelKey: "standardsGroupSecurity",
     fields: [
       {
         key: "auth_type",
-        label: "Auth configured",
-        description: "Must use authentication (not 'none')",
+        labelKey: "standardsFieldAuthLabel",
+        descriptionKey: "standardsFieldAuthDesc",
         check: (s) => !!s.auth_type && s.auth_type !== "none",
       },
     ],

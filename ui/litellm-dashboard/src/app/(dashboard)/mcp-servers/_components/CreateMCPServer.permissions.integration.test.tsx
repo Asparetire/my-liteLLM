@@ -80,7 +80,7 @@ const fillMinimalHttpServer = async (name: string) => {
   const user = userEvent.setup({ delay: null });
   await user.type(getServerNameInput(), name);
   await user.type(screen.getByPlaceholderText("https://your-mcp-server.com"), "https://example.com/mcp");
-  await selectOption("认证方式", "None");
+  await selectOption("认证方式", "无认证");
 };
 
 const submitAndReadPayload = async () => {

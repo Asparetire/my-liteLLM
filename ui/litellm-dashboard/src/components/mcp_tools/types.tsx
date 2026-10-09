@@ -47,17 +47,29 @@ export const AUTH_TYPE = {
 };
 
 export const AUTH_TYPE_ITEMS = [
-  { value: AUTH_TYPE.NONE, label: "None" },
-  { value: AUTH_TYPE.API_KEY, label: "API Key" },
-  { value: AUTH_TYPE.BEARER_TOKEN, label: "Bearer Token" },
-  { value: AUTH_TYPE.TOKEN, label: "Token" },
-  { value: AUTH_TYPE.BASIC, label: "Basic Auth" },
-  { value: AUTH_TYPE.OAUTH2, label: "OAuth" },
-  { value: AUTH_TYPE.OAUTH2_TOKEN_EXCHANGE, label: "OAuth Token Exchange (OBO)" },
-  { value: AUTH_TYPE.OAUTH2_ID_JAG, label: "ID-JAG (Okta Cross App Access)" },
-  { value: AUTH_TYPE.AWS_SIGV4, label: "AWS SigV4 (Bedrock AgentCore MCPs)" },
-  { value: AUTH_TYPE.TRUE_PASSTHROUGH, label: "True Passthrough (no LiteLLM auth)" },
-  { value: AUTH_TYPE.OAUTH_DELEGATE, label: "OAuth Delegate (client-supplied upstream token)" },
+  { value: AUTH_TYPE.NONE, label: "None", labelKey: "authTypeNone" },
+  { value: AUTH_TYPE.API_KEY, label: "API Key", labelKey: "authTypeApiKey" },
+  { value: AUTH_TYPE.BEARER_TOKEN, label: "Bearer Token", labelKey: "authTypeBearerToken" },
+  { value: AUTH_TYPE.TOKEN, label: "Token", labelKey: "authTypeToken" },
+  { value: AUTH_TYPE.BASIC, label: "Basic Auth", labelKey: "authTypeBasic" },
+  { value: AUTH_TYPE.OAUTH2, label: "OAuth", labelKey: "authTypeOAuth2" },
+  {
+    value: AUTH_TYPE.OAUTH2_TOKEN_EXCHANGE,
+    label: "OAuth Token Exchange (OBO)",
+    labelKey: "authTypeTokenExchange",
+  },
+  { value: AUTH_TYPE.OAUTH2_ID_JAG, label: "ID-JAG (Okta Cross App Access)", labelKey: "authTypeIdJag" },
+  { value: AUTH_TYPE.AWS_SIGV4, label: "AWS SigV4 (Bedrock AgentCore MCPs)", labelKey: "authTypeAwsSigv4" },
+  {
+    value: AUTH_TYPE.TRUE_PASSTHROUGH,
+    label: "True Passthrough (no LiteLLM auth)",
+    labelKey: "authTypeTruePassthrough",
+  },
+  {
+    value: AUTH_TYPE.OAUTH_DELEGATE,
+    label: "OAuth Delegate (client-supplied upstream token)",
+    labelKey: "authTypeOAuthDelegate",
+  },
 ];
 
 // The two client-forwarded token modes: the caller supplies the upstream Authorization (forwarded
@@ -265,10 +277,10 @@ export const TRANSPORT = {
 };
 
 export const TRANSPORT_ITEMS = [
-  { value: TRANSPORT.HTTP, label: "Streamable HTTP (Recommended)" },
-  { value: TRANSPORT.SSE, label: "Server-Sent Events (SSE)" },
-  { value: TRANSPORT.STDIO, label: "Standard Input/Output (stdio)" },
-  { value: TRANSPORT.OPENAPI, label: "OpenAPI Spec" },
+  { value: TRANSPORT.HTTP, label: "Streamable HTTP (Recommended)", labelKey: "transportHttp" },
+  { value: TRANSPORT.SSE, label: "Server-Sent Events (SSE)", labelKey: "transportSse" },
+  { value: TRANSPORT.STDIO, label: "Standard Input/Output (stdio)", labelKey: "transportStdio" },
+  { value: TRANSPORT.OPENAPI, label: "OpenAPI Spec", labelKey: "transportOpenapi" },
 ];
 
 export const handleTransport = (transport?: string | null, specPath?: string | null): string => {

@@ -43,7 +43,7 @@ describe("EnvVarsSection", () => {
       env_vars: [{ name: "DB_USER", value: "admin", scope: "user", description: "Your DB username" }],
     });
 
-    expect(screen.queryByPlaceholderText("e.g. postgresql")).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText("如 postgresql")).not.toBeInTheDocument();
     await userEvent.click(screen.getByText("Submit"));
 
     expect(onFinish).toHaveBeenCalledWith(
@@ -64,9 +64,9 @@ describe("EnvVarsSection", () => {
   it("carries a row added after mount into the submitted list, scoped global without the user picking one", async () => {
     const onFinish = renderSection({ env_vars: [] });
 
-    await userEvent.click(screen.getByText("Add Variable"));
-    await userEvent.type(screen.getByPlaceholderText("e.g. DB_PROTOCOL"), "DB_PROTOCOL");
-    await userEvent.type(screen.getByPlaceholderText("e.g. postgresql"), "postgresql");
+    await userEvent.click(screen.getByText("添加变量"));
+    await userEvent.type(screen.getByPlaceholderText("如 DB_PROTOCOL"), "DB_PROTOCOL");
+    await userEvent.type(screen.getByPlaceholderText("如 postgresql"), "postgresql");
     await userEvent.click(screen.getByText("Submit"));
 
     expect(onFinish).toHaveBeenCalledWith(
@@ -79,8 +79,8 @@ describe("EnvVarsSection", () => {
   it("rejects a variable name that starts with a digit", async () => {
     renderSection({ env_vars: [{ name: "", value: "", scope: "global", description: "" }] });
 
-    await userEvent.type(screen.getByPlaceholderText("e.g. DB_PROTOCOL"), "9LIVES");
+    await userEvent.type(screen.getByPlaceholderText("如 DB_PROTOCOL"), "9LIVES");
 
-    expect(await screen.findByText("Use letters, digits, underscores; cannot start with a digit.")).toBeInTheDocument();
+    expect(await screen.findByText("只能使用字母、数字、下划线，且不能以数字开头。")).toBeInTheDocument();
   });
 });

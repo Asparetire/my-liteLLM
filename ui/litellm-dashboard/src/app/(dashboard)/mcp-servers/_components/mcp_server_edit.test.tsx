@@ -341,7 +341,7 @@ describe("MCPServerEdit (true passthrough warning)", () => {
     renderWithAuthType("true_passthrough");
 
     await waitFor(() => {
-      expect(screen.getByText("True Passthrough disables LiteLLM authentication for this server")).toBeInTheDocument();
+      expect(screen.getByText("True Passthrough 将对该服务器禁用 LiteLLM 认证")).toBeInTheDocument();
     });
   });
 
@@ -352,7 +352,7 @@ describe("MCPServerEdit (true passthrough warning)", () => {
       expect(screen.getAllByRole("button", { name: "保存更改" }).length).toBeGreaterThan(0);
     });
     expect(
-      screen.queryByText("True Passthrough disables LiteLLM authentication for this server"),
+      screen.queryByText("True Passthrough 将对该服务器禁用 LiteLLM 认证"),
     ).not.toBeInTheDocument();
   });
 
@@ -370,7 +370,7 @@ describe("MCPServerEdit (true passthrough warning)", () => {
       />,
     );
 
-    await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
+    await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
 
     await waitFor(() => {
       expect(mockOauth.getTemporaryPayload).toBeTruthy();
@@ -389,7 +389,7 @@ describe("MCPServerEdit (OAuth authorize temp payload)", () => {
   it("forwards issuer/authorization_url/token_url/registration_url to the temp OAuth session payload", async () => {
     // Without these fields the ephemeral server the temp OAuth session endpoint builds has no
     // admin-configured OAuth endpoints on it, discovery falls back to (and fails against) the
-    // plain server url, and Authorize & Fetch Token 400s with "authorization url is not
+    // plain server url, and 授权并获取 Token 400s with "authorization url is not
     // configured" even though the saved server (and the visible form) has all four fields filled in.
     render(
       <MCPServerEdit
@@ -522,7 +522,7 @@ describe("MCPServerEdit OAuth token invalidation", () => {
     });
     mockOauth.reset.mockClear();
 
-    await selectOption("传输类型", "Standard Input/Output (stdio)");
+    await selectOption("传输类型", "标准输入/输出（stdio）");
 
     await waitFor(() => expect(mockOauth.reset).toHaveBeenCalled());
     expect(mockRemoveToken).toHaveBeenCalledWith("oauth_server_1", undefined);
@@ -813,8 +813,8 @@ describe("MCPServerEdit (interactive OAuth)", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Token Validation Rules (optional)")).toBeInTheDocument();
-      expect(screen.getByText("Token Storage TTL (seconds, optional)")).toBeInTheDocument();
+      expect(screen.getByText("Token 校验规则（可选）")).toBeInTheDocument();
+      expect(screen.getByText("Token 存储 TTL（秒，可选）")).toBeInTheDocument();
     });
   });
 
@@ -861,7 +861,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
 
     // Wait for the form to mount and the token_validation_json field to appear
     await waitFor(() => {
-      expect(screen.getByText("Token Validation Rules (optional)")).toBeInTheDocument();
+      expect(screen.getByText("Token 校验规则（可选）")).toBeInTheDocument();
     });
 
     const textarea = document.getElementById("token_validation_json") as HTMLTextAreaElement;
@@ -896,10 +896,10 @@ describe("MCPServerEdit (interactive OAuth)", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Token Endpoint Auth Method (optional)")).toBeInTheDocument();
+      expect(screen.getByText("Token Endpoint 认证方式（可选）")).toBeInTheDocument();
     });
 
-    await selectOption("Token Endpoint Auth Method (optional)", "Client Secret Basic");
+    await selectOption("Token Endpoint 认证方式（可选）", "Client Secret Basic");
 
     const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
@@ -928,7 +928,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Token Endpoint Auth Method (optional)")).toBeInTheDocument();
+      expect(screen.getByText("Token Endpoint 认证方式（可选）")).toBeInTheDocument();
     });
 
     const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
@@ -958,7 +958,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Token Validation Rules (optional)")).toBeInTheDocument();
+      expect(screen.getByText("Token 校验规则（可选）")).toBeInTheDocument();
     });
 
     // Leave token_validation_json empty
@@ -1028,7 +1028,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Token Validation Rules (optional)")).toBeInTheDocument();
+      expect(screen.getByText("Token 校验规则（可选）")).toBeInTheDocument();
     });
 
     const textarea = document.getElementById("token_validation_json") as HTMLTextAreaElement;
@@ -1044,7 +1044,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
     // The field's inline validator intercepts invalid JSON before handleSave runs,
     // so the inline error message appears and updateMCPServer is never called.
     await waitFor(() => {
-      expect(screen.getByText("Must be valid JSON")).toBeInTheDocument();
+      expect(screen.getByText("必须是有效的 JSON")).toBeInTheDocument();
     });
     expect(networking.updateMCPServer).not.toHaveBeenCalled();
   });
@@ -1066,7 +1066,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Token Storage TTL (seconds, optional)")).toBeInTheDocument();
+      expect(screen.getByText("Token 存储 TTL（秒，可选）")).toBeInTheDocument();
     });
 
     const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
@@ -1084,7 +1084,7 @@ describe("MCPServerEdit (interactive OAuth)", () => {
 });
 
 describe("MCPServerEdit (resource indicator)", () => {
-  const RESOURCE_PLACEHOLDER = "auto, or https://mcp.example.com/mcp";
+  const RESOURCE_PLACEHOLDER = "auto 或 https://mcp.example.com/mcp";
   const serverWithResource = {
     ...interactiveOAuthServer,
     credentials: { upstream_resource: "api://finance-api/.default" },
@@ -1251,7 +1251,7 @@ describe("MCPServerEdit (tool list fetch)", () => {
       );
     });
     expect(networking.listMCPTools).not.toHaveBeenCalled();
-    expect(screen.getByRole("button", { name: "Authorize & Fetch Tools (browser-only)" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "授权并获取工具（仅浏览器）" })).toBeInTheDocument();
   });
 
   it("uses the staged OAuth token to load passthrough tools after authorize", async () => {
@@ -1489,11 +1489,11 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
 
       const user = userEvent.setup({ delay: null });
       await user.type(
-        screen.getByPlaceholderText("Leave blank to keep the currently saved app (if any)"),
+        screen.getByPlaceholderText("留空保持已保存的应用（如有）"),
         "org-app-client-id",
       );
       await user.type(
-        screen.getByPlaceholderText("Leave blank to keep the currently saved secret (if any)"),
+        screen.getByPlaceholderText("留空保持已保存的 secret（如有）"),
         "org-app-secret",
       );
 
@@ -1536,11 +1536,11 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
 
       const user = userEvent.setup({ delay: null });
       await user.type(
-        screen.getByPlaceholderText("Leave blank to keep the currently saved app (if any)"),
+        screen.getByPlaceholderText("留空保持已保存的应用（如有）"),
         "org-app-client-id",
       );
       await user.type(
-        screen.getByPlaceholderText("Leave blank to keep the currently saved secret (if any)"),
+        screen.getByPlaceholderText("留空保持已保存的 secret（如有）"),
         "org-app-secret",
       );
 
@@ -1591,11 +1591,11 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
 
     // Blank fields keep the stored app (the backend merges partial credential updates), so the
     // edit form states that convention and removal is an explicit checkbox that saves nulls.
-    expect(screen.getByPlaceholderText("Leave blank to keep the currently saved app (if any)")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("留空保持已保存的应用（如有）")).toBeInTheDocument();
 
     fireEvent.click(
       screen.getByRole("checkbox", {
-        name: /Remove the saved OAuth app on save/,
+        name: /保存时移除已保存的 OAuth 应用/,
       }),
     );
 
@@ -1625,7 +1625,7 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
     );
 
     // No warning until the upstream changes.
-    expect(screen.queryByText(/registered for the previous upstream/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/可能已失效/)).not.toBeInTheDocument();
 
     await act(async () => {
       fireEvent.change(screen.getByPlaceholderText("https://your-mcp-server.com"), {
@@ -1634,7 +1634,7 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
     });
 
     // Keep + warn parity with the create form: the stored app is kept, and the banner appears.
-    expect(screen.getByText(/registered for the previous upstream/)).toBeInTheDocument();
+    expect(screen.getByText(/可能已失效/)).toBeInTheDocument();
   });
 
   it("preserves a stored client_id on OAuth-resume restore even when the saved snapshot is token-only", async () => {
@@ -1664,7 +1664,7 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
       />,
     );
 
-    const clientIdField = await screen.findByPlaceholderText("Leave blank to keep the currently saved app (if any)");
+    const clientIdField = await screen.findByPlaceholderText("留空保持已保存的应用（如有）");
     await waitFor(() => expect((clientIdField as HTMLInputElement).value).toBe("stored-client"));
     // The leftover minted token must not have rehydrated anywhere.
     expect(document.body.innerHTML).not.toContain("leftover-token");
@@ -1688,8 +1688,8 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
     );
 
     // Check "remove saved app" on server A.
-    fireEvent.click(screen.getByRole("checkbox", { name: /Remove the saved OAuth app on save/ }));
-    expect(screen.getByRole("checkbox", { name: /Remove the saved OAuth app on save/ })).toBeChecked();
+    fireEvent.click(screen.getByRole("checkbox", { name: /保存时移除已保存的 OAuth 应用/ }));
+    expect(screen.getByRole("checkbox", { name: /保存时移除已保存的 OAuth 应用/ })).toBeChecked();
 
     // Switch the panel to server B without unmounting.
     rerender(
@@ -1704,7 +1704,7 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
     );
 
     // The checkbox must have reset, so saving server B does not send the explicit-null delete write.
-    expect(screen.getByRole("checkbox", { name: /Remove the saved OAuth app on save/ })).not.toBeChecked();
+    expect(screen.getByRole("checkbox", { name: /保存时移除已保存的 OAuth 应用/ })).not.toBeChecked();
 
     await act(async () => {
       fireEvent.click(screen.getAllByRole("button", { name: "保存更改" })[0]);
@@ -1733,9 +1733,9 @@ describe("MCPServerEdit (OAuth token persistence on save)", () => {
       />,
     );
 
-    await selectOption("认证方式", "OAuth Delegate (client-supplied upstream token)");
+    await selectOption("认证方式", "OAuth Delegate（客户端自带上游令牌）");
     mockOauth.tokenResponse = { access_token: "fresh-tok", token_type: "bearer" };
-    await selectOption("认证方式", "True Passthrough (no LiteLLM auth)");
+    await selectOption("认证方式", "True Passthrough（无 LiteLLM 认证）");
 
     await waitFor(() => {
       const withHeaders = vi
@@ -1876,7 +1876,7 @@ describe("MCPServerEdit oauth2_flow selector", () => {
       />,
     );
 
-    await selectOption("OAuth Flow Type", "Machine-to-Machine (M2M)");
+    await selectOption("OAuth 流程类型", "Machine-to-Machine (M2M)");
 
     const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
@@ -1908,7 +1908,7 @@ describe("MCPServerEdit oauth2_flow selector", () => {
       />,
     );
 
-    await selectOption("OAuth Flow Type", "Interactive (PKCE)");
+    await selectOption("OAuth 流程类型", "Interactive (PKCE)");
 
     const saveButtons = screen.getAllByRole("button", { name: "保存更改" });
     await act(async () => {
@@ -1945,7 +1945,7 @@ describe("MCPServerEdit OAuth flow prefill display", () => {
     renderEdit({ oauth2_flow: null, token_url: "https://idp.example.com/oauth/token" });
 
     // The select renders its placeholder (undefined value), not a guessed option.
-    expect(screen.getByText("Select OAuth flow")).toBeInTheDocument();
+    expect(screen.getByText("选择 OAuth 流程")).toBeInTheDocument();
     // Neither flow is preselected as the current value.
     expect(screen.queryByText("Machine-to-Machine (M2M)")).not.toBeInTheDocument();
     expect(screen.queryByText("Interactive (PKCE)")).not.toBeInTheDocument();
@@ -1955,14 +1955,14 @@ describe("MCPServerEdit OAuth flow prefill display", () => {
     renderEdit({ oauth2_flow: "client_credentials" });
 
     expect(screen.getByText("Machine-to-Machine (M2M)")).toBeInTheDocument();
-    expect(screen.queryByText("Select OAuth flow")).not.toBeInTheDocument();
+    expect(screen.queryByText("选择 OAuth 流程")).not.toBeInTheDocument();
   });
 
   it("prefills Interactive (PKCE) for a stored authorization_code server", () => {
     renderEdit({ oauth2_flow: "authorization_code" });
 
     expect(screen.getByText("Interactive (PKCE)")).toBeInTheDocument();
-    expect(screen.queryByText("Select OAuth flow")).not.toBeInTheDocument();
+    expect(screen.queryByText("选择 OAuth 流程")).not.toBeInTheDocument();
   });
 
   it("warns when a server has no OAuth flow set", () => {
@@ -2006,7 +2006,7 @@ describe("MCPServerEdit OAuth flow prefill display", () => {
 
     expect(screen.getByText("该服务器尚未设置 OAuth 流程")).toBeInTheDocument();
 
-    await selectOption("OAuth Flow Type", "Machine-to-Machine (M2M)");
+    await selectOption("OAuth 流程类型", "Machine-to-Machine (M2M)");
 
     await waitFor(() => {
       expect(screen.queryByText("该服务器尚未设置 OAuth 流程")).not.toBeInTheDocument();
@@ -2152,8 +2152,8 @@ describe("MCPServerEdit (dcr_bridge toggle)", () => {
       expect(getDcrToggle()).toBeInTheDocument();
     });
     const toggle = getDcrToggle() as HTMLElement;
-    const secretInput = screen.getByPlaceholderText("Leave blank to keep the currently saved secret (if any)");
-    const authorizeButton = screen.getByRole("button", { name: "Authorize & Fetch Tools (browser-only)" });
+    const secretInput = screen.getByPlaceholderText("留空保持已保存的 secret（如有）");
+    const authorizeButton = screen.getByRole("button", { name: "授权并获取工具（仅浏览器）" });
     expect(secretInput.compareDocumentPosition(toggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(toggle.compareDocumentPosition(authorizeButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
@@ -2248,7 +2248,7 @@ describe("MCPServerEdit (dcr_bridge toggle)", () => {
 
     // The field stays mounted across the two client-forwarded modes, so the live toggle value is
     // preserved rather than forced false by the switch.
-    await selectOption("认证方式", "OAuth Delegate (client-supplied upstream token)");
+    await selectOption("认证方式", "OAuth Delegate（客户端自带上游令牌）");
     await waitFor(() => {
       expect(getDcrToggle()).toBeInTheDocument();
     });
